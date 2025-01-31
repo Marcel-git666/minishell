@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/01/31 13:53:48 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/01/31 14:26:48 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,5 @@
 # include <limits.h>
 
 long	ft_atoi(const char *str);
-int		ft_printf(const char *format, ...);
 
 #endif
