@@ -6,7 +6,7 @@
 #    By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/03 16:05:35 by mmravec           #+#    #+#              #
-#    Updated: 2025/01/31 13:56:52 by mmravec          ###   ########.fr        #
+#    Updated: 2025/01/31 14:10:40 by mmravec          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ CFLAGS = -Wall -Werror -Wextra -g
 # -pthread -fsanitize=thread
 
 # Source files
-SRCS = main.c utils.c ft_printf.c ft_printf_utils.c
+SRCS = main.c utils.c
 
 OBJS = $(SRCS:.c=.o)
 
