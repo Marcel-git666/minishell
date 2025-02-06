@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_lstlast.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/06 20:04:42 by mmravec          ###   ########.fr       */
+/*   Created: 2024/09/12 12:22:32 by mmravec           #+#    #+#             */
+/*   Updated: 2024/09/16 11:34:11 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-int	main(void)
+t_list	*ft_lstlast(t_list *lst)
 {
-	printf("Welcome to mini shell!\n");
-	printf("$");
-	return (0);
+	while (lst && lst->next)
+		lst = lst->next;
+	return (lst);
 }

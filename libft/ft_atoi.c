@@ -1,20 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/06 20:04:42 by mmravec          ###   ########.fr       */
+/*   Created: 2024/09/09 21:04:39 by mmravec           #+#    #+#             */
+/*   Updated: 2024/09/17 15:27:48 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-int	main(void)
+int	ft_atoi(const char *str)
 {
-	printf("Welcome to mini shell!\n");
-	printf("$");
-	return (0);
+	int	result;
+	int	positive;
+
+	positive = 1;
+	result = 0;
+	while ((*str >= 9 && *str <= 13) || *str == 32)
+	{
+		str++;
+	}
+	if (*str == '+' || *str == '-')
+	{
+		if (*str == '-')
+			positive = positive * (-1);
+		str++;
+	}
+	while (*str >= '0' && *str <= '9')
+	{
+		result = result * 10 + (*str - '0');
+		str++;
+	}
+	return (result * positive);
 }

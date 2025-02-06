@@ -1,20 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_memchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/06 20:04:42 by mmravec          ###   ########.fr       */
+/*   Created: 2024/09/09 14:57:31 by mmravec           #+#    #+#             */
+/*   Updated: 2024/09/16 13:11:31 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-int	main(void)
+void	*ft_memchr(const void *s, int c, size_t n)
 {
-	printf("Welcome to mini shell!\n");
-	printf("$");
-	return (0);
+	size_t			i;
+	unsigned char	*cs;
+
+	i = 0;
+	cs = (unsigned char *)s;
+	while (i < n)
+	{
+		if (cs[i] == (unsigned char)c)
+			return (cs + i);
+		i++;
+	}
+	return (NULL);
 }

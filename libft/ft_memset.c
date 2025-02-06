@@ -1,20 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_memset.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/06 20:04:42 by mmravec          ###   ########.fr       */
+/*   Created: 2024/09/06 18:25:52 by mmravec           #+#    #+#             */
+/*   Updated: 2024/09/16 13:11:31 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-int	main(void)
+void	*ft_memset(void *b, int c, size_t len)
 {
-	printf("Welcome to mini shell!\n");
-	printf("$");
-	return (0);
+	unsigned char	*origin;
+	size_t			i;
+
+	i = 0;
+	origin = (unsigned char *)b;
+	while (i < len)
+	{
+		origin[i] = c;
+		i++;
+	}
+	return (b);
 }
