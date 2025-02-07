@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/07 17:47:08 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/07 19:23:22 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ void	free_tokens(t_token *head);
 t_token	*lexer(const char *input);
 
 // utils.c
+int		ft_isspace(int c);
 char	*ft_strndup(const char *s, size_t n);
 
 #endif
