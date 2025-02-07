@@ -6,7 +6,7 @@
 #    By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/03 16:05:35 by mmravec           #+#    #+#              #
-#    Updated: 2025/02/06 20:04:01 by mmravec          ###   ########.fr        #
+#    Updated: 2025/02/07 18:53:35 by mmravec          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ CFLAGS = -Wall -Werror -Wextra -g
 # -pthread -fsanitize=thread
 
 # Source files
-SRCS = main.c utils.c
+SRCS = main.c utils.c token.c token_extraction.c lexer.c
 
 OBJS = $(SRCS:.c=.o)
 
@@ -24,9 +24,14 @@ OBJS = $(SRCS:.c=.o)
 LIBFT_DIR = libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-# Rule to build the final server executable
+# Readline flags
+READLINE_DIR = /usr/local/opt/readline
+READLINE_FLAGS = -lreadline -lncurses
+READLINE_INCLUDE = -I$(READLINE_DIR)/include
+
+# Rule to build the final minishell executable
 $(NAME): $(LIBFT) $(OBJS)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -L$(LIBFT_DIR) -lft
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -L$(LIBFT_DIR) -lft $(READLINE_FLAGS)
 
 # Rule to build libft by calling its Makefile
 $(LIBFT):
@@ -34,7 +39,7 @@ $(LIBFT):
 
 # Rule to compile .c files into .o files
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(READLINE_INCLUDE) -c $< -o $@
 
 # Default target to build everything (both server and client)
 all: $(NAME)
