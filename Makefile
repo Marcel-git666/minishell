@@ -6,7 +6,7 @@
 #    By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/03 16:05:35 by mmravec           #+#    #+#              #
-#    Updated: 2025/02/07 18:53:35 by mmravec          ###   ########.fr        #
+#    Updated: 2025/02/07 20:04:33 by mmravec          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,8 @@ CFLAGS = -Wall -Werror -Wextra -g
 # -pthread -fsanitize=thread
 
 # Source files
-SRCS = main.c utils.c token.c token_extraction.c lexer.c
+SRCS = main.c utils.c token.c token_extraction.c lexer.c \
+	builtins.c execution.c
 
 OBJS = $(SRCS:.c=.o)
 

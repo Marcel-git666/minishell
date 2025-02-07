@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/07 19:23:22 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/07 20:04:25 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,12 @@
 # include <readline/history.h>
 # include "token.h"
 # include "libft/libft.h"
+
+// builtins.c
+void	builtin_exit(void);
+
+// execution.c
+void	execute_command(t_token *tokens);
 
 // token_extraction.c
 int		is_special_char(char c);

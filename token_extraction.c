@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/07 17:38:24 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/07 19:47:18 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,13 @@ char	*extract_word(const char *input, size_t *index)
 	char	*word;
 
 	start = *index;
-	while (input[*index] && !isspace(input[*index])
-		&& !is_special_char(input[*index]))
+	while (input[*index] && !ft_isspace(input[*index])
+		&& (!is_special_char(input[*index]) || input[*index] == '-'
+		|| (*index > start && input[*index - 1] == '-')
+		|| (*index == start && (input[*index] == '/' || input[*index] == '~')))) // Allow paths
+	{
 		(*index)++;
+	}
 	word = ft_strndup(input + start, *index - start);
 	return (word);
 }
