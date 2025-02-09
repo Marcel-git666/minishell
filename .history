@@ -1,0 +1,27 @@
+ls -la
+pwd
+exit
+ls -la
+exit
+ls -la
+pwd
+exit
+ls -la
+ls -la
+ls -la
+ls -la
+ls -la
+ls -la
+ls -la
+pwd
+pwd
+pwd
+pwd
+exit
+ls -la
+ls -la | cat -e
+ls -la > /path/to/file
+exit
+ls -la
+ls -la > file.ttf
+sort < input.txt > output.txt

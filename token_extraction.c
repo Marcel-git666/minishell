@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/07 20:11:10 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/09 14:03:02 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ t_token	*extract_operator(const char *input, size_t *index)
 		else
 		{
 			(*index)++;
-			return create_token(TOKEN_REDIR_OUT, ">");
+			return (create_token(TOKEN_REDIR_OUT, ">"));
 		}
 	}
 	else if (input[*index] == '<')

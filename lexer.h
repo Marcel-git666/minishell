@@ -1,31 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncmp.c                                       :+:      :+:    :+:   */
+/*   lexer.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/06 17:16:45 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/09 12:34:37 by mmravec          ###   ########.fr       */
+/*   Created: 2025/02/09 14:14:51 by mmravec           #+#    #+#             */
+/*   Updated: 2025/02/09 21:22:43 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#ifndef LEXER_H
+# define LEXER_H
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
+typedef struct s_lexer
 {
-	unsigned int	i;
+	t_token		*tokens;
+	const char	*input;
+	size_t		i;
+	int			is_file_expected;
+}	t_lexer;
 
-	i = 0;
-	if (n < 1)
-		return (0);
-	while (s1[i] != '\0' && s2[i] != 0 && i < n)
-	{
-		if (s1[i] != s2[i])
-			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
-		i++;
-	}
-	if ((i == n) || (s1[i] == s2[i]))
-		return (0);
-	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
-}
+#endif
