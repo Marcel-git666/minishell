@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/09 14:17:15 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/10 22:32:38 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,5 +72,6 @@ void	run_shell_loop(void);
 // utils.c
 int		ft_isspace(int c);
 char	*ft_strndup(const char *s, size_t n);
+void	error_message(const char *error);
 
 #endif

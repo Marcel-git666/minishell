@@ -63,15 +63,33 @@ ls -la > output.txt
 cat << STOP
 sort < sort_order > sorted.txt
 echo hello >> test.txt
-
 cat <<< "input"
-
 ls -l | grep "file" | sort
 ls | sort > sorted.txt
-
 echo $HOME
-
 echo "$USER is logged in"
-
 echo > file1 > file2
-
+ls "jwfhwei fjoreo'
+cat <<? "input"
+exit
+cat <<? "input"
+cat <<< "input"
+exit
+cat <<< "input"
+ls "jwfhwei fjoreo'
+echo > file1 > file2
+exit
+echo > file1 > file2
+ls "jwfhwei fjoreo'
+cat <<< "input"
+exit
+cat <<< "input"
+ls "jwfhwei fjoreo'
+echo > file1 > file2
+exit
+make re
+echo > file1 > file2
+ls "jwfhwei fjoreo'
+cat <<< "input"
+cat <<? "input"
+cat >?> "input"
