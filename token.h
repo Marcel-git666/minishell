@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 14:26:56 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/07 16:22:43 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/10 17:51:45 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ typedef enum e_token_type
 	TOKEN_ENV_VAR,		// Environment variable ($HOME)
 	TOKEN_EXIT_CODE,	// Special variable ($?)
 	TOKEN_FILE,			// File name for redirection
+	TOKEN_DELIMITER, // Assign a unique token type
 	TOKEN_EOF			// End of input (NULL)
 }	t_token_type;
 

@@ -10,9 +10,6 @@ ls -la
 ls -la
 ls -la
 ls -la
-ls -la
-ls -la
-ls -la
 pwd
 pwd
 pwd
@@ -25,3 +22,56 @@ exit
 ls -la
 ls -la > file.ttf
 sort < input.txt > output.txt
+exit
+ls -la >> file.txt
+sort << sort.txt >> sorted.txt
+ls -la > file
+ls -l > output.txt
+sort < sort.txt > sorted.txt
+sort << sort.txt >> sorted.txt
+cat << EOF
+exit
+ls -la > file.txt
+exit
+make
+exit
+ls -la > output.txt
+ls -la >> output.txt
+cat << STOP
+ls -la > output.txt
+cat << STOP
+sort < sort_order > sorted.txt
+exit
+sort < sort_order > sorted.txt
+cat << STOP
+ls -la > output.txt
+exit
+sort < sort_order > sorted.txt
+cat << STOP
+ls -la > output.txt
+exit
+ls -la > output.txt
+cat << STOP
+sort < sort_order > sorted.txt
+cat << STOP
+ls -la > output.txt
+exit
+echo hello > test.txt
+exit
+echo hello > test.txt
+ls -la > output.txt
+cat << STOP
+sort < sort_order > sorted.txt
+echo hello >> test.txt
+
+cat <<< "input"
+
+ls -l | grep "file" | sort
+ls | sort > sorted.txt
+
+echo $HOME
+
+echo "$USER is logged in"
+
+echo > file1 > file2
+
