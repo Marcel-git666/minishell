@@ -93,3 +93,27 @@ ls "jwfhwei fjoreo'
 cat <<< "input"
 cat <<? "input"
 cat >?> "input"
+make
+exit
+cat >?> "input"
+cat >> "input"
+cat >>> "input"
+cat >>>? "input"
+exit
+cat >>>? "input"
+cat >> "input"
+pwd
+echo > file1 > file2
+ls | sort > sorted.txt
+ls || sort > sorted.txt
+ls |6 sort > sorted.txt
+exit
+ls |6 sort > sorted.txt
+ls || sort > sorted.txt
+| make
+make |
+exit
+ls || sort > sorted.txt
+ls |6 sort > sorted.txt
+make |
+exit

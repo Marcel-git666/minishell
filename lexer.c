@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/10 23:07:29 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/11 16:49:54 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,13 +47,17 @@ void	add_token_from_input(t_lexer *lexer, int *is_first_word)
 
 int	process_redirections(t_lexer *lexer, int *is_first_word)
 {
+	if ((lexer->input[lexer->i] == '>' || lexer->input[lexer->i] == '<')
+		&& lexer->input[lexer->i + 1] == lexer->input[lexer->i] // << or >>
+		&& lexer->input[lexer->i + 2] != '\0' // Check if more characters exist
+		&& !ft_isspace(lexer->input[lexer->i + 2]) // Must be followed by space or valid word
+		&& !ft_isalnum(lexer->input[lexer->i + 2])) // Must not be another special character
+	{
+		error_message("syntax error near unexpected token");
+		return (-1);
+	}
 	if (lexer->input[lexer->i] == '<' && lexer->input[lexer->i + 1] == '<')
 	{
-		if (lexer->input[lexer->i + 2] != '\0')
-		{
-			error_message("syntax error near unexpected token");
-			return (-1);
-		}
 		lexer->i += 2;
 		add_token(&(lexer->tokens), create_token(TOKEN_HEREDOC, "<<"));
 		lexer->is_delimiter_expected = 1;
@@ -77,6 +81,8 @@ int	process_redirections(t_lexer *lexer, int *is_first_word)
 		add_token(&(lexer->tokens), create_token(TOKEN_REDIR_IN, "<"));
 		lexer->is_file_expected = 1;
 	}
+	else
+		return (-1);
 	if (!lexer->is_delimiter_expected)
 		*is_first_word = 0;
 	return (0);
@@ -104,8 +110,24 @@ static int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 		if (process_redirections(lexer, is_first_word) == -1)
 			return (-1);
 	}
+	else if (lexer->input[lexer->i] == '|' && lexer->input[lexer->i + 1] == '|')
+	{
+		error_message("syntax error near unexpected token `||`");
+		return (-1);
+	}
 	else if (lexer->input[lexer->i] == '|')
 	{
+		if (lexer->i == 0 || lexer->input[lexer->i + 1] == '\0')
+		{
+			error_message("syntax error: `|` cannot start or end a command");
+			return (-1);
+		}
+		if (!ft_isalpha(lexer->input[lexer->i + 1])
+			&& lexer->input[lexer->i + 1] != '_')
+		{
+			error_message("syntax error: `|` must be followed by a valid command");
+			return (-1);
+		}
 		op = extract_operator(lexer->input, &(lexer->i));
 		if (op)
 		{
