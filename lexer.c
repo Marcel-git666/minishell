@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/11 16:55:02 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/11 20:04:38 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,15 @@ void	add_token_from_input(t_lexer *lexer, int *is_first_word)
 	char	*word;
 
 	word = extract_word(lexer->input, &(lexer->i));
-	if (lexer->is_file_expected) // ✅ Convert to FILE if needed
-	{
-		add_token(&lexer->tokens, create_token(TOKEN_FILE, word));
-		lexer->is_file_expected = 0; // Reset flag
-	}
-	else if (lexer->is_delimiter_expected)
+	if (lexer->is_delimiter_expected)
 	{
 		add_token(&lexer->tokens, create_token(TOKEN_DELIMITER, word));
-		lexer->is_delimiter_expected = 0; // Reset flag
-		*is_first_word = 1;
+		lexer->is_delimiter_expected = 0;
+	}
+	else if (lexer->is_file_expected)
+	{
+		add_token(&lexer->tokens, create_token(TOKEN_FILE, word));
+		lexer->is_file_expected = 0;
 	}
 	else if (*is_first_word)
 	{
@@ -60,10 +59,16 @@ int	process_redirections(t_lexer *lexer, int *is_first_word)
 	{
 		lexer->i += 2;
 		add_token(&(lexer->tokens), create_token(TOKEN_HEREDOC, "<<"));
+		skip_whitespace(lexer->input, &(lexer->i));
+		if (!ft_isalnum(lexer->input[lexer->i]))
+		{
+			error_message("syntax error: expected delimiter after <<");
+			return (-1);
+		}
 		lexer->is_delimiter_expected = 1;
 		*is_first_word = 1;
 	}
-	if (lexer->input[lexer->i] == '>' && lexer->input[lexer->i + 1] == '>')
+	else if (lexer->input[lexer->i] == '>' && lexer->input[lexer->i + 1] == '>')
 	{
 		lexer->i += 2;
 		add_token(&(lexer->tokens), create_token(TOKEN_APPEND_OUT, ">>"));
