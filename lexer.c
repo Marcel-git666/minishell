@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/11 16:49:54 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/11 16:55:02 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ static int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 			return (-1);
 		}
 		if (!ft_isalpha(lexer->input[lexer->i + 1])
-			&& lexer->input[lexer->i + 1] != '_')
+			&& lexer->input[lexer->i + 1] == '\0')
 		{
 			error_message("syntax error: `|` must be followed by a valid command");
 			return (-1);
