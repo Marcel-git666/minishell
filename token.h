@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 14:26:56 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/10 17:51:45 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/12 10:45:10 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,14 @@ typedef enum e_token_type
 	TOKEN_EXIT_CODE,	// Special variable ($?)
 	TOKEN_FILE,			// File name for redirection
 	TOKEN_DELIMITER, // Assign a unique token type
-	TOKEN_EOF			// End of input (NULL)
+	TOKEN_EOF,			// End of input (NULL)
 }	t_token_type;
 
-typedef struct	s_token
+typedef struct s_token
 {
-	t_token_type	type;	// Type of token (e.g., TOKEN_CMD, TOKEN_PIPE)
-	char			*value;	// The actual token value (e.g., "ls", "-l", "|")
-	struct s_token	*next;	// Pointer to the next token (linked list)
-}	t_token;
+	t_token_type	type; // Type of token (e.g., TOKEN_CMD, TOKEN_PIPE)
+	char			*value; // The actual token value (e.g., "ls", "-l", "|")
+	struct s_token	*next; // Pointer to the next token (linked list)
+}		t_token;
 
-# endif
+#endif
