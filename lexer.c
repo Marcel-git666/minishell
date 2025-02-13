@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/11 20:04:38 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/13 14:16:44 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,7 @@ static int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 	{
 		quoted = extract_quoted_string(lexer->input, &(lexer->i));
 		if (!quoted)
-		{
-			error_message("syntax error: missing closing quote");
 			return (-1);
-		}
 		add_token(&(lexer->tokens), create_token(TOKEN_STRING, quoted));
 		free(quoted);
 	}
