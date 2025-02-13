@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/10 22:32:38 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/13 19:05:27 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,17 +52,20 @@ t_token	*lexer(const char *input);
 // main.c
 void	print_tokens(t_token *tokens);
 
-// token_extraction.c
-int		is_special_char(char c);
-char	*extract_word(const char *input, size_t *index);
-char	*extract_quoted_string(const char *input, size_t *index);
-t_token	*extract_operator(const char *input, size_t *index);
-char	*extract_env_var(const char *input, size_t *index);
-
 // token.c
 t_token	*create_token(t_token_type type, char *value);
 void	add_token(t_token **head, t_token *new_token);
 void	free_tokens(t_token *head);
+
+// token_extraction.c
+int		is_special_char(char c);
+char	*extract_word(const char *input, size_t *index);
+t_token	*extract_operator(const char *input, size_t *index);
+char	*extract_env_var(const char *input, size_t *index);
+
+// token_string_extraction.c
+char	*extract_single_quoted_string(t_lexer *lexer);
+char	*extract_double_quoted_string(t_lexer *lexer);
 
 // shell_loop.c
 void	initialize_shell(void);

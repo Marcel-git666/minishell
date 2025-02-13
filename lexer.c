@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/13 14:16:44 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/13 19:08:51 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,13 +99,19 @@ static int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 	char	*env;
 	char	*quoted;
 
-	if (lexer->input[lexer->i] == '\'' || lexer->input[lexer->i] == '"')
+	if (lexer->input[lexer->i] == '\'' || lexer->input[lexer->i] == '\"')
 	{
-		quoted = extract_quoted_string(lexer->input, &(lexer->i));
+		if (lexer->input[lexer->i] == '\'')
+			quoted = extract_single_quoted_string(lexer);
+		else
+			quoted = extract_double_quoted_string(lexer);
 		if (!quoted)
 			return (-1);
-		add_token(&(lexer->tokens), create_token(TOKEN_STRING, quoted));
-		free(quoted);
+		if (ft_strlen(quoted) > 0)
+		{
+			add_token(&(lexer->tokens), create_token(TOKEN_STRING, quoted));
+			free(quoted);
+		}
 	}
 	else if (lexer->input[lexer->i] == '>' || lexer->input[lexer->i] == '<')
 	{

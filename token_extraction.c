@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/10 22:54:58 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/13 17:41:39 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,27 +30,6 @@ char	*extract_word(const char *input, size_t *index)
 		return (NULL);
 	word = ft_strndup(input + start, *index - start);
 	return (word);
-}
-
-char	*extract_quoted_string(const char *input, size_t *index)
-{
-	char	quote;
-	char	*str;
-	size_t	start;
-
-	quote = input[(*index)++];
-	start = *index;
-	while (input[*index] && input[*index] != quote)
-		(*index)++;
-	if (input[*index] == '\0')  // ❌ No closing quote found
-	{
-		error_message("syntax error: missing closing quote");
-		return (NULL);
-	}
-	str = ft_strndup(input + start, *index - start);
-	if (input[*index] == quote)
-		(*index)++;
-	return (str);
 }
 
 t_token	*extract_operator(const char *input, size_t *index)
