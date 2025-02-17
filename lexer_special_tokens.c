@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 10:39:02 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 11:51:45 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,27 @@
 
 static int	handle_pipe_token(t_lexer *lexer, int *is_first_word)
 {
-	if (lexer->i == 0 || lexer->input[lexer->i + 1] == '\0')
-		return (error_message("syntax error: `|` cannot"
-				" start or end a command"), -1);
-	if (!ft_isalpha(lexer->input[lexer->i + 1])
-		&& lexer->input[lexer->i + 1] == '\0')
-		return (error_message("syntax error: `|` must be followed "
-				"by a valid command"), -1);
-	add_token(&(lexer->tokens), create_token(TOKEN_PIPE, "|"));
+	int	j;
+	int	k;
+
+	if (*is_first_word)
+		return (error_message("syntax error: `|` cannot start a command"), -1);
+	j = lexer->i - 1;
+	while (j >= 0 && ft_isspace(lexer->input[j]))
+		j--;
+	k = lexer->i + 1;
+	while (lexer->input[k] && ft_isspace(lexer->input[k]))
+		k++;
+	if (lexer->input[k] == '|')
+		return (error_message("syntax error: consecutive pipes are not allowed"),
+			-1);
 	lexer->i++;
+	while (lexer->input[lexer->i] && ft_isspace(lexer->input[lexer->i]))
+		lexer->i++;
+	if (j < 0 || !lexer->input[lexer->i])
+		return (error_message("syntax error: `|` cannot start or end a command"),
+			-1);
+	add_token(&(lexer->tokens), create_token(TOKEN_PIPE, "|"));
 	*is_first_word = 1;
 	return (0);
 }
