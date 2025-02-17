@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 17:22:21 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 19:55:58 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@
 # include <fcntl.h>
 # include "lexer.h"
 # define HISTORY_FILE ".history"
+
+// global variable
+extern int	g_signal_received;
 
 // builtins.c
 void	builtin_exit(void);
