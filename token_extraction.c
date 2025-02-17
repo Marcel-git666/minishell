@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/13 17:41:39 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/13 19:50:57 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,31 +39,16 @@ t_token	*extract_operator(const char *input, size_t *index)
 		(*index)++;
 		return (create_token(TOKEN_PIPE, "|"));
 	}
-	else if (input[*index] == '>')
+	if (input[*index] == '>' || input[*index] == '<')
 	{
 		if (input[*index + 1] == '>')
-		{
-			(*index) += 2;
-			return (create_token(TOKEN_APPEND_OUT, ">>"));
-		}
+			return ((*index) += 2, create_token(TOKEN_APPEND_OUT, ">>"));
+		else if (input[*index] == '>')
+			return ((*index)++, create_token(TOKEN_REDIR_OUT, ">"));
+		else if (input[*index + 1] == '<')
+			return ((*index) += 2, create_token(TOKEN_HEREDOC, "<<"));
 		else
-		{
-			(*index)++;
-			return (create_token(TOKEN_REDIR_OUT, ">"));
-		}
-	}
-	else if (input[*index] == '<')
-	{
-		if (input[*index + 1] == '<')
-		{
-			(*index) += 2;
-			return (create_token(TOKEN_HEREDOC, "<<"));
-		}
-		else
-		{
-			(*index)++;
-			return (create_token(TOKEN_REDIR_IN, "<"));
-		}
+			return ((*index)++, create_token(TOKEN_REDIR_IN, "<"));
 	}
 	return (NULL);
 }
