@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/13 20:07:26 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 10:35:04 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,10 @@ void	save_history(void);
 void	skip_whitespace(const char *input, size_t *i);
 t_token	*lexer(const char *input);
 
+// lexer_process_redirections.c
+int		process_redirections(t_lexer *lexer);
+
 // lexer_special_tokens.c
-int		process_redirections(t_lexer *lexer, int *is_first_word);
 int		handle_special_tokens(t_lexer *lexer, int *is_first_word);
 
 // main.c

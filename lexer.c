@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/13 20:00:02 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 11:15:06 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ t_token	*lexer(const char *input)
 		if (lexer.input[lexer.i] == '\0')
 			break ;
 		if (ft_isalnum(lexer.input[lexer.i]) || lexer.input[lexer.i] == '-'
-			|| lexer.input[lexer.i] == '/'
+			|| lexer.input[lexer.i] == '/' || lexer.is_delimiter_expected
 			|| lexer.input[lexer.i] == '.' || lexer.input[lexer.i] == '~')
 			add_token_from_input(&lexer, &is_first_word);
 		else if (handle_special_tokens(&lexer, &is_first_word) == -1)
