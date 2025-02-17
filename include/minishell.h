@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 16:18:44 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 17:22:21 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,5 +83,6 @@ void	run_shell_loop(void);
 int		ft_isspace(int c);
 char	*ft_strndup(const char *s, size_t n);
 void	error_message(const char *error);
+int		check_next_token(t_lexer *lexer, size_t next_pos);
 
 #endif

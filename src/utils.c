@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 15:25:28 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 16:19:00 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 17:22:06 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,4 +41,15 @@ char	*ft_strndup(const char *s, size_t n)
 	}
 	copy[i] = '\0';
 	return (copy);
+}
+
+int	check_next_token(t_lexer *lexer, size_t next_pos)
+{
+	while (lexer->input[next_pos] && ft_isspace(lexer->input[next_pos]))
+		next_pos++;
+	if (!lexer->input[next_pos] || lexer->input[next_pos] == '>'
+		|| lexer->input[next_pos] == '<' || lexer->input[next_pos] == '|')
+		return (error_message("syntax error: redirection requires a filename"),
+			-1);
+	return (0);
 }

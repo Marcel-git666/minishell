@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 10:21:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 11:39:39 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 19:14:01 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,27 @@ static void	add_redirection_token(t_lexer *lexer, char *token_str,
 	lexer->i += ft_strlen(token_str);
 }
 
+static int	handle_single_redirection(t_lexer *lexer, char *token,
+		int token_type)
+{
+	size_t	next_pos;
+
+	next_pos = lexer->i + 1;
+	if (check_next_token(lexer, next_pos) == -1)
+		return (-1);
+	return (add_redirection_token(lexer, token, token_type, 1), 0);
+}
+
 static int	handle_append_out(t_lexer *lexer)
 {
-	if (!ft_isspace(lexer->input[lexer->i + 2])
-		&& lexer->input[lexer->i + 2] != '\0')
+	size_t	next_pos;
+
+	if (lexer->input[lexer->i + 2] == '>')
 		return (error_message("syntax error: invalid redirection operator"),
 			-1);
+	next_pos = lexer->i + 2;
+	if (check_next_token(lexer, next_pos) == -1)
+		return (-1);
 	add_redirection_token(lexer, ">>", TOKEN_APPEND_OUT, 1);
 	return (0);
 }
@@ -50,10 +65,10 @@ int	process_redirections(t_lexer *lexer)
 	if (lexer->input[lexer->i] == '>' && lexer->input[lexer->i + 1] == '>')
 		return (handle_append_out(lexer));
 	else if (lexer->input[lexer->i] == '>')
-		return (add_redirection_token(lexer, ">", TOKEN_REDIR_OUT, 1), 0);
+		return (handle_single_redirection(lexer, ">", TOKEN_REDIR_OUT));
 	else if (lexer->input[lexer->i] == '<' && lexer->input[lexer->i + 1] == '<')
 		return (handle_heredoc(lexer));
 	else if (lexer->input[lexer->i] == '<')
-		return (add_redirection_token(lexer, "<", TOKEN_REDIR_IN, 1), 0);
+		return (handle_single_redirection(lexer, "<", TOKEN_REDIR_IN));
 	return (-1);
 }

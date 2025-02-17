@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 11:54:29 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 19:16:10 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static int	handle_quote_token(t_lexer *lexer)
 		add_token(&(lexer->tokens), create_token(TOKEN_STRING, quoted));
 		free(quoted);
 	}
-	return (1);
+	return (0);
 }
 
 int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
@@ -63,7 +63,7 @@ int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 	char	*env;
 
 	if (lexer->input[lexer->i] == '\'' || lexer->input[lexer->i] == '\"')
-		handle_quote_token(lexer);
+		return (handle_quote_token(lexer));
 	else if (lexer->input[lexer->i] == '>' || lexer->input[lexer->i] == '<')
 		return (process_redirections(lexer));
 	else if (lexer->input[lexer->i] == '|')
