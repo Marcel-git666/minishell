@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 10:35:04 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 16:18:44 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "token.h"
-# include "libft/libft.h"
+# include "libft.h"
 # include <fcntl.h>
 # include "lexer.h"
 # define HISTORY_FILE ".history"

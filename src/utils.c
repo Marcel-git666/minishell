@@ -6,12 +6,11 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 15:25:28 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/10 22:38:34 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/17 16:19:00 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "libft/libft.h"
 
 int	ft_isspace(int c)
 {
