@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 19:55:58 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/18 15:19:27 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,9 @@ int		handle_special_tokens(t_lexer *lexer, int *is_first_word);
 
 // main.c
 void	print_tokens(t_token *tokens);
+
+// signals.c
+void	setup_signals(void);
 
 // token.c
 t_token	*create_token(t_token_type type, char *value);

@@ -6,7 +6,7 @@
 #    By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/03 16:05:35 by mmravec           #+#    #+#              #
-#    Updated: 2025/02/17 16:16:25 by mmravec          ###   ########.fr        #
+#    Updated: 2025/02/18 15:19:45 by mmravec          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ LIBFT_DIR = libft
 # Source files
 SRCS = main.c utils.c token.c token_extraction.c lexer.c history.c \
 	builtins.c execution.c ft_strtok.c file_manipulation.c shell_loop.c \
-	token_string_extraction.c lexer_special_tokens.c \
+	token_string_extraction.c lexer_special_tokens.c signals.c\
 	lexer_process_redirections.c
 
 # Add src/ prefix to source files
