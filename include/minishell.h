@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/18 15:19:27 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/18 22:15:33 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,8 @@ void	free_tokens(t_token *head);
 
 // token_extraction.c
 int		is_special_char(char c);
-char	*extract_word(const char *input, size_t *index);
+char	*extract_word(const char *input, size_t *index,
+			int is_delimiter_expected);
 t_token	*extract_operator(const char *input, size_t *index);
 char	*extract_env_var(const char *input, size_t *index);
 

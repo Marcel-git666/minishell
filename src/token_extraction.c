@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 19:25:03 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/18 22:14:45 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int	is_special_char(char c)
 		|| c == '\'' || c == '"');
 }
 
-char	*extract_word(const char *input, size_t *index)
+char	*extract_word(const char *input, size_t *index, int is_delimiter_expected)
 {
 	size_t	start;
 	char	*word;
@@ -26,7 +26,7 @@ char	*extract_word(const char *input, size_t *index)
 	start = *index;
 	while (input[*index] && !ft_isspace(input[*index]))
 	{
-		if (*index > start && is_special_char(input[*index]))
+		if (!is_delimiter_expected && *index > start && is_special_char(input[*index]))
 			break ;
 		(*index)++;
 	}

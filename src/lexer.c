@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 19:25:37 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/18 22:16:23 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ void	add_token_from_input(t_lexer *lexer, int *is_first_word)
 {
 	char	*word;
 
-	word = extract_word(lexer->input, &(lexer->i));
+	word = extract_word(lexer->input, &(lexer->i),
+			lexer->is_delimiter_expected);
 	if (lexer->is_delimiter_expected)
 	{
 		add_token(&lexer->tokens, create_token(TOKEN_DELIMITER, word));
@@ -60,7 +61,7 @@ t_token	*lexer(const char *input)
 		skip_whitespace(lexer.input, &(lexer.i));
 		if (lexer.input[lexer.i] == '\0')
 			break ;
-		if (is_special_char(lexer.input[lexer.i]))
+		if (is_special_char(lexer.input[lexer.i]) && !lexer.is_delimiter_expected)
 		{
 			if (handle_special_tokens(&lexer, &is_first_word) == -1)
 				return (NULL);
