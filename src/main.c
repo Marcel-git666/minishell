@@ -6,20 +6,21 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/10 18:24:32 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/19 17:52:25 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "test.h"
 
 void	print_tokens(t_token *tokens)
 {
-	const char *token_labels[] = {
-			"TOKEN_CMD", "TOKEN_ARG", "TOKEN_PIPE", "TOKEN_REDIR_IN",
-			"TOKEN_REDIR_OUT", "TOKEN_APPEND_OUT", "TOKEN_HEREDOC",
-			"TOKEN_STRING", "TOKEN_ENV_VAR", "TOKEN_EXIT_CODE",
-			"TOKEN_FILE", "TOKEN_DELIMITER", "TOKEN_EOF"
-		};
+	const char	*token_labels[] =
+	{
+		"TOKEN_CMD", "TOKEN_ARG", "TOKEN_PIPE", "TOKEN_REDIR_IN",
+		"TOKEN_REDIR_OUT", "TOKEN_APPEND_OUT", "TOKEN_HEREDOC",
+		"TOKEN_STRING", "TOKEN_ENV_VAR", "TOKEN_EXIT_CODE",
+		"TOKEN_FILE", "TOKEN_DELIMITER", "TOKEN_ASSIGNMENT", "TOKEN_EOF"
+	};
 
 	while (tokens)
 	{
@@ -28,8 +29,13 @@ void	print_tokens(t_token *tokens)
 	}
 }
 
-int	main(void)
+int	main(int argc, char **argv)
 {
+	if (argc > 1 && ft_strncmp(argv[1], "--test", 7) == 0)
+	{
+		run_test_suite();
+		return (0);
+	}
 	initialize_shell();
 	run_shell_loop();
 	save_history();

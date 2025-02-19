@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/18 22:14:45 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/19 17:37:08 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,16 @@ char	*extract_word(const char *input, size_t *index, int is_delimiter_expected)
 {
 	size_t	start;
 	char	*word;
+	int		found_equals;
 
 	start = *index;
+	found_equals = 0;
 	while (input[*index] && !ft_isspace(input[*index]))
 	{
-		if (!is_delimiter_expected && *index > start && is_special_char(input[*index]))
+		if (input[*index] == '=' && !found_equals)
+			found_equals = 1;
+		if (!is_delimiter_expected && !found_equals && *index > start
+				&& is_special_char(input[*index]) && input[*index] != '$')
 			break ;
 		(*index)++;
 	}
@@ -62,6 +67,11 @@ char	*extract_env_var(const char *input, size_t *index)
 	size_t	start;
 
 	start = ++(*index);
+	if (input[*index] == '?')
+	{
+		(*index)++;	// Skip the ?
+		return (ft_strdup("?"));
+	}
 	while (ft_isalnum(input[*index]) || input[*index] == '_')
 		(*index)++;
 	return (ft_strndup(input + start, *index - start));

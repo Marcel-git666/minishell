@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 19:16:10 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/19 17:32:19 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,10 @@ int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 	else if (lexer->input[lexer->i] == '$')
 	{
 		env = extract_env_var(lexer->input, &(lexer->i));
-		add_token(&(lexer->tokens), create_token(TOKEN_ENV_VAR, env));
+		if (ft_strncmp(env, "?", 2) == 0)
+			add_token(&(lexer->tokens), create_token(TOKEN_EXIT_CODE, "?"));
+		else
+			add_token(&(lexer->tokens), create_token(TOKEN_ENV_VAR, env));
 		free(env);
 	}
 	else

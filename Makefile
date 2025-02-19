@@ -6,7 +6,7 @@
 #    By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/03 16:05:35 by mmravec           #+#    #+#              #
-#    Updated: 2025/02/18 15:19:45 by mmravec          ###   ########.fr        #
+#    Updated: 2025/02/19 17:52:17 by mmravec          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ LIBFT_DIR = libft
 # Source files
 SRCS = main.c utils.c token.c token_extraction.c lexer.c history.c \
 	builtins.c execution.c ft_strtok.c file_manipulation.c shell_loop.c \
-	token_string_extraction.c lexer_special_tokens.c signals.c\
+	token_string_extraction.c lexer_special_tokens.c signals.c test.c \
 	lexer_process_redirections.c
 
 # Add src/ prefix to source files
@@ -35,8 +35,18 @@ OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 # Libft library
 LIBFT = $(LIBFT_DIR)/libft.a
 
+# Detect architecture and set paths accordingly
+UNAME_M := $(shell uname -m)
+
+ifeq ($(UNAME_M),arm64)
+	# M1/M2 Mac
+	READLINE_DIR = /opt/homebrew/opt/readline
+else
+	# Intel Mac
+	READLINE_DIR = /usr/local/opt/readline
+endif
+
 # Readline flags
-READLINE_DIR = /usr/local/opt/readline
 READLINE_FLAGS =  -L$(READLINE_DIR)/lib -lreadline -lncurses
 READLINE_INCLUDE = -I$(READLINE_DIR)/include
 
