@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 17:49:01 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/19 18:03:20 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/02/20 22:10:12 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,62 +32,71 @@ void	assert_token(t_token *token, t_token_type expected_type,
 		token->value);
 }
 
+void	assert_token_sequence(t_token *tokens, t_expected_token *expected,
+		int count)
+{
+	int		i;
+	t_token	*current;
+
+	current = tokens;
+	i = 0;
+	printf("\nChecking token sequence:\n");
+	while (i < count && current)
+	{
+		assert_token(current, expected[i].type, expected[i].value);
+		current = current->next;
+		i++;
+	}
+	if (i < count)
+		printf("%sFAIL%s: Expected %d tokens but got only %d\n",
+			RED, RESET, count, i);
+	if (current)
+		printf("%sFAIL%s: More tokens present than expected\n", RED, RESET);
+}
+
 void	test_basic_cmd(void)
 {
 	t_token	*tokens;
+	t_expected_token expected[] = {
+		{TOKEN_CMD, "ls"},
+		{TOKEN_ARG, "-la"}
+	};
 
 	printf("\nTesting basic commands:\n");
 	tokens = lexer("ls -la");
-	assert_token(tokens, TOKEN_CMD, "ls");
-	assert_token(tokens->next, TOKEN_ARG, "-la");
+	assert_token_sequence(tokens, expected, 2);
 	free_tokens(tokens);
 }
 
 void	test_complex_cmd(void)
 {
 	t_token	*tokens;
+	t_expected_token expected[] = {
+		{TOKEN_CMD, "ls"},
+		{TOKEN_ARG, "-la"},
+		{TOKEN_PIPE, "|"},
+		{TOKEN_CMD, "cat"},
+		{TOKEN_ARG, "-e"},
+		{TOKEN_REDIR_OUT, ">"},
+		{TOKEN_FILE, "output.txt"}
+	};
 
 	printf("\nTesting: ls -la  |cat -e > output.txt\n");
 	tokens = lexer("ls -la  |cat -e > output.txt");
-	assert_token(tokens, TOKEN_CMD, "ls");
-	assert_token(tokens->next, TOKEN_ARG, "-la");
-	tokens = tokens->next;
-	assert_token(tokens->next, TOKEN_PIPE, "|");
-	tokens = tokens->next;
-	assert_token(tokens->next, TOKEN_CMD, "cat");
-	tokens = tokens->next;
-	assert_token(tokens->next, TOKEN_ARG, "-e");
-	tokens = tokens->next;
-	assert_token(tokens->next, TOKEN_REDIR_OUT, ">");
-	tokens = tokens->next;
-	assert_token(tokens->next, TOKEN_FILE, "output.txt");
+	assert_token_sequence(tokens, expected, 7);
 	free_tokens(tokens);
 }
 
-void	test_lexer(void)
-{
-	t_token	*tokens;
-
-	test_basic_cmd();
-	test_complex_cmd();
-	printf("\nTesting variable assignments:\n");
-	tokens = lexer("VAR=value");
-	assert_token(tokens, TOKEN_ASSIGNMENT, "VAR=value");
-	free_tokens(tokens);
-
-	tokens = lexer("VAR = value");
-	if (!tokens)
-		printf("%sPASS%s: Invalid assignment correctly returns NULL\n", GREEN, RESET);
-	else
-	{
-		printf("%sFAIL%s: Invalid assignment should return NULL\n", RED, RESET);
-		free_tokens(tokens);
-	}
-}
 
 void	run_test_suite(void)
 {
 	printf("\n=== Running Test Suite ===\n");
-	test_lexer();
+	test_basic_cmd();
+	test_complex_cmd();
+	test_pipe_sequences();
+	test_env_variables();
+	test_heredoc_variations();
+	test_mixed_quotes();
+	test_mixed_redirections();
 	printf("\n=== Test Suite Complete ===\n");
 }
