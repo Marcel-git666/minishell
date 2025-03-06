@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 17:40:18 by mmravec           #+#    #+#             */
-/*   Updated: 2025/03/06 18:01:23 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/03/06 18:46:29 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,21 @@ static void	extract_text_before_env_var(t_lexer *lexer, size_t *start)
 	*start = lexer->i;
 }
 
+static void process_env_var(t_lexer *lexer, size_t *start)
+{
+	char *env_name;
+
+	extract_text_before_env_var(lexer, start);
+	env_name = extract_env_var(lexer->input, &(lexer->i));
+	add_token(&(lexer->tokens), create_token(TOKEN_ENV_VAR, env_name));
+	free(env_name);
+	*start = lexer->i;
+}
+
 char	*extract_double_quoted_string(t_lexer *lexer)
 {
 	char	quote;
 	size_t	start;
-	char	*env_name;
 	char	*empty_str;
 
 	quote = lexer->input[(lexer->i)++];
@@ -57,11 +67,7 @@ char	*extract_double_quoted_string(t_lexer *lexer)
 	{
 		if (lexer->input[lexer->i] == '$') // Found env variable inside quotes
 		{
-			extract_text_before_env_var(lexer, &start);
-			env_name = extract_env_var(lexer->input, &(lexer->i));
-			add_token(&(lexer->tokens), create_token(TOKEN_ENV_VAR, env_name));
-			free(env_name);
-			start = lexer->i;
+			process_env_var(lexer, &start);
 			continue ;
 		}
 		(lexer->i)++;
