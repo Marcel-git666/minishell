@@ -14,7 +14,7 @@ Minishell is a simplified version of a shell (command-line interpreter) that imp
 ## Team Members
 
 - Marcel - Lexer, parser, memory management
-- Partner - Command execution, built-ins, environment handling
+- Katka - Command execution, built-ins, environment handling
 
 ## Current Status
 
@@ -64,7 +64,7 @@ There is a 5-byte "still reachable" memory block from a static variable `last_ex
    - [ ] Set up signal handlers
    - [ ] Implement behavior for Ctrl+C, Ctrl+D, Ctrl+\
 
-### Partner's Tasks
+### Katka's Tasks
 1. **Command Execution**
    - [ ] Implement path resolution
    - [ ] Handle command execution (execve)
