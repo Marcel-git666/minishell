@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/19 17:32:19 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/03/06 18:08:57 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,8 @@ static int	handle_quote_token(t_lexer *lexer)
 	if (!quoted)
 		return (-1);
 	if (ft_strlen(quoted) > 0)
-	{
 		add_token(&(lexer->tokens), create_token(TOKEN_STRING, quoted));
-		free(quoted);
-	}
+	free(quoted);
 	return (0);
 }
 

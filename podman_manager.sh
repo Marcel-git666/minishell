@@ -26,12 +26,18 @@ show_usage() {
   echo "  cleanup    - Full cleanup (stop machine, prune, remove cached images)"
   echo "  diskusage  - Show disk usage of Podman machine"
   echo "  recreate   - Remove and recreate Podman machine with smaller size"
+  echo "  remove     - Properly remove Podman machine completely"
   echo "  help       - Show this help message"
 }
 
 # Function to start Podman machine
 start_machine() {
   echo -e "${BLUE}Starting Podman machine...${NC}"
+  # Check if machine exists first
+  if ! podman machine list | grep -q "podman-machine-default"; then
+    echo -e "${YELLOW}Podman machine doesn't exist. Creating it now...${NC}"
+    podman machine init
+  fi
   podman machine start
   echo -e "${GREEN}Podman machine started successfully.${NC}"
 }
@@ -39,7 +45,7 @@ start_machine() {
 # Function to stop Podman machine
 stop_machine() {
   echo -e "${BLUE}Stopping Podman machine...${NC}"
-  podman machine stop
+  podman machine stop || echo -e "${YELLOW}Machine may not be running.${NC}"
   echo -e "${GREEN}Podman machine stopped.${NC}"
 }
 
@@ -91,21 +97,46 @@ full_cleanup() {
   # Prune resources
   prune_resources
 
-  # Remove cache
-  echo -e "${BLUE}Removing cached image data...${NC}"
-  rm -rf ~/.local/share/containers/storage/overlay-containers
-  rm -rf ~/.local/share/containers/storage/overlay-images
-
   echo -e "${GREEN}Full cleanup completed.${NC}"
+}
+
+# Function to properly remove the Podman machine
+remove_machine() {
+  echo -e "${YELLOW}WARNING: This will delete your Podman machine completely!${NC}"
+  echo -e "All containers and images will be lost."
+  read -p "Are you sure you want to continue? (y/n): " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # Stop machine if running
+    if podman machine list | grep -q "Currently running"; then
+      stop_machine
+    fi
+
+    # Remove the machine properly
+    echo -e "${BLUE}Removing Podman machine...${NC}"
+    podman machine rm podman-machine-default --force
+
+    echo -e "${GREEN}Podman machine removed.${NC}"
+  else
+    echo -e "${YELLOW}Operation cancelled.${NC}"
+  fi
 }
 
 # Function to show disk usage
 show_disk_usage() {
   echo -e "${BLUE}Podman machine disk usage:${NC}"
-  du -sh ~/.local/share/containers/podman/machine/
+  if [ -d ~/.local/share/containers/podman/machine/ ]; then
+    du -sh ~/.local/share/containers/podman/machine/
+  else
+    echo -e "${YELLOW}Podman machine directory not found.${NC}"
+  fi
 
   echo -e "${BLUE}Podman storage breakdown:${NC}"
-  du -sh ~/.local/share/containers/storage/*
+  if [ -d ~/.local/share/containers/storage/ ]; then
+    du -sh ~/.local/share/containers/storage/*
+  else
+    echo -e "${YELLOW}Podman storage directory not found.${NC}"
+  fi
 }
 
 # Function to recreate the machine with smaller size
@@ -116,12 +147,13 @@ recreate_machine() {
   echo
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     # Stop and remove current machine
-    if podman machine list | grep -q "Currently running"; then
-      stop_machine
+    if podman machine list | grep -q "podman-machine-default"; then
+      if podman machine list | grep -q "Currently running"; then
+        stop_machine
+      fi
+      echo -e "${BLUE}Removing Podman machine...${NC}"
+      podman machine rm podman-machine-default --force
     fi
-
-    echo -e "${BLUE}Removing Podman machine...${NC}"
-    podman machine rm podman-machine-default -f
 
     # Create new machine with smaller size
     echo -e "${BLUE}Creating new Podman machine with smaller disk size...${NC}"
@@ -161,6 +193,9 @@ case "$1" in
     ;;
   recreate)
     recreate_machine
+    ;;
+  remove)
+    remove_machine
     ;;
   help|--help|-h)
     show_usage

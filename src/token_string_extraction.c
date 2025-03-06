@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 17:40:18 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/13 19:34:30 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/03/06 18:01:23 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,16 @@ char	*extract_single_quoted_string(t_lexer *lexer)
 
 static void	extract_text_before_env_var(t_lexer *lexer, size_t *start)
 {
+	char	*substr;
+	t_token	*token;
+
 	if (lexer->i > *start)
-		add_token(&(lexer->tokens), create_token(TOKEN_STRING,
-				ft_substr(lexer->input, *start, lexer->i - *start)));
+	{
+		substr = ft_substr(lexer->input, *start, lexer->i - *start);
+		token = create_token(TOKEN_STRING, substr);
+		add_token(&(lexer->tokens), token);
+		free(substr);
+	}
 	*start = lexer->i;
 }
 
@@ -42,6 +49,7 @@ char	*extract_double_quoted_string(t_lexer *lexer)
 	char	quote;
 	size_t	start;
 	char	*env_name;
+	char	*empty_str;
 
 	quote = lexer->input[(lexer->i)++];
 	start = lexer->i;
@@ -62,5 +70,6 @@ char	*extract_double_quoted_string(t_lexer *lexer)
 		return (error_message("syntax error: missing closing quote"), NULL);
 	extract_text_before_env_var(lexer, &start);
 	(lexer->i)++;
-	return (ft_strdup(""));
+	empty_str = ft_strdup("");
+	return (empty_str);
 }
