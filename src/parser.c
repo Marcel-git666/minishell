@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/06 09:46:13 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/06 16:13:51 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,7 @@ t_ast_node	*parse_tokens(t_token *tokens)
 	ast_node = NULL;
 
 	init_parser(tokens, &parser);
-	if (parser.current_token->type == TOKEN_CMD)
-		ast_node = parse_command(&parser);
+	ast_node = parse_expression(&parser);
 
 	if (parser.error)
 	{
@@ -42,6 +41,54 @@ t_ast_node	*parse_tokens(t_token *tokens)
 	}
 
 	return (ast_node);
+}
+t_ast_node	*parse_expression(t_parser *parser)
+{
+	t_ast_node *left_node;
+	t_ast_node *pipe_node;
+
+	// Parse left side (must be a command)
+	if (parser->current_token->type == TOKEN_CMD)
+		left_node = parse_command(parser);
+	else
+	{
+		parser->error = 1;  // First token must be a command
+		return (NULL);
+	}
+
+	// Check if next token is a pipe
+	if (parser->current_token && parser->current_token->type == TOKEN_PIPE)
+	{
+		get_next_token(parser);
+		// Create pipe node
+		pipe_node = create_pipe_node(left_node, parser);
+
+		return (pipe_node);
+	}
+
+	return (left_node);
+}
+
+t_ast_node	*create_pipe_node(t_ast_node *left_node, t_parser *parser)
+{
+	t_ast_node	*pipe_node;
+
+	pipe_node = malloc(sizeof(t_ast_node));
+	if (!pipe_node)
+		return (NULL);
+	pipe_node->type = NODE_PIPE;
+	pipe_node->u_content.pipe.left = left_node;
+	pipe_node->next = NULL;
+	pipe_node->u_content.pipe.right = parse_expression(parser);
+	if (pipe_node->u_content.pipe.right == NULL)
+	{
+		parser->error = 1;
+		parser->error_msg
+			= ft_strdup("syntax error: invalid command after pipe");
+		free(pipe_node);
+		return (NULL);
+	}
+	return (pipe_node);
 }
 
 t_ast_node	*parse_command(t_parser *parser)

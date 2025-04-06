@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/05 23:38:49 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/06 16:29:34 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,12 @@ void		free_ast(t_ast_node *node);
 void		init_parser(t_token *tokens, t_parser *parser);
 t_ast_node	*parse_tokens(t_token *tokens);
 t_ast_node	*parse_command(t_parser *parser);
+t_ast_node	*parse_expression(t_parser *parser);
+t_ast_node	*create_pipe_node(t_ast_node *left_node, t_parser *parser);
+
+// parser_utils.c
+t_token		*get_next_token(t_parser *parser);
+void		print_ast(t_ast_node *node, int depth); // temporary
 
 // signals.c
 void		setup_signals(void);

@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 12:59:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/05 23:43:34 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/06 16:31:18 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,11 @@ void	run_shell_loop(void)
 				{
 					// For now, just print that parsing succeeded
 					printf("Successfully created AST\n");
+					print_ast(ast, 0);
 					execute_command(ast);
 					free_ast(ast);
 				}
+				free_tokens(tokens);
 			}
 		}
 		free(input);
