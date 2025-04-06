@@ -6,7 +6,7 @@
 #    By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/03 16:05:35 by mmravec           #+#    #+#              #
-#    Updated: 2025/02/20 20:08:31 by mmravec          ###   ########.fr        #
+#    Updated: 2025/04/06 09:45:53 by mmravec          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,8 @@ LIBFT_DIR = libft
 SRCS = main.c utils.c token.c token_extraction.c lexer.c history.c \
 	builtins.c execution.c ft_strtok.c file_manipulation.c shell_loop.c \
 	token_string_extraction.c lexer_special_tokens.c signals.c test.c \
-	lexer_process_redirections.c test1.c test2.c
+	lexer_process_redirections.c test1.c test2.c parser.c \
+	parser_utils.c
 
 # Add src/ prefix to source files
 SRCS := $(addprefix $(SRC_DIR)/,$(SRCS))

@@ -6,11 +6,12 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 12:59:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/18 17:57:54 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/05 23:43:34 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "parser.h"
 
 void	initialize_shell(void)
 {
@@ -43,9 +44,10 @@ void	handle_input(char *input)
 
 void	run_shell_loop(void)
 {
-	char	*input;
-	t_token	*tokens;
-	char	*prompt;
+	char		*input;
+	t_token		*tokens;
+	char		*prompt;
+	t_ast_node	*ast;
 
 	setup_signals();
 	while (1)
@@ -65,8 +67,14 @@ void	run_shell_loop(void)
 			if (tokens)
 			{
 				print_tokens(tokens);
-				execute_command(tokens);
-				free_tokens(tokens);
+				ast = parse_tokens(tokens);
+				if (ast)
+				{
+					// For now, just print that parsing succeeded
+					printf("Successfully created AST\n");
+					execute_command(ast);
+					free_ast(ast);
+				}
 			}
 		}
 		free(input);

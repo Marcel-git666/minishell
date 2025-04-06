@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/18 22:15:33 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/05 23:38:49 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,68 +28,75 @@
 # include "libft.h"
 # include <fcntl.h>
 # include "lexer.h"
+# include "parser.h"
 # define HISTORY_FILE ".history"
 
 // global variable
 extern int	g_signal_received;
 
 // builtins.c
-void	builtin_exit(void);
+void		builtin_exit(void);
 
 // execution.c
-void	execute_command(t_token *tokens);
+void		execute_command(t_ast_node *ast_node);
 
 // file_manipulation.c
-int		open_file(char *name, char **file_content, int oflag);
+int			open_file(char *name, char **file_content, int oflag);
 
 // ft_strtok.c
-char	*ft_strtok(char *s1, const char *s2);
+char		*ft_strtok(char *s1, const char *s2);
 
 // history.c
-void	load_history(void);
-void	save_history(void);
+void		load_history(void);
+void		save_history(void);
 
 // lexer.c
-void	skip_whitespace(const char *input, size_t *i);
-t_token	*lexer(const char *input);
+void		skip_whitespace(const char *input, size_t *i);
+t_token		*lexer(const char *input);
 
 // lexer_process_redirections.c
-int		process_redirections(t_lexer *lexer);
+int			process_redirections(t_lexer *lexer);
 
 // lexer_special_tokens.c
-int		handle_special_tokens(t_lexer *lexer, int *is_first_word);
+int			handle_special_tokens(t_lexer *lexer, int *is_first_word);
 
 // main.c
-void	print_tokens(t_token *tokens);
+void		print_tokens(t_token *tokens);
+
+// parser.c
+void		free_ast(t_ast_node *node);
+void		init_parser(t_token *tokens, t_parser *parser);
+t_ast_node	*parse_tokens(t_token *tokens);
+t_ast_node	*parse_command(t_parser *parser);
 
 // signals.c
-void	setup_signals(void);
+void		setup_signals(void);
 
 // token.c
-t_token	*create_token(t_token_type type, char *value);
-void	add_token(t_token **head, t_token *new_token);
-void	free_tokens(t_token *head);
+t_token		*create_token(t_token_type type, char *value);
+void		add_token(t_token **head, t_token *new_token);
+void		free_tokens(t_token *head);
 
 // token_extraction.c
-int		is_special_char(char c);
-char	*extract_word(const char *input, size_t *index,
-			int is_delimiter_expected);
-t_token	*extract_operator(const char *input, size_t *index);
-char	*extract_env_var(const char *input, size_t *index);
+int			is_special_char(char c);
+char		*extract_word(const char *input, size_t *index,
+				int is_delimiter_expected);
+t_token		*extract_operator(const char *input, size_t *index);
+char		*extract_env_var(const char *input, size_t *index);
 
 // token_string_extraction.c
-char	*extract_single_quoted_string(t_lexer *lexer);
-char	*extract_double_quoted_string(t_lexer *lexer);
+char		*extract_single_quoted_string(t_lexer *lexer);
+char		*extract_double_quoted_string(t_lexer *lexer);
 
 // shell_loop.c
-void	initialize_shell(void);
-void	handle_input(char *input);
-void	run_shell_loop(void);
+void		initialize_shell(void);
+void		handle_input(char *input);
+void		run_shell_loop(void);
 
 // utils.c
-int		ft_isspace(int c);
-char	*ft_strndup(const char *s, size_t n);
-void	error_message(const char *error);
-int		check_next_token(t_lexer *lexer, size_t next_pos);
+int			ft_isspace(int c);
+char		*ft_strndup(const char *s, size_t n);
+void		error_message(const char *error);
+int			check_next_token(t_lexer *lexer, size_t next_pos);
 
 #endif
