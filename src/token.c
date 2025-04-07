@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:26:18 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/06 11:20:01 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/06 19:56:45 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,4 +54,12 @@ void	free_tokens(t_token *head)
 		free(temp->value);
 		free(temp);
 	}
+}
+
+int	is_redirection_token(t_token_type type)
+{
+	return (type == TOKEN_REDIR_IN
+		|| type == TOKEN_REDIR_OUT
+		|| type == TOKEN_APPEND_OUT
+		|| type == TOKEN_HEREDOC);
 }

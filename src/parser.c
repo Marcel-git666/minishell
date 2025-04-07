@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/06 16:13:51 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/06 20:14:54 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,15 +44,24 @@ t_ast_node	*parse_tokens(t_token *tokens)
 }
 t_ast_node	*parse_expression(t_parser *parser)
 {
-	t_ast_node *left_node;
-	t_ast_node *pipe_node;
+	t_ast_node *node;
 
-	// Parse left side (must be a command)
-	if (parser->current_token->type == TOKEN_CMD)
-		left_node = parse_command(parser);
+	if (!parser->current_token)
+	return (NULL);
+	if (is_redirection_token(parser->current_token->type))
+		node = parse_redirection(parser);
+	else if (parser->current_token->type == TOKEN_CMD)
+	{
+		node = parse_command(parser);
+		if (parser->current_token
+			&& is_redirection_token(parser->current_token->type))
+			node = attach_redirection_to_command(node, parser);
+	}
 	else
 	{
-		parser->error = 1;  // First token must be a command
+		parser->error = 1;
+		parser->error_msg
+			= ft_strdup("syntax error: expected command or redirection");
 		return (NULL);
 	}
 
@@ -60,13 +69,10 @@ t_ast_node	*parse_expression(t_parser *parser)
 	if (parser->current_token && parser->current_token->type == TOKEN_PIPE)
 	{
 		get_next_token(parser);
-		// Create pipe node
-		pipe_node = create_pipe_node(left_node, parser);
-
-		return (pipe_node);
+		node = create_pipe_node(node, parser);
 	}
 
-	return (left_node);
+	return (node);
 }
 
 t_ast_node	*create_pipe_node(t_ast_node *left_node, t_parser *parser)

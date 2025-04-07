@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/06 16:29:34 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/06 19:57:07 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void		setup_signals(void);
 t_token		*create_token(t_token_type type, char *value);
 void		add_token(t_token **head, t_token *new_token);
 void		free_tokens(t_token *head);
+int			is_redirection_token(t_token_type type);
 
 // token_extraction.c
 int			is_special_char(char c);

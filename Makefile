@@ -6,7 +6,7 @@
 #    By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/03 16:05:35 by mmravec           #+#    #+#              #
-#    Updated: 2025/04/06 09:45:53 by mmravec          ###   ########.fr        #
+#    Updated: 2025/04/06 20:17:40 by mmravec          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ SRCS = main.c utils.c token.c token_extraction.c lexer.c history.c \
 	builtins.c execution.c ft_strtok.c file_manipulation.c shell_loop.c \
 	token_string_extraction.c lexer_special_tokens.c signals.c test.c \
 	lexer_process_redirections.c test1.c test2.c parser.c \
-	parser_utils.c
+	parser_utils.c parser_redir.c
 
 # Add src/ prefix to source files
 SRCS := $(addprefix $(SRC_DIR)/,$(SRCS))
