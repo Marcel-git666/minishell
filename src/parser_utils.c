@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 09:45:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/06 16:28:17 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/11 21:27:10 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,16 @@ void	free_ast(t_ast_node *node)
 		if (node->u_content.pipe.right)
 			free_ast(node->u_content.pipe.right);
 	}
+	else if (node->type == NODE_REDIR)
+	{
+		if (node->u_content.redir.redir)
+		{
+			free(node->u_content.redir.redir->file_or_delimiter);
+			free(node->u_content.redir.redir);
+		}
+		if (node->u_content.redir.child)
+			free_ast(node->u_content.redir.child);
+	}
 	free(node);
 }
 
@@ -84,4 +94,26 @@ void	print_ast(t_ast_node *node, int depth)
 		print_ast(node->u_content.pipe.right, depth + 2);
 	}
 	// Handle other node types as needed
+	// In print_ast, add handling for NODE_REDIR
+	else if (node->type == NODE_REDIR)
+	{
+		const char *redir_type_str = "UNKNOWN";
+
+		if (node->u_content.redir.redir->type == REDIR_IN)
+			redir_type_str = "REDIR_IN";
+		else if (node->u_content.redir.redir->type == REDIR_OUT)
+			redir_type_str = "REDIR_OUT";
+		else if (node->u_content.redir.redir->type == REDIR_APPEND)
+			redir_type_str = "REDIR_APPEND";
+		else if (node->u_content.redir.redir->type == REDIR_HEREDOC)
+			redir_type_str = "REDIR_HEREDOC";
+
+		printf("REDIRECTION: %s, FILE: %s\n", redir_type_str,
+			node->u_content.redir.redir->file_or_delimiter);
+
+		for (int j = 0; j < depth + 1; j++)
+			printf("  ");
+		printf("COMMAND:\n");
+		print_ast(node->u_content.redir.child, depth + 2);
+	}
 }

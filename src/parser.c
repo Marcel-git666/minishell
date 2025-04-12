@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/06 20:14:54 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/12 10:58:50 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,10 @@ t_ast_node	*parse_tokens(t_token *tokens)
 }
 t_ast_node	*parse_expression(t_parser *parser)
 {
-	t_ast_node *node;
+	t_ast_node	*node;
 
 	if (!parser->current_token)
-	return (NULL);
+		return (NULL);
 	if (is_redirection_token(parser->current_token->type))
 		node = parse_redirection(parser);
 	else if (parser->current_token->type == TOKEN_CMD)
@@ -108,7 +108,8 @@ t_ast_node	*parse_command(t_parser *parser)
 	argument_count = 0;
 	cmd_token = parser->current_token;
 	parser->current_token = parser->current_token->next;
-	while (parser->current_token && parser->current_token->type == TOKEN_ARG)
+	while (parser->current_token && (parser->current_token->type == TOKEN_ARG
+		|| parser->current_token->type == TOKEN_STRING))
 	{
 		argument_count++;
 		parser->current_token = parser->current_token->next;

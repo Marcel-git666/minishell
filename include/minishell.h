@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/06 19:57:07 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/11 21:22:16 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,11 @@ t_ast_node	*parse_tokens(t_token *tokens);
 t_ast_node	*parse_command(t_parser *parser);
 t_ast_node	*parse_expression(t_parser *parser);
 t_ast_node	*create_pipe_node(t_ast_node *left_node, t_parser *parser);
+
+//parser_redir.c
+t_ast_node	*parse_redirection(t_parser *parser);
+t_ast_node	*attach_redirection_to_command(t_ast_node *cmd_node,
+				t_parser *parser);
 
 // parser_utils.c
 t_token		*get_next_token(t_parser *parser);

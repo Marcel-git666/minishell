@@ -6,14 +6,14 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 20:17:10 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/06 20:21:00 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/11 21:30:46 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
 
-t_ast_node *parse_redirection(t_parser *parser)
+t_ast_node	*parse_redirection(t_parser *parser)
 {
 	t_ast_node *node;
 	t_redirection *redir;
@@ -41,7 +41,8 @@ t_ast_node *parse_redirection(t_parser *parser)
 	get_next_token(parser);
 
 	// Check if we have a filename token
-	if (!parser->current_token || parser->current_token->type != TOKEN_FILE)
+	if (!parser->current_token || (parser->current_token->type != TOKEN_FILE
+			&& parser->current_token->type != TOKEN_DELIMITER))
 	{
 		parser->error = 1;
 		free(redir);
@@ -96,13 +97,13 @@ t_ast_node *parse_redirection(t_parser *parser)
 
 t_ast_node *attach_redirection_to_command(t_ast_node *cmd_node, t_parser *parser)
 {
-    t_ast_node *redir_node = parse_redirection(parser);
+	t_ast_node	*redir_node = parse_redirection(parser);
 
-    if (!redir_node)
-        return cmd_node;  // Return original if redirection parsing failed
+	if (!redir_node)
+		return (cmd_node);  // Return original if redirection parsing failed
 
-    // Attach the command to the redirection
-    redir_node->u_content.redir.child = cmd_node;
+	// Attach the command to the redirection
+	redir_node->u_content.redir.child = cmd_node;
 
-    return redir_node;
+	return (redir_node);
 }
