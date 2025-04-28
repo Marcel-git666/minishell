@@ -47,13 +47,13 @@ There is a 5-byte "still reachable" memory block from a static variable `last_ex
    - [x] Fix memory leaks in token parsing
 
 2. **Parser Implementation**
-   - [ ] Create abstract syntax tree (AST)
-   - [ ] Handle command separation
+   - [x] Create abstract syntax tree (AST)
+   - [x] Handle command separation
    - [ ] Implement syntax validation
 
 3. **Error Handling**
-   - [ ] Implement error messages
-   - [ ] Add syntax error detection
+   - [x] Implement error messages
+   - [x] Add syntax error detection
    - [ ] Create graceful error recovery
 
 4. **History Management**
@@ -61,8 +61,13 @@ There is a 5-byte "still reachable" memory block from a static variable `last_ex
    - [ ] Handle history file operations
 
 5. **Signal Handling Support**
-   - [ ] Set up signal handlers
-   - [ ] Implement behavior for Ctrl+C, Ctrl+D, Ctrl+\
+   - [x] Set up signal handlers
+   - [x] Implement behavior for Ctrl+C, Ctrl+D, Ctrl+\
+
+6. **Environment Variable Management**
+   - [ ] Environment variable storage
+   - [ ] Variable expansion
+   - [ ] Handle $? special variable
 
 ### Katka's Tasks
 1. **Command Execution**
@@ -89,10 +94,7 @@ There is a 5-byte "still reachable" memory block from a static variable `last_ex
    - [ ] Implement pipe functionality
    - [ ] Handle multiple pipes
 
-5. **Environment Variable Management**
-   - [ ] Environment variable storage
-   - [ ] Variable expansion
-   - [ ] Handle $? special variable
+
 
 ## How to Run
 

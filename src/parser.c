@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/12 10:58:50 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/27 22:43:33 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,7 @@ t_ast_node	*parse_expression(t_parser *parser)
 	}
 	else
 	{
-		parser->error = 1;
-		parser->error_msg
-			= ft_strdup("syntax error: expected command or redirection");
+		set_parser_error(parser, "syntax error: expected command or redirection");
 		return (NULL);
 	}
 
@@ -88,9 +86,7 @@ t_ast_node	*create_pipe_node(t_ast_node *left_node, t_parser *parser)
 	pipe_node->u_content.pipe.right = parse_expression(parser);
 	if (pipe_node->u_content.pipe.right == NULL)
 	{
-		parser->error = 1;
-		parser->error_msg
-			= ft_strdup("syntax error: invalid command after pipe");
+		set_parser_error(parser, "syntax error: invalid command after pipe");
 		free(pipe_node);
 		return (NULL);
 	}

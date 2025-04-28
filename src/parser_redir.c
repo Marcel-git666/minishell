@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_redir.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 20:17:10 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/11 21:30:46 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/04/27 22:47:04 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ t_ast_node	*parse_redirection(t_parser *parser)
 	if (!parser->current_token || (parser->current_token->type != TOKEN_FILE
 			&& parser->current_token->type != TOKEN_DELIMITER))
 	{
-		parser->error = 1;
+		set_parser_error(parser, "syntax error: expected filename or delimiter after redirection");
 		free(redir);
 		return (NULL);
 	}
