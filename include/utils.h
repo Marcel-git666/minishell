@@ -1,26 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.h                                              :+:      :+:    :+:   */
+/*   utils.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/18 22:23:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/03 18:41:41 by marcel           ###   ########.fr       */
+/*   Created: 2025/05/04 01:57:05 by marcel            #+#    #+#             */
+/*   Updated: 2025/05/04 02:12:57 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ENV_H
-# define ENV_H
+#ifndef UTILS_H
+# define UTILS_H
 
-typedef struct s_env
-{
-	char			*key;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
+// Forward declaration
+struct s_lexer;
+typedef struct s_lexer t_lexer;
 
-// env.c
-void		env_init(char **envp);
+// utils.c
+int			ft_isspace(int c);
+char		*ft_strndup(const char *s, size_t n);
+void		error_message(const char *error);
+int			check_next_token(t_lexer *lexer, size_t next_pos);
 
 #endif

@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   shell_loop.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 12:59:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/06 16:31:18 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/05/03 18:55:56 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "parser.h"
 
-void	initialize_shell(void)
+void	initialize_shell(char **envp)
 {
 	printf("Welcome to mini shell!\n");
+	env_init(envp);
 	load_history();
 }
 

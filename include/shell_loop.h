@@ -1,26 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.h                                              :+:      :+:    :+:   */
+/*   shell_loop.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/18 22:23:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/03 18:41:41 by marcel           ###   ########.fr       */
+/*   Created: 2025/05/03 18:55:08 by marcel            #+#    #+#             */
+/*   Updated: 2025/05/03 18:55:38 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ENV_H
-# define ENV_H
+#ifndef SHELL_LOOP_H
+# define SHELL_LOOP_H
 
-typedef struct s_env
-{
-	char			*key;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
-
-// env.c
-void		env_init(char **envp);
+// shell_loop.c
+void		initialize_shell(char **envp);
+void		handle_input(char *input);
+void		run_shell_loop(void);
 
 #endif

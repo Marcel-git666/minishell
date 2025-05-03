@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   test1.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 20:06:22 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/20 22:07:58 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/05/04 02:12:16 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "test.h"
 
 void	test_pipe_sequences(void)

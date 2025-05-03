@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   test.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 17:49:01 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/20 22:10:12 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/05/04 02:11:23 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "test.h"
 
 void	assert_token(t_token *token, t_token_type expected_type,

@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   test.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 17:48:09 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/20 22:10:31 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/05/04 02:06:03 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TEST_H
 # define TEST_H
 
-# include "minishell.h"
+# include "token.h"
 
 typedef struct s_expected_token
 {

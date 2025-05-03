@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/19 17:52:25 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/05/04 02:07:02 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "test.h"
 
 void	print_tokens(t_token *tokens)
@@ -29,14 +30,14 @@ void	print_tokens(t_token *tokens)
 	}
 }
 
-int	main(int argc, char **argv)
+int	main(int argc, char **argv, char **envp)
 {
 	if (argc > 1 && ft_strncmp(argv[1], "--test", 7) == 0)
 	{
 		run_test_suite();
 		return (0);
 	}
-	initialize_shell();
+	initialize_shell(envp);
 	run_shell_loop();
 	save_history();
 	printf("Exiting minishell...\n");

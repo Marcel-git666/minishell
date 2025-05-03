@@ -3,15 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   token.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 14:26:56 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/19 15:48:39 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/05/04 02:09:13 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TOKEN_H
 # define TOKEN_H
+
+# include <stddef.h>
+
+// Forward declaration
+struct s_lexer;
+typedef struct s_lexer t_lexer;
 
 typedef enum e_token_type
 {
@@ -37,5 +43,23 @@ typedef struct s_token
 	char			*value; // The actual token value (e.g., "ls", "-l", "|")
 	struct s_token	*next; // Pointer to the next token (linked list)
 }		t_token;
+
+// token.c
+t_token		*create_token(t_token_type type, char *value);
+void		add_token(t_token **head, t_token *new_token);
+void		free_tokens(t_token *head);
+int			is_redirection_token(t_token_type type);
+
+// token_extraction.c
+int			is_special_char(char c);
+char		*extract_word(const char *input, size_t *index,
+				int is_delimiter_expected);
+t_token		*extract_operator(const char *input, size_t *index);
+char		*extract_env_var(const char *input, size_t *index);
+
+// token_string_extraction.c
+char		*extract_single_quoted_string(t_lexer *lexer);
+char		*extract_double_quoted_string(t_lexer *lexer);
+
 
 #endif

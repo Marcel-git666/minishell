@@ -1,26 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.h                                              :+:      :+:    :+:   */
+/*   signals.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/18 22:23:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/03 18:41:41 by marcel           ###   ########.fr       */
+/*   Created: 2025/05/03 18:53:45 by marcel            #+#    #+#             */
+/*   Updated: 2025/05/03 18:54:26 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ENV_H
-# define ENV_H
+#ifndef SIGNALS_H   
+# define SIGNALS_H
 
-typedef struct s_env
-{
-	char			*key;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
-
-// env.c
-void		env_init(char **envp);
+// signals.c
+void		setup_signals(void);
 
 #endif

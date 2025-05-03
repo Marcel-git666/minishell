@@ -1,26 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.h                                              :+:      :+:    :+:   */
+/*   execution.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/18 22:23:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/03 18:41:41 by marcel           ###   ########.fr       */
+/*   Created: 2025/05/03 18:50:12 by marcel            #+#    #+#             */
+/*   Updated: 2025/05/04 02:01:39 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ENV_H
-# define ENV_H
+#ifndef EXECUTION_H
+# define EXECUTION_H
 
-typedef struct s_env
-{
-	char			*key;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
+// Forward declarations 
+struct s_ast_node;
+typedef struct s_ast_node t_ast_node;
 
-// env.c
-void		env_init(char **envp);
+// execution.c
+void		execute_command(t_ast_node *ast_node);
 
 #endif
