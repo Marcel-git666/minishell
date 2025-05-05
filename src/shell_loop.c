@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 12:59:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/03 18:55:56 by marcel           ###   ########.fr       */
+/*   Updated: 2025/05/05 01:17:32 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,10 @@
 
 void	initialize_shell(char **envp)
 {
+	t_env	*env_list;	
 	printf("Welcome to mini shell!\n");
-	env_init(envp);
+	env_list = env_init(envp);
+	env_print(env_list);
 	load_history();
 }
 

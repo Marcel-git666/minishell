@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+         #
+#    By: marcel <marcel@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/03 22:02:38 by mmravec           #+#    #+#              #
-#    Updated: 2024/10/10 11:28:30 by mmravec          ###   ########.fr        #
+#    Updated: 2025/05/05 01:23:48 by marcel           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ SRCS = ft_isalnum.c ft_isalpha.c ft_isascii.c ft_isdigit.c ft_isprint.c \
 		ft_putendl_fd.c ft_putnbr_fd.c ft_printf.c ft_printf_utils.c \
 		ft_lstnew.c ft_lstadd_front.c ft_lstsize.c ft_lstlast.c \
 		ft_lstadd_back.c ft_lstdelone.c ft_lstclear.c ft_lstiter.c \
-		ft_lstmap.c
+		ft_lstmap.c ft_strcmp.c
 OBJS = $(SRCS:.c=.o)      # Object files corresponding to .c files
 
 # Rule to create the static library

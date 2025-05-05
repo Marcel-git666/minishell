@@ -1,31 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.h                                              :+:      :+:    :+:   */
+/*   ft_strcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/18 22:23:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/05 01:14:21 by marcel           ###   ########.fr       */
+/*   Created: 2025/05/05 01:22:53 by marcel            #+#    #+#             */
+/*   Updated: 2025/05/05 01:30:25 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ENV_H
-# define ENV_H
+#include "libft.h"
 
-typedef struct s_env
+int ft_strcmp(const char *s1, const char *s2)
 {
-	char			*key;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
+	size_t  i;
 
-// env.c
-t_env	*env_init(char **envp);
-void	env_free(t_env *env);
-void	env_print(t_env *env);
-int		env_set(t_env **env, const char *key, const char *value);
-char	*env_get(t_env *env, const char *key);
-int		env_unset(t_env **env, const char *key);
-
-#endif
+	i = 0;
+	if (s1 == NULL || s2 == NULL)
+        return (-1);
+    while (s1[i] && s2[i] && s1[i] == s2[i])
+		i++;
+	return (((unsigned char)s1[i]) - (unsigned char)s2[i]);
+}
