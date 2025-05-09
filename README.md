@@ -25,7 +25,7 @@ Minishell is a simplified version of a shell (command-line interpreter) that imp
 - [ ] Redirections
 - [ ] Pipes
 - [ ] Environment variables
-- [ ] Signal handling
+- [x] Signal handling
 
 ## Memory Management Notes
 
