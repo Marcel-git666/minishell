@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:24:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/05 01:22:04 by marcel           ###   ########.fr       */
+/*   Updated: 2025/05/11 21:50:37 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,11 +106,11 @@ int	env_set(t_env **env, const char *key, const char *value)
         return (0);
     new_node->key = ft_strdup(key);
     new_node->value = ft_strdup(value);
-    if (!current->key || !current->value)
+    if (!new_node->key || !new_node->value)
     {
-        free(current->key);
-        free(current->value);
-        free(current);
+        free(new_node->key);
+        free(new_node->value);
+        free(new_node);
         return (0); // Memory allocation failed
     }
     new_node->next = *env;
@@ -155,4 +155,111 @@ int    env_unset(t_env **env, const char *key)
         current = current->next;
     }
     return (0); // Key not found
+}
+
+char **env_to_array(t_env *env)
+{
+    int     count;
+    t_env   *current;
+    char    **env_array;
+    char	*temp;
+    char	*result;
+    
+    count = 0;
+    current = env;
+    while (current)
+    {
+        count++;
+        current = current->next;
+    }
+    env_array = malloc(sizeof(char *) * (count + 1));
+    if (!env_array)
+        return (NULL);
+    current = env;
+    count = 0;
+    while (current)
+    {
+        temp = ft_strjoin(current->key, "=");
+		if (!temp)
+        {
+            free(env_array[count]);
+			while (count > 0)
+			{
+				free(env_array[--count]);
+			}
+			free(env_array);
+			return (NULL);
+        }
+        result = ft_strjoin(temp, current->value);
+		free(temp);
+		if (!result)
+		{
+			free(env_array[count]);
+			while (count > 0)
+			{
+				free(env_array[--count]);
+			}
+			free(env_array);
+			return (NULL);
+		}
+        env_array[count++] = result;
+        current = current->next;
+    }
+    env_array[count] = NULL;
+    return (env_array);
+}
+
+char *path_resolve(const char *command, t_env *env)
+{
+	char	*path;
+	char	*full_path;
+	char	**paths;
+	char	*dir_with_slash;
+	int		i;
+
+	if (!command || !*command)
+        return (NULL);
+	if (ft_strchr(command, '/'))
+    {
+        // Check if the command is directly executable
+        if (access(command, X_OK) == 0)
+            return (ft_strdup(command));
+        return (NULL);
+    }
+	path = env_get(env, "PATH");
+	if (!path)
+		return (NULL);
+	paths = ft_split(path, ':');
+	if (!paths)
+		return (NULL);
+	i = 0;
+	while (paths[i])
+	{
+		char *dir_with_slash = ft_strjoin(paths[i], "/");
+        if (!dir_with_slash)
+        {
+            // Free memory on error
+            while (paths[i])
+                free(paths[i++]);
+            free(paths);
+            return (NULL);
+        }
+		full_path = ft_strjoin(dir_with_slash, command);
+		free(dir_with_slash);
+		if (!full_path)
+			return (NULL);
+		if (access(full_path, X_OK) == 0)
+		{
+			free(paths);
+			return (full_path);
+		}
+		free(full_path);
+		i++;
+	}
+	// Free memory when command not found
+    i = 0;
+    while (paths[i])
+        free(paths[i++]);
+	free(paths);
+	return (NULL);
 }
