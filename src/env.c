@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:24:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/11 21:50:37 by marcel           ###   ########.fr       */
+/*   Updated: 2025/05/23 15:49:58 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,14 @@ t_env   *env_init(char **envp)
             // Split key and value at the equals sign
             new_node->key = ft_strndup(envp[i], equals_pos - envp[i]);
             new_node->value = ft_strdup(equals_pos + 1);
-            
+
             if (!new_node->key || !new_node->value)
             {
                 free(new_node->key);
                 free(new_node);
                 return (NULL); // Handle memory allocation failure
             }
-            
+
             // Add to the list
             new_node->next = env_list;
             env_list = new_node;
@@ -164,7 +164,7 @@ char **env_to_array(t_env *env)
     char    **env_array;
     char	*temp;
     char	*result;
-    
+
     count = 0;
     current = env;
     while (current)
@@ -214,7 +214,7 @@ char *path_resolve(const char *command, t_env *env)
 	char	*path;
 	char	*full_path;
 	char	**paths;
-	char	*dir_with_slash;
+	// char	*dir_with_slash;
 	int		i;
 
 	if (!command || !*command)
