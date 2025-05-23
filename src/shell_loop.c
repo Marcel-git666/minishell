@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   shell_loop.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 12:59:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/05 01:17:32 by marcel           ###   ########.fr       */
+/*   Updated: 2025/05/23 15:46:20 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 void	initialize_shell(char **envp)
 {
-	t_env	*env_list;	
+	t_env	*env_list;
+	
 	printf("Welcome to mini shell!\n");
 	env_list = env_init(envp);
 	env_print(env_list);
