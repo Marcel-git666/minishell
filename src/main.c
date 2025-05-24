@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/04 02:07:02 by marcel           ###   ########.fr       */
+/*   Updated: 2025/05/18 22:17:18 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,20 @@ void	print_tokens(t_token *tokens)
 
 int	main(int argc, char **argv, char **envp)
 {
+	t_shell	*shell;
+	
 	if (argc > 1 && ft_strncmp(argv[1], "--test", 7) == 0)
 	{
 		run_test_suite();
 		return (0);
 	}
-	initialize_shell(envp);
-	run_shell_loop();
+	shell = initialize_shell(envp);
+	if (!shell)
+		return (1);
+	run_shell_loop(shell);
 	save_history();
+	env_free(shell->env);
+	free(shell);
 	printf("Exiting minishell...\n");
 	return (0);
 }

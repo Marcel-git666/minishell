@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/04 01:58:26 by marcel           ###   ########.fr       */
+/*   Updated: 2025/05/18 21:53:46 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,13 @@
 # include "utils.h"
 
 # define HISTORY_FILE ".history"
+
+// Shell state structure
+typedef struct s_shell
+{
+    t_env *env;           // Environment variables
+    int last_exit_code;   // For $? expansion
+} t_shell;
 
 // global variable
 extern int	g_signal_received;

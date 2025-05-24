@@ -12,14 +12,28 @@
 
 #include "minishell.h"
 
-void	initialize_shell(char **envp)
+t_shell	*initialize_shell(char **envp)
 {
-	t_env	*env_list;
-	
+	t_shell *shell;
+    
+    shell = malloc(sizeof(t_shell));
+    if (!shell)
+	{
+        error_message("Failed to allocate shell state");
+		return (NULL);
+	}
 	printf("Welcome to mini shell!\n");
-	env_list = env_init(envp);
-	env_print(env_list);
+	shell->env = env_init(envp);
+	if (!shell->env)
+	{
+		free(shell);
+		error_message("Failed to initialize environment");
+		return (NULL);
+	}
+	shell->last_exit_code = 0;
+	env_print(shell->env);
 	load_history();
+	return (shell);
 }
 
 void	handle_input(char *input)
@@ -45,7 +59,7 @@ void	handle_input(char *input)
 	}
 }
 
-void	run_shell_loop(void)
+void	run_shell_loop(t_shell *shell)
 {
 	char		*input;
 	t_token		*tokens;
@@ -76,7 +90,7 @@ void	run_shell_loop(void)
 					// For now, just print that parsing succeeded
 					printf("Successfully created AST\n");
 					print_ast(ast, 0);
-					execute_command(ast);
+					execute_command(ast, shell);
 					free_ast(ast);
 				}
 				free_tokens(tokens);
