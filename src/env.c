@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:24:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/11 21:50:37 by marcel           ###   ########.fr       */
+/*   Updated: 2025/05/18 20:21:07 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,55 +211,58 @@ char **env_to_array(t_env *env)
 
 char *path_resolve(const char *command, t_env *env)
 {
-	char	*path;
-	char	*full_path;
-	char	**paths;
-	char	*dir_with_slash;
-	int		i;
+    char *path;
+    char *full_path;
+    char **paths;
+    char *dir_with_slash;
+    int i;
+    int j;
 
-	if (!command || !*command)
+    if (!command || !*command)
         return (NULL);
-	if (ft_strchr(command, '/'))
-    {
-        // Check if the command is directly executable
+    if (ft_strchr(command, '/')) {
         if (access(command, X_OK) == 0)
             return (ft_strdup(command));
         return (NULL);
     }
-	path = env_get(env, "PATH");
-	if (!path)
-		return (NULL);
-	paths = ft_split(path, ':');
-	if (!paths)
-		return (NULL);
-	i = 0;
-	while (paths[i])
-	{
-		char *dir_with_slash = ft_strjoin(paths[i], "/");
-        if (!dir_with_slash)
-        {
-            // Free memory on error
-            while (paths[i])
-                free(paths[i++]);
+    path = env_get(env, "PATH");
+    if (!path)
+        return (NULL);
+    paths = ft_split(path, ':');
+    if (!paths)
+        return (NULL);
+    i = 0;
+    while (paths[i]) {
+        dir_with_slash = ft_strjoin(paths[i], "/");
+        if (!dir_with_slash) {
+            j = 0;
+            while (paths[j])
+                free(paths[j++]);
             free(paths);
             return (NULL);
         }
-		full_path = ft_strjoin(dir_with_slash, command);
-		free(dir_with_slash);
-		if (!full_path)
-			return (NULL);
-		if (access(full_path, X_OK) == 0)
-		{
-			free(paths);
-			return (full_path);
-		}
-		free(full_path);
-		i++;
-	}
-	// Free memory when command not found
+        full_path = ft_strjoin(dir_with_slash, command);
+        free(dir_with_slash);
+        if (!full_path) {
+            j = 0;
+            while (paths[j])
+                free(paths[j++]);
+            free(paths);
+            return (NULL);
+        }
+        if (access(full_path, X_OK) == 0) {
+            j = 0;
+            while (paths[j])
+                free(paths[j++]);
+            free(paths);
+            return (full_path);
+        }
+        free(full_path);
+        i++;
+    }
     i = 0;
     while (paths[i])
         free(paths[i++]);
-	free(paths);
-	return (NULL);
+    free(paths);
+    return (NULL);
 }
