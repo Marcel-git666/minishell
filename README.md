@@ -14,7 +14,7 @@ Minishell is a simplified version of a shell (command-line interpreter) that imp
 ## Team Members
 
 - Marcel - Lexer, parser, memory management
-- Katka - Command execution, built-ins, environment handling
+- Lada - Command execution, built-ins, environment handling
 
 ## Current Status
 
@@ -69,7 +69,7 @@ There is a 5-byte "still reachable" memory block from a static variable `last_ex
    - [ ] Variable expansion
    - [ ] Handle $? special variable
 
-### Katka's Tasks
+### Lada's Tasks
 1. **Command Execution**
    - [ ] Implement path resolution
    - [ ] Handle command execution (execve)
