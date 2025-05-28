@@ -13,6 +13,8 @@
 #ifndef EXECUTION_H
 # define EXECUTION_H
 
+# include "env.h"
+
 // Forward declarations 
 struct s_ast_node;
 typedef struct s_ast_node t_ast_node;
@@ -21,5 +23,9 @@ typedef struct s_shell t_shell;
 
 // execution.c
 void		execute_command(t_ast_node *ast_node, t_shell *shell);
+
+// builtin.c
+void		builtin_pwd(t_env *env);
+void		builtin_cd(t_ast_node *root, t_env *env);
 
 #endif

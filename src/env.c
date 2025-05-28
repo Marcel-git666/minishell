@@ -31,7 +31,6 @@ t_env   *env_init(char **envp)
             // Split key and value at the equals sign
             new_node->key = ft_strndup(envp[i], equals_pos - envp[i]);
             new_node->value = ft_strdup(equals_pos + 1);
-
             if (!new_node->key || !new_node->value)
             {
                 free(new_node->key);

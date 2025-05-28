@@ -12,6 +12,7 @@
 
 #include "minishell.h"
 #include "parser.h"
+#include "env.h"
 
 void	execute_command(t_ast_node *ast_node, t_shell *shell)
 {
@@ -22,7 +23,11 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell)
 		if (ft_strncmp(ast_node->u_content.cmd.cmd, "exit", 5) == 0)
 			builtin_exit();
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "env", 4) == 0)
-            env_print(shell->env); 
+			env_print(shell->env);
+		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "pwd", 4) == 0)
+			builtin_pwd(shell->env);
+		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "cd", 3) == 0)
+			builtin_cd(ast_node, shell->env);
 		else
 		{
 			// For now, just print command info
