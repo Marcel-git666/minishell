@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 19:56:35 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/07 20:01:31 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/05/28 15:52:23 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,46 +45,70 @@ char	*previous_rep(t_env *env)
 	return (ft_substr(env->value, 0, i));
 }
 
-char	*only_slash(t_ast_node *root)
+char	*only_slash(t_ast_node *root, t_env *env)
 {
-	int		i;
-	char	*address;
+	int				i;
+	char			*address;
+	// DIR				*direct;
+	// struct dirent	*dir;
 
-	i = -1;
+	i = 0;
+	if (root->u_content.cmd.arg_count == 0)
+	{
+		while (env && ft_strncmp(env->key, "HOME", 5) != 0)
+			env = env->next;
+		chdir(env->value);
+		return (env->value);
+	}
 	address = ft_strrchr(root->u_content.cmd.args[0], '/');
-	while (root->u_content.cmd.args[0][++i] && root->u_content.cmd.args[0][i] != address)
-		;
-	printf("i: %d\n", i);
-	if (i == 0)
+	while (root->u_content.cmd.args[0][i]
+		&& &root->u_content.cmd.args[0][i] != address)
+		i++;
+	if (i == 0 && ft_strlen(root->u_content.cmd.args[0]) == 1)
 	{
 		chdir("/");
 		return ("/");
 	}
-	// return (0);
+	// else
+	// {
+	// 	direct = opendir("/src");
+	// 	dir = readdir(direct);
+	// 	while ((dir = readdir(direct)) != NULL)
+	// 	{
+	// 		printf("\t%s\n", dir->d_name);
+	// 	}
+	// }
+	return ("/src");
 }
 
-// DO I need to validate the arguments before executing them?
+// DO I need to validate the arguments before executing them? -> YES
 void	builtin_cd(t_ast_node *root, t_env *env)
 {
 	t_env	*first_env;
 	char	*oldpwd;
 	char	*newpwd;
 
-	first_env = env;
+	first_env = env; // make function for setting oldpwd
 	while (env && ft_strncmp(env->key, "PWD", 4) != 0)
 		env = env->next;
-	oldpwd = ft_strndup(env->value, ft_strlen(env->value));
-	if (ft_strncmp(root->u_content.cmd.args[0], "..", 2) == 0)
+	if (root->u_content.cmd.arg_count && root->u_content.cmd.arg_count > 1)
 	{
-		newpwd = previous_rep( env);
+		printf("~%s\n", env->value);
+		return ;
+	}
+	oldpwd = ft_strndup(env->value, ft_strlen(env->value));
+	if (root->u_content.cmd.arg_count && ft_strncmp(root->u_content.cmd.args[0], "..", 2) == 0)
+	{
+		newpwd = previous_rep(env);
 		if (ft_strncmp(newpwd, "-1", 3) == 0)
 			return ;
 	}
-	else if (ft_strncmp(root->u_content.cmd.args[0], "/", 2) == 0) // i celá adresa uvnit5 funkce to rozdělím na root "/" a na absolutní adresu "/mnt/c/User/ladaf/..."
-		newpwd = only_slash(root/*, env*/);
+	else if (root->u_content.cmd.arg_count == 0
+		|| ft_strncmp(root->u_content.cmd.args[0], "/", 2) == 0) 
+		newpwd = only_slash(root, first_env);
 	env_set(&first_env, "PWD", newpwd);
 	env_set(&first_env, "OLDPWD", oldpwd);
-	// printing
+// printing
 	env = first_env;
 	while (env && ft_strncmp(env->key, "PWD", 4) != 0)
 		env = env->next;

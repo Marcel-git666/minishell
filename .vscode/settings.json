@@ -3,6 +3,7 @@
 		"minishell.h": "c",
 		"parser.h": "c",
 		"env.h": "c",
-		"execution.h": "c"
+		"execution.h": "c",
+		"builtins.h": "c"
 	}
 }
