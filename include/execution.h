@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 18:50:12 by marcel            #+#    #+#             */
-/*   Updated: 2025/05/18 22:14:39 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/01 12:14:42 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,6 @@ void		execute_command(t_ast_node *ast_node, t_shell *shell);
 // builtin.c
 void		builtin_pwd(t_env *env);
 void		builtin_cd(t_ast_node *root, t_env *env);
+void		builtin_export(t_ast_node *root, t_env *env);
 
 #endif

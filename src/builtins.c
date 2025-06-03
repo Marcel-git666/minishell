@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 19:56:35 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/28 15:52:23 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/03 08:10:56 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,4 +117,68 @@ void	builtin_cd(t_ast_node *root, t_env *env)
 	while (env && ft_strncmp(env->key, "OLDPWD", 7) != 0)
 		env = env->next;
 	printf("OLDPWD: %s\n", env->value);
+}
+
+t_env	*find_smallest(t_env *env, t_env *small)
+{
+	t_env	*smallest;
+
+	smallest = env;
+	while (env)
+	{
+		while (ft_strncmp(env->key, smallest->key, ft_strlen(env->key)) < 0)
+			//&& ft_strncmp(env->key, small->key, ft_strlen(env->key) > 0))
+		{
+			if (!small)
+				small = smallest;
+			if (ft_strncmp(env->key, small->key, ft_strlen(env->key) > 0))
+				smallest = env;
+		}
+		env = env->next;
+	}
+	return (smallest);
+}
+
+void	builtin_export(t_ast_node *root, t_env *env)
+{
+	t_env	*smallest;
+	t_env	*small;
+	t_env	*start;
+
+	if (root->u_content.cmd.arg_count < 0 || root->u_content.cmd.arg_count > 1)
+		return ;
+	if (root->u_content.cmd.arg_count == 1
+		&& ft_strncmp(root->u_content.cmd.args[1], "-p", 2) != 0)
+	{
+		error_message("-bash: export: -l: invalid option\nexport: usage: export\
+			[-fn] [name[=value] ...] or export -p\n");
+		return ;
+	}
+	small = 0;
+	smallest = find_smallest(env, small);
+	start = env;
+	// while (env)
+	// {
+		while (env)
+		{
+			if (ft_strncmp(env->key, smallest->key, ft_strlen(smallest->key)) == 0)
+			{
+				if (root->u_content.cmd.arg_count
+					&& !ft_strncmp(root->u_content.cmd.args[0], "-p", 2))
+				{
+					printf("export: %s=%s\n", smallest->key, smallest->value);
+				}
+				else
+				{
+					printf("%s=%s\n", smallest->key, smallest->value);
+				}
+				smallest = env;
+			}
+			if (find_smallest(start, smallest) == 0)
+				break ;
+			smallest = find_smallest(start, smallest);
+			env = env->next;
+		}
+	// 	env = start;
+	// }
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:24:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/23 15:49:58 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/06/03 18:42:04 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ t_env   *env_init(char **envp)
             // Split key and value at the equals sign
             new_node->key = ft_strndup(envp[i], equals_pos - envp[i]);
             new_node->value = ft_strdup(equals_pos + 1);
+            new_node->order = 0;
             if (!new_node->key || !new_node->value)
             {
                 free(new_node->key);
