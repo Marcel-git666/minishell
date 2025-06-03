@@ -6,12 +6,17 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 19:56:35 by mmravec           #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/06/03 08:10:56 by lformank         ###   ########.fr       */
+=======
+/*   Updated: 2025/05/30 18:04:33 by lformank         ###   ########.fr       */
+>>>>>>> 2cf40f32b73460ecf4a627e30dfd4069eb483053
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "env.h"
+#include "builtins.h"
 
 void	builtin_exit(void)
 {
@@ -21,102 +26,56 @@ void	builtin_exit(void)
 
 void	builtin_pwd(t_env *env)
 {
-	while (env && ft_strncmp(env->key, "PWD", 4) != 0)
-		env = env->next;
+	char	*cwd;
+
+	cwd = malloc(sizeof(char) * 100);
+	if (!cwd)
+		return ;
+	getcwd(cwd, 99);
 	printf("%s\n", env->value);
 }
 
-char	*previous_rep(t_env *env)
-{
-	int		i;
-	char	*address;
-
-	i = 0;
-	//maybe I need to change the place of searching PWD in env to here too
-	address = ft_strrchr(env->value, '/');
-	while (&(env)->value[i] != address && &env->value[i])
-	{
-		printf("value[%d] = %c\n", i, env->value[i]);
-		i++;
-	}
-	if (i == 0)
-		return ("-1");
-	chdir(ft_substr(env->value, 0, i));
-	return (ft_substr(env->value, 0, i));
-}
-
-char	*only_slash(t_ast_node *root, t_env *env)
-{
-	int				i;
-	char			*address;
-	// DIR				*direct;
-	// struct dirent	*dir;
-
-	i = 0;
-	if (root->u_content.cmd.arg_count == 0)
-	{
-		while (env && ft_strncmp(env->key, "HOME", 5) != 0)
-			env = env->next;
-		chdir(env->value);
-		return (env->value);
-	}
-	address = ft_strrchr(root->u_content.cmd.args[0], '/');
-	while (root->u_content.cmd.args[0][i]
-		&& &root->u_content.cmd.args[0][i] != address)
-		i++;
-	if (i == 0 && ft_strlen(root->u_content.cmd.args[0]) == 1)
-	{
-		chdir("/");
-		return ("/");
-	}
-	// else
-	// {
-	// 	direct = opendir("/src");
-	// 	dir = readdir(direct);
-	// 	while ((dir = readdir(direct)) != NULL)
-	// 	{
-	// 		printf("\t%s\n", dir->d_name);
-	// 	}
-	// }
-	return ("/src");
-}
-
-// DO I need to validate the arguments before executing them? -> YES
 void	builtin_cd(t_ast_node *root, t_env *env)
 {
-	t_env	*first_env;
-	char	*oldpwd;
-	char	*newpwd;
+	char	*cwd;
 
-	first_env = env; // make function for setting oldpwd
-	while (env && ft_strncmp(env->key, "PWD", 4) != 0)
-		env = env->next;
-	if (root->u_content.cmd.arg_count && root->u_content.cmd.arg_count > 1)
+	cwd = get_pwd();
+	if (root->u_content.cmd.arg_count > 1)
 	{
-		printf("~%s\n", env->value);
+		printf("~%s\n", cwd);
 		return ;
 	}
-	oldpwd = ft_strndup(env->value, ft_strlen(env->value));
-	if (root->u_content.cmd.arg_count && ft_strncmp(root->u_content.cmd.args[0], "..", 2) == 0)
+	if (root->u_content.cmd.arg_count
+		&& ft_strncmp(root->u_content.cmd.args[0], "..", 2) == 0)
+		previous_rep(env, cwd);	
+	else
+		path(root, env, cwd);
+	cwd = get_pwd();
+	env_set(&env, "PWD", cwd);
+	free(cwd);
+}
+
+void	builtin_export(t_ast_node *root, t_env *env)
+{
+	int		i;
+	t_env	*first;
+	t_env	*restart;
+
+	i = -1;
+	first = env;
+	restart = env;
+	while (env)
 	{
-		newpwd = previous_rep(env);
-		if (ft_strncmp(newpwd, "-1", 3) == 0)
-			return ;
+		while (env && first->key && first->key[i] <= env->key[i])
+		{
+			while (first->key[i] == env->key[i])
+				i++;
+			if ((first->key[i] < env->key[i]))
+				printf("first: %c and env: %c\n", first->key[i], env->key[i]);
+			env = env->next;
+		}
+		
 	}
-	else if (root->u_content.cmd.arg_count == 0
-		|| ft_strncmp(root->u_content.cmd.args[0], "/", 2) == 0) 
-		newpwd = only_slash(root, first_env);
-	env_set(&first_env, "PWD", newpwd);
-	env_set(&first_env, "OLDPWD", oldpwd);
-// printing
-	env = first_env;
-	while (env && ft_strncmp(env->key, "PWD", 4) != 0)
-		env = env->next;
-	printf("PWD: %s\n", env->value);
-	env = first_env;
-	while (env && ft_strncmp(env->key, "OLDPWD", 7) != 0)
-		env = env->next;
-	printf("OLDPWD: %s\n", env->value);
 }
 
 t_env	*find_smallest(t_env *env, t_env *small)
