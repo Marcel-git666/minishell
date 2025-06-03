@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_extraction.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/19 17:37:08 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/06/02 20:07:26 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,14 @@ char	*extract_env_var(const char *input, size_t *index)
 		(*index)++;	// Skip the ?
 		return (ft_strdup("?"));
 	}
+	if (input[*index] == '$')
+	{
+    	(*index)++; 
+    	return (ft_strdup("$")); // Return something to indicate PID
+	}
+	if (!ft_isalpha(input[*index]) && input[*index] != '_')
+		return (error_message("syntax error: invalid environment variable name"), NULL);
+	(*index)++;
 	while (ft_isalnum(input[*index]) || input[*index] == '_')
 		(*index)++;
 	return (ft_strndup(input + start, *index - start));
