@@ -6,11 +6,61 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:24:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/03 18:42:04 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/03 20:50:06 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "builtins.h"
+
+int	ft_envsize(t_env *lst)
+{
+	int		len;
+
+	len = 0;
+	while (lst)
+	{
+		len++;
+		lst = lst->next;
+	}
+	return (len);
+}
+
+void    get_order(t_env *env)
+{
+    int     i;
+    t_env   *start;
+	t_env	*smallest;
+	t_env	*small;
+	int		len;
+
+    i = 0;
+	len = ft_envsize(env);
+    start = env;
+	smallest = find_smallest(env);
+	small = env;
+
+	while (env)
+	{
+		if (ft_strcmp(env->key, smallest->key) < 0)
+		{
+			smallest = env;
+			// printf("smallest: %s\n", smallest->key);
+		}
+		env = env->next;
+	}
+	return (smallest);
+
+    while (env)
+    {
+		env = start;
+		while (env)
+		{
+			if (ft_strcmp(env->key, smallest->key) > 0)
+			
+		}
+    }
+}
 
 t_env   *env_init(char **envp)
 {
@@ -59,6 +109,7 @@ t_env   *env_init(char **envp)
         }
         i++;
     }
+    get_order(env_list);
     return (env_list);
 }
 

@@ -6,13 +6,10 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 20:03:35 by mmravec           #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2025/06/01 12:22:27 by lformank         ###   ########.fr       */
-=======
-/*   Updated: 2025/05/30 17:40:31 by lformank         ###   ########.fr       */
->>>>>>> 2cf40f32b73460ecf4a627e30dfd4069eb483053
+/*   Updated: 2025/06/03 19:39:50 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "minishell.h"
 #include "parser.h"

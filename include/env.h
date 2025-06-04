@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:23:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/03 18:39:45 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/03 19:44:18 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,5 +30,6 @@ char	*env_get(t_env *env, const char *key);
 int		env_unset(t_env **env, const char *key);
 char	**env_to_array(t_env *env);
 char	*path_resolve(const char *command, t_env *env);
+int		ft_envsize(t_env *lst);
 
 #endif

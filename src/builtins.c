@@ -6,13 +6,10 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 19:56:35 by mmravec           #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2025/06/03 08:10:56 by lformank         ###   ########.fr       */
-=======
-/*   Updated: 2025/05/30 18:04:33 by lformank         ###   ########.fr       */
->>>>>>> 2cf40f32b73460ecf4a627e30dfd4069eb483053
+/*   Updated: 2025/06/03 20:41:32 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "minishell.h"
 #include "env.h"
@@ -55,43 +52,17 @@ void	builtin_cd(t_ast_node *root, t_env *env)
 	free(cwd);
 }
 
-void	builtin_export(t_ast_node *root, t_env *env)
-{
-	int		i;
-	t_env	*first;
-	t_env	*restart;
-
-	i = -1;
-	first = env;
-	restart = env;
-	while (env)
-	{
-		while (env && first->key && first->key[i] <= env->key[i])
-		{
-			while (first->key[i] == env->key[i])
-				i++;
-			if ((first->key[i] < env->key[i]))
-				printf("first: %c and env: %c\n", first->key[i], env->key[i]);
-			env = env->next;
-		}
-		
-	}
-}
-
-t_env	*find_smallest(t_env *env, t_env *small)
+t_env	*find_smallest(t_env *env)
 {
 	t_env	*smallest;
 
 	smallest = env;
 	while (env)
 	{
-		while (ft_strncmp(env->key, smallest->key, ft_strlen(env->key)) < 0)
-			//&& ft_strncmp(env->key, small->key, ft_strlen(env->key) > 0))
+		if (ft_strcmp(env->key, smallest->key) < 0)
 		{
-			if (!small)
-				small = smallest;
-			if (ft_strncmp(env->key, small->key, ft_strlen(env->key) > 0))
-				smallest = env;
+			smallest = env;
+			// printf("smallest: %s\n", smallest->key);
 		}
 		env = env->next;
 	}
@@ -101,8 +72,6 @@ t_env	*find_smallest(t_env *env, t_env *small)
 void	builtin_export(t_ast_node *root, t_env *env)
 {
 	t_env	*smallest;
-	t_env	*small;
-	t_env	*start;
 
 	if (root->u_content.cmd.arg_count < 0 || root->u_content.cmd.arg_count > 1)
 		return ;
@@ -113,9 +82,7 @@ void	builtin_export(t_ast_node *root, t_env *env)
 			[-fn] [name[=value] ...] or export -p\n");
 		return ;
 	}
-	small = 0;
-	smallest = find_smallest(env, small);
-	start = env;
+	smallest = find_smallest(env);
 	// while (env)
 	// {
 		while (env)
@@ -133,9 +100,6 @@ void	builtin_export(t_ast_node *root, t_env *env)
 				}
 				smallest = env;
 			}
-			if (find_smallest(start, smallest) == 0)
-				break ;
-			smallest = find_smallest(start, smallest);
 			env = env->next;
 		}
 	// 	env = start;
