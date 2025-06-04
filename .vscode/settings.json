@@ -10,7 +10,8 @@
 		"tuple": "c",
 		"type_traits": "c",
 		"utility": "c",
-		"builtins.h": "c"
+		"builtins.h": "c",
+		"dirent.h": "c"
 	}
 		
 }

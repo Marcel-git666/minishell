@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 18:40:20 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/03 19:47:19 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/04 11:43:26 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,12 @@ void	previous_rep(t_env *env, char *cwd);
 int		absolute_path(t_ast_node *root, int i, int j);
 
 // export
-t_env	*find_smallest(t_env *env);
+void	builtin_export(t_ast_node *root, t_env *env);
+
+// unset
+void	builtin_unset(t_ast_node *root, t_env *env);
+
+// echo
+void	builtin_echo(t_ast_node *root);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 20:03:35 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/03 19:39:50 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/04 11:43:11 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,10 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell)
 			builtin_cd(ast_node, shell->env);
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "export", 7) == 0)
 			builtin_export(ast_node, shell->env);
+		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "unset", 6) == 0)
+			builtin_unset(ast_node, shell->env);
+		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "echo", 5) == 0)
+			builtin_echo(ast_node);
 		else
 		{
 			// For now, just print command info
