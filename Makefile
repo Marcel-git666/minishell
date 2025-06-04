@@ -6,7 +6,7 @@
 #    By: lformank <lformank@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/03 16:05:35 by mmravec           #+#    #+#              #
-#    Updated: 2025/05/30 15:33:13 by lformank         ###   ########.fr        #
+#    Updated: 2025/06/04 14:04:30 by lformank         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ SRCS = main.c utils.c token.c token_extraction.c lexer.c history.c \
 	builtins.c execution.c ft_strtok.c file_manipulation.c shell_loop.c \
 	token_string_extraction.c lexer_special_tokens.c signals.c test.c \
 	lexer_process_redirections.c test1.c test2.c parser.c \
-	parser_utils.c parser_redir.c parser_error.c env.c cd.c\
+	parser_utils.c parser_redir.c parser_error.c env.c cd.c redirection.c \
 
 # Add src/ prefix to source files
 SRCS := $(addprefix $(SRC_DIR)/,$(SRCS))
