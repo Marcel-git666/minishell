@@ -17,12 +17,13 @@
 # include <dirent.h>
 # include "env.h"
 # include "parser.h"
+# include <limits.h>
 
 //	exit
 void	builtin_exit(void);
 
 // pwd
-void	builtin_pwd(t_env *env);
+void	builtin_pwd(void);
 
 // cd
 void	builtin_cd(t_ast_node *root, t_env *env);

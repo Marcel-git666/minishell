@@ -11,7 +11,9 @@
 		"type_traits": "c",
 		"utility": "c",
 		"builtins.h": "c",
-		"dirent.h": "c"
+		"dirent.h": "c",
+		"shell_loop.h": "c",
+		"unistd.h": "c"
 	}
 		
 }

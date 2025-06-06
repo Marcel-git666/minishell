@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 15:07:52 by lformank          #+#    #+#             */
-/*   Updated: 2025/05/30 16:13:35 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/06 17:39:15 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,8 @@ int	only_cd(t_ast_node *root, t_env *env, char *cwd)
 		while (env && ft_strncmp(env->key, "HOME", 5) != 0)
 			env = env->next;
 		chdir(env->value);
-		env_set(&env, "OLDPWD", cwd);
+		if (env_set(&env, "OLDPWD", cwd) == 0)
+			free(cwd);
 		return (0);
 	}
 	return (1);
@@ -97,21 +98,3 @@ void	path(t_ast_node *root, t_env *env, char *cwd)
 	env_set(&env, "OLDPWD", cwd);
 }
 
-char	*get_pwd(void)
-{
-	char	*cwd;
-	int		n;
-
-	n = 100;
-	cwd = malloc(sizeof(char) * n);
-	while (!getcwd(cwd, n))
-	{
-		if (!cwd)
-			free(cwd);
-		n += 50;
-		cwd = malloc(sizeof(char) * n);
-		if (!cwd)
-			return (NULL);
-	}
-	return (cwd);
-}

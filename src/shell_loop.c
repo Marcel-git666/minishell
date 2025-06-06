@@ -59,7 +59,7 @@ void	handle_input(char *input)
 	}
 }
 
-void	run_shell_loop(t_shell *shell)
+void	run_shell_loop(t_shell *shell, char **envp)
 {
 	char		*input;
 	t_token		*tokens;
@@ -91,7 +91,7 @@ void	run_shell_loop(t_shell *shell)
 					printf("Successfully created AST\n");
 					print_ast(ast, 0);
 					// redirection(ast, shell);
-					execute_command(ast, shell);
+					execute_command(ast, shell, envp);
 					free_ast(ast);
 				}
 				free_tokens(tokens);

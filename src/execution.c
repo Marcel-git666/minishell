@@ -17,31 +17,83 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-void	search_command(/*t_ast_node *ast_node, t_shell *shell*/)
-{
-	DIR				*direc;
-	struct dirent	*dir;
-	struct stat		statbuf;
-	char			*path;
 
-	direc = opendir(".");
-	dir = readdir(direc);
-	while (direc && dir)
+char	*full_path(char **paths, char *path, t_ast_node *ast)
+{
+	char	*slash;
+	int		i;
+
+	i = -1;
+	while (paths[++i])
 	{
-		printf("%s\n", dir->d_name);
-		path = ft_strjoin("./", dir->d_name);
-		if (stat(path, &statbuf) == 0)
+		slash = ft_strjoin(paths[i], "/");
+		path = ft_strjoin(slash, ast->u_content.cmd.cmd);
+		if (access(path, F_OK) == 0)
 		{
-			if (S_ISDIR(statbuf.st_mode)) // check inode num if file is directory
-				printf("\t%s\n", path);
+			free(slash);
+			return (path);
 		}
-		dir = readdir(direc);
+		free(slash);	
+		free(path);
 	}
-	free(path);
-	closedir(direc);
+	return (NULL);
 }
 
-void	execute_command(t_ast_node *ast_node, t_shell *shell)
+void	fork_it(char *path, char **args, char **envp)
+{
+	int	pid;
+
+	pid = 0;
+	if (access(path, F_OK) == 0)
+	{
+		pid = fork();
+		if (pid == 0)
+			execve(path, args, envp);
+		else
+			wait(&pid);
+	}
+}
+
+void	free_source(char **path, char *slash, char *final_path, char **args)
+{
+	int	i;
+
+	i = -1;
+	while (args[++i])
+		free(args[i]);
+	free(args);
+	free(final_path);
+	i = -1;
+	while (path[++i])
+		free(path[i]);
+	free(path);
+	free(slash);
+}
+
+void	search_command(t_ast_node *ast, t_env *env, char **envp)
+{
+	char	**paths;
+	char	*slash;
+	char	*path;
+	char	**args;
+	int		i;
+
+	i = -1;
+	slash = NULL;
+	path = NULL;
+	while (env && ft_strncmp(env->key, "PATH", 5) != 0)
+		env = env->next;
+	paths = ft_split(env->value,':');
+	args = ft_calloc((ast->u_content.cmd.arg_count + 2), sizeof(char *));
+	args[0] = ft_strdup(ast->u_content.cmd.cmd);
+	while (++i < ast->u_content.cmd.arg_count && ast->u_content.cmd.arg_count != 0)
+		args[i + 1] = ft_strdup(ast->u_content.cmd.args[i]);
+	path = full_path(paths, path, ast);
+	fork_it(path, args, envp);
+	free_source(paths, slash, path, args);
+}
+
+void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
 	if (!ast_node)
 		return ;
@@ -68,7 +120,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell)
 			builtin_echo(ast_node);
 		else
 		{
-			search_command(/*ast_node, shell->env*/);
+			search_command(ast_node, shell->env, envp);
 			// For now, just print command info
 			printf("Would execute: %s", ast_node->u_content.cmd.cmd);
 			if (ast_node->u_content.cmd.arg_count > 0)
@@ -80,4 +132,5 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell)
 			printf("\n");
 		}
 	}
+	return ;
 }

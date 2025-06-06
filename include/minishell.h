@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/18 21:53:46 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/06 16:48:22 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 # include <readline/history.h>
 # include "libft.h"
 # include <fcntl.h>
+# include <sys/wait.h>
 
 # include "token.h"
 # include "builtins.h"

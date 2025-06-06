@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "minishell.h"
 #include "env.h"
 #include "builtins.h"
@@ -21,25 +20,26 @@ void	builtin_exit(void)
 	exit(0);
 }
 
-void	builtin_pwd(t_env *env)
+void	builtin_pwd(void)
 {
-	char	*cwd;
+    char	cwd[PATH_MAX];
 
-	cwd = malloc(sizeof(char) * 100);
-	if (!cwd)
-		return ;
-	getcwd(cwd, 99);
-	printf("%s\n", env->value);
+    if (getcwd(cwd, sizeof(cwd)))
+        printf("%s\n", cwd);
+    else
+        perror("pwd");
 }
 
 void	builtin_cd(t_ast_node *root, t_env *env)
 {
 	char	*cwd;
 
-	cwd = get_pwd();
+	cwd = malloc(PATH_MAX * sizeof(char));
+	getcwd(cwd, PATH_MAX);
 	if (root->u_content.cmd.arg_count > 1)
 	{
 		printf("~%s\n", cwd);
+		free(cwd);
 		return ;
 	}
 	if (root->u_content.cmd.arg_count
@@ -47,7 +47,9 @@ void	builtin_cd(t_ast_node *root, t_env *env)
 		previous_rep(env, cwd);	
 	else
 		path(root, env, cwd);
-	cwd = get_pwd();
+	free(cwd);
+	cwd = malloc(PATH_MAX * sizeof(char));
+	getcwd(cwd, PATH_MAX);
 	env_set(&env, "PWD", cwd);
 	free(cwd);
 }
