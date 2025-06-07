@@ -54,20 +54,20 @@ There is a 5-byte "still reachable" memory block from a static variable `last_ex
 3. **Error Handling**
    - [x] Implement error messages
    - [x] Add syntax error detection
-   - [ ] Create graceful error recovery
+   - [x] Create graceful error recovery
 
 4. **History Management**
    - [x] Implement command history
-   - [ ] Handle history file operations
+   - [x] Handle history file operations
 
 5. **Signal Handling Support**
    - [x] Set up signal handlers
    - [x] Implement behavior for Ctrl+C, Ctrl+D, Ctrl+\
 
 6. **Environment Variable Management**
-   - [ ] Environment variable storage
+   - [x] Environment variable storage
    - [ ] Variable expansion
-   - [ ] Handle $? special variable
+   - [x] Handle $? special variable
 
 ### Lada's Tasks
 1. **Command Execution**
