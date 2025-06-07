@@ -125,20 +125,28 @@ void	builtin_unset(t_ast_node *root, t_env *env)
 
 void	builtin_echo(t_ast_node *root)
 {
-	int	i;
+	int		i;
+	int		newline = 1;
 
-	if (root->u_content.cmd.arg_count == 1
-		&& ft_strncmp(root->u_content.cmd.args[0], "-n", 3) == 0)
-		return;
-	if (ft_strncmp(root->u_content.cmd.args[0], "-n", 3) == 0)
-		i = 0;
-	else
-		i = -1;
-	while (++i < root->u_content.cmd.arg_count && root->u_content.cmd.args[i])
+	if (root->u_content.cmd.arg_count > 0
+		&& ft_strncmp(root->u_content.cmd.args[0], "-n", 2) == 0)
 	{
-		if (root->u_content.cmd.args[i])
-			printf("%s ", root->u_content.cmd.args[i]);
+		newline = 0;
+		i = 0; // Start from the second argument
 	}
-	if (ft_strncmp(root->u_content.cmd.args[0], "-n", 3) == 0)
+	else
+		i = -1; // Start from the first argument
+	
+	while (++i < root->u_content.cmd.arg_count && root->u_content.cmd.args[i])
+    {
+        if (root->u_content.cmd.args[i])
+        {
+            printf("%s", root->u_content.cmd.args[i]);
+            // Add space only if not the last argument
+            if (i < root->u_content.cmd.arg_count - 1)
+                printf(" ");
+        }
+    }
+	if (newline)
 		printf("\n");
 }
