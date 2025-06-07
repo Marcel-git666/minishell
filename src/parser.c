@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/27 22:43:33 by marcel           ###   ########.fr       */
+/*   Updated: 2025/05/28 13:44:16 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,6 @@ t_ast_node	*parse_command(t_parser *parser)
 			= ft_strdup(parser->current_token->value);
 		parser->current_token = parser->current_token->next;
 	}
-
 	return (ast_node);
 }
 

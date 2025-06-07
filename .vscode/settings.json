@@ -1,0 +1,19 @@
+{
+	"files.associations": {
+		"minishell.h": "c",
+		"parser.h": "c",
+		"env.h": "c",
+		"execution.h": "c",
+		"system_error": "c",
+		"array": "c",
+		"functional": "c",
+		"tuple": "c",
+		"type_traits": "c",
+		"utility": "c",
+		"builtins.h": "c",
+		"dirent.h": "c",
+		"shell_loop.h": "c",
+		"unistd.h": "c"
+	}
+		
+}

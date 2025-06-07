@@ -3,14 +3,73 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:24:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/23 15:49:58 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/06/04 11:13:16 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "builtins.h"
+
+int	ft_envsize(t_env *lst)
+{
+	int		len;
+
+	len = 0;
+	while (lst)
+	{
+		len++;
+		lst = lst->next;
+	}
+	return (len);
+}
+
+static void	add_order(t_env *env, char **envp, int len)
+{
+	int		j;
+	t_env	*start;
+
+	j = -1;
+	start = env;
+	while (++j < len)
+	{
+		while (env && ft_strncmp(env->key, envp[j], ft_strlen(env->key)) != 0)
+			env = env->next;
+		if (env && ft_strncmp(env->key, envp[j], ft_strlen(env->key)) == 0)
+			env->order = j;
+		env = start;
+	}
+}
+
+static void	get_order(t_env *env, char **envp)
+{
+    int		i;
+	int		j;
+	int		len;
+	t_env	*start;
+	char	*temp;
+
+    i = -1;
+	j = 0;
+	start = env;
+	len = ft_envsize(env);
+	while (++j < (len - 1))
+	{
+		i = -1;
+		while (++i < (len - j))
+		{
+			if (ft_strcmp(envp[i], envp[i + 1]) > 0)
+			{
+				temp = envp[i];
+				envp[i] = envp[i + 1];
+				envp[i + 1] = temp;
+			}
+		}
+	}
+	add_order(start, envp, len);
+}
 
 t_env   *env_init(char **envp)
 {
@@ -31,7 +90,7 @@ t_env   *env_init(char **envp)
             // Split key and value at the equals sign
             new_node->key = ft_strndup(envp[i], equals_pos - envp[i]);
             new_node->value = ft_strdup(equals_pos + 1);
-
+            new_node->order = 0;
             if (!new_node->key || !new_node->value)
             {
                 free(new_node->key);
@@ -59,6 +118,7 @@ t_env   *env_init(char **envp)
         }
         i++;
     }
+    get_order(env_list, envp);
     return (env_list);
 }
 

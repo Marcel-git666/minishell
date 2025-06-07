@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   shell_loop.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 12:59:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/23 15:46:20 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/06/04 14:07:53 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	handle_input(char *input)
 	}
 }
 
-void	run_shell_loop(t_shell *shell)
+void	run_shell_loop(t_shell *shell, char **envp)
 {
 	char		*input;
 	t_token		*tokens;
@@ -90,7 +90,8 @@ void	run_shell_loop(t_shell *shell)
 					// For now, just print that parsing succeeded
 					printf("Successfully created AST\n");
 					print_ast(ast, 0);
-					execute_command(ast, shell);
+					// redirection(ast, shell);
+					execute_command(ast, shell, envp);
 					free_ast(ast);
 				}
 				free_tokens(tokens);

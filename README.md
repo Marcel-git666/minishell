@@ -76,13 +76,13 @@ There is a 5-byte "still reachable" memory block from a static variable `last_ex
    - [ ] Manage process forking
 
 2. **Built-in Commands**
-   - [ ] echo with -n option
-   - [ ] cd with relative/absolute paths
-   - [ ] pwd
-   - [ ] export
-   - [ ] unset
-   - [ ] env
-   - [ ] exit
+   - [x] echo with -n option
+   - [x] cd with relative/absolute paths
+   - [x] pwd
+   - [x] export
+   - [x] unset
+   - [x] env
+   - [x] exit
 
 3. **Redirection Implementation**
    - [ ] Input redirection (<)

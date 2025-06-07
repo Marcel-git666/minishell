@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/18 22:17:18 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/06 10:16:09 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	main(int argc, char **argv, char **envp)
 	shell = initialize_shell(envp);
 	if (!shell)
 		return (1);
-	run_shell_loop(shell);
+	run_shell_loop(shell, envp);
 	save_history();
 	env_free(shell->env);
 	free(shell);
