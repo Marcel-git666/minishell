@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_special_tokens.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/03/06 18:08:57 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/06/07 19:55:24 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 	else if (lexer->input[lexer->i] == '$')
 	{
 		env = extract_env_var(lexer->input, &(lexer->i));
+		if (!env)
+			return (-1);
 		if (ft_strncmp(env, "?", 2) == 0)
 			add_token(&(lexer->tokens), create_token(TOKEN_EXIT_CODE, "?"));
 		else
