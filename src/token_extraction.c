@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/02 20:07:26 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/07 19:58:30 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,6 @@ char	*extract_env_var(const char *input, size_t *index)
 	{
 		(*index)++;	// Skip the ?
 		return (ft_strdup("?"));
-	}
-	if (input[*index] == '$')
-	{
-    	(*index)++; 
-    	return (ft_strdup("$")); // Return something to indicate PID
 	}
 	if (!ft_isalpha(input[*index]) && input[*index] != '_')
 		return (error_message("syntax error: invalid environment variable name"), NULL);
