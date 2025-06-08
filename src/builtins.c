@@ -54,23 +54,56 @@ void	builtin_cd(t_ast_node *root, t_env *env)
 	free(cwd);
 }
 
+static void handle_export_assignment(char *assignment, t_env **env)
+{
+    char **parts;
+    int i;
+    
+    parts = ft_split(assignment, '=');
+    if (!parts || !parts[0] || !parts[1])
+    {
+        // Free parts pokud jsou částečně alokovány
+        if (parts)
+        {
+            i = -1;
+            while (parts[++i])
+                free(parts[i]);
+            free(parts);
+        }
+        return;
+    }
+    
+    env_set(env, parts[0], parts[1]);
+    
+    // Free parts
+    i = -1;
+    while (parts[++i])
+        free(parts[i]);
+    free(parts);
+}
+
 void	builtin_export(t_ast_node *root, t_env *env)
 {
 	int		j;
 	int		len;
 	t_env	*start;
 
-	j = -1;
-	start = env;
-	len = ft_envsize(env);
-	if (root->u_content.cmd.arg_count > 1 || root->u_content.cmd.arg_count < 0
-		|| (root->u_content.cmd.arg_count == 1
+	if (root->u_content.cmd.arg_count == 1 &&
+    	ft_strchr(root->u_content.cmd.args[0], '='))
+	{
+		handle_export_assignment(root->u_content.cmd.args[0], &env);
+    	return ;
+	}
+	if (root->u_content.cmd.arg_count > 1  || (root->u_content.cmd.arg_count == 1
 		&& ft_strncmp(root->u_content.cmd.args[0], "-p", 2) != 0))
 	{
-		error_message("-bash: export: -l: invalid option\nexport: usage: export\
+		error_message("error: export: -l: invalid option\nexport: usage: export \
 or export -p");
 		return ;
 	}
+	j = -1;
+	start = env;
+	len = ft_envsize(env);
 	while (env && ++j < len)
 	{
 		while (env && j != env->order)
