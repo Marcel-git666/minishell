@@ -49,7 +49,7 @@ There is a 5-byte "still reachable" memory block from a static variable `last_ex
 2. **Parser Implementation**
    - [x] Create abstract syntax tree (AST)
    - [x] Handle command separation
-   - [ ] Implement syntax validation
+   - [x] Implement syntax validation
 
 3. **Error Handling**
    - [x] Implement error messages
