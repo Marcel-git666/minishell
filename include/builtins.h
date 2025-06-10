@@ -26,17 +26,17 @@ void	builtin_exit(void);
 void	builtin_pwd(void);
 
 // cd
-void	builtin_cd(t_ast_node *root, t_env *env);
+void	builtin_cd(t_ast_node *root, t_env **env);
 char	*get_pwd(void);
 void	path(t_ast_node *root, t_env *env, char *cwd);
 void	previous_rep(t_env *env, char *cwd);
 int		absolute_path(t_ast_node *root, int i, int j);
 
 // export
-void	builtin_export(t_ast_node *root, t_env *env);
+void	builtin_export(t_ast_node *root, t_env **env);
 
 // unset
-void	builtin_unset(t_ast_node *root, t_env *env);
+void	builtin_unset(t_ast_node *root, t_env **env);
 
 // echo
 void	builtin_echo(t_ast_node *root);
