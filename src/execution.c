@@ -111,11 +111,11 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "pwd", 4) == 0)
 			builtin_pwd();
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "cd", 3) == 0)
-			builtin_cd(ast_node, shell->env);
+			builtin_cd(ast_node, &shell->env);
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "export", 7) == 0)
-			builtin_export(ast_node, shell->env);
+			builtin_export(ast_node, &shell->env);
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "unset", 6) == 0)
-			builtin_unset(ast_node, shell->env);
+			builtin_unset(ast_node, &shell->env);
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "echo", 5) == 0)
 			builtin_echo(ast_node);
 		else

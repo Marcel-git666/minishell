@@ -30,7 +30,7 @@ void	builtin_pwd(void)
         perror("pwd");
 }
 
-void	builtin_cd(t_ast_node *root, t_env *env)
+void	builtin_cd(t_ast_node *root, t_env **env)
 {
 	char	*cwd;
 
@@ -44,46 +44,71 @@ void	builtin_cd(t_ast_node *root, t_env *env)
 	}
 	if (root->u_content.cmd.arg_count
 		&& ft_strncmp(root->u_content.cmd.args[0], "..", 2) == 0)
-		previous_rep(env, cwd);	
+		previous_rep(*env, cwd);	
 	else
-		path(root, env, cwd);
+		path(root, *env, cwd);
 	free(cwd);
 	cwd = malloc(PATH_MAX * sizeof(char));
 	getcwd(cwd, PATH_MAX);
-	env_set(&env, "PWD", cwd);
+	env_set(env, "PWD", cwd);
 	free(cwd);
 }
 
-void	builtin_export(t_ast_node *root, t_env *env)
+static void handle_export_assignment(char *assignment, t_env **env)
 {
-	int		j;
-	int		len;
-	t_env	*start;
+    char **parts;
+    int i;
+    
+    parts = ft_split(assignment, '=');
+    if (!parts || !parts[0] || !parts[1])
+    {
+        // Free parts pokud jsou částečně alokovány
+        if (parts)
+        {
+            i = -1;
+            while (parts[++i])
+                free(parts[i]);
+            free(parts);
+        }
+        return;
+    }
+    
+    env_set(env, parts[0], parts[1]);
+    
+    // Free parts
+    i = -1;
+    while (parts[++i])
+        free(parts[i]);
+    free(parts);
+}
 
-	j = -1;
-	start = env;
-	len = ft_envsize(env);
-	if (root->u_content.cmd.arg_count > 1 || root->u_content.cmd.arg_count < 0
-		|| (root->u_content.cmd.arg_count == 1
+void	builtin_export(t_ast_node *root, t_env **env)
+{
+	if (root->u_content.cmd.arg_count == 1 &&
+    	ft_strchr(root->u_content.cmd.args[0], '='))
+	{
+		handle_export_assignment(root->u_content.cmd.args[0], env);
+    	return ;
+	}
+	if (root->u_content.cmd.arg_count > 1  || (root->u_content.cmd.arg_count == 1
 		&& ft_strncmp(root->u_content.cmd.args[0], "-p", 2) != 0))
 	{
-		error_message("-bash: export: -l: invalid option\nexport: usage: export\
+		error_message("error: export: -l: invalid option\nexport: usage: export \
 or export -p");
 		return ;
 	}
-	while (env && ++j < len)
-	{
-		while (env && j != env->order)
-			env = env->next;
-		if (env && root->u_content.cmd.arg_count == 1)
-			printf("export %s=%s\n", env->key, env->value);
-		else if (env)
-			printf("%s=%s\n", env->key, env->value);
-		env = start;
-	}
+	t_env *current = *env;  // ← Lokální kopie pointeru
+    while (current)
+    {
+        if (root->u_content.cmd.arg_count == 1)
+            printf("export %s=%s\n", current->key, current->value);
+        else
+            printf("%s=%s\n", current->key, current->value);
+        current = current->next;  // ← Posuň lokální kopii
+    }
 }
 
-void	builtin_unset(t_ast_node *root, t_env *env)
+void	builtin_unset(t_ast_node *root, t_env **env)
 {
 	int		i;
 	t_env	*prev;
@@ -91,7 +116,7 @@ void	builtin_unset(t_ast_node *root, t_env *env)
 	t_env	*to_free;
 
 	i = -1;
-	start = env;
+	start = *env;
 	if (root->u_content.cmd.arg_count == 0)
 	{
 		error_message("unset: not enough arguments");
@@ -99,20 +124,20 @@ void	builtin_unset(t_ast_node *root, t_env *env)
 	}
 	while (++i < root->u_content.cmd.arg_count && root->u_content.cmd.args[i])
 	{
-		while (env && ft_strncmp(root->u_content.cmd.args[i], env->key,
+		while (*env && ft_strncmp(root->u_content.cmd.args[i], (*env)->key,
 			ft_strlen(root->u_content.cmd.args[i])) != 0)
 		{
-			prev = env;
-			env = env->next;
+			prev = *env;
+			*env = (*env)->next;
 		}
-		if (env && env->key && ft_strncmp(root->u_content.cmd.args[i], env->key,
+		if (*env && (*env)->key && ft_strncmp(root->u_content.cmd.args[i], (*env)->key,
 			ft_strlen(root->u_content.cmd.args[i])) == 0)
 		{
-			to_free = env;
-			env = env->next;
-			prev->next = env;
+			to_free = *env;
+			*env = (*env)->next;
+			prev->next = *env;
 		}
-		env = start;
+		*env = start;
 		if (to_free)
 		{
 			free(to_free->key);

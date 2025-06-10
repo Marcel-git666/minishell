@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 18:50:12 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/06 16:49:38 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/08 20:06:50 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void		search_command(t_ast_node *ast, t_env *env, char **envp);
 
 // builtin.c
 void		builtin_pwd(void);
-void		builtin_cd(t_ast_node *root, t_env *env);
-void		builtin_export(t_ast_node *root, t_env *env);
+void		builtin_cd(t_ast_node *root, t_env **env);
+void		builtin_export(t_ast_node *root, t_env **env);
 
 #endif
