@@ -38,19 +38,35 @@ char	*full_path(char **paths, char *path, t_ast_node *ast)
 	}
 	return (NULL);
 }
-void	fork_it(char *path, char **args, char **envp)
+int	fork_it(char *path, char **args, char **envp)
 {
-	int	pid;
+	int		pid;
+	int		status;
 
-	pid = 0;
-	if (access(path, F_OK) == 0)
-	{
-		pid = fork();
-		if (pid == 0)
-			execve(path, args, envp);
-		else
-			wait(&pid);
+	printf("DEBUG: fork_it called with path='%s'\n", path);
+	if (access(path, F_OK) != 0) {
+		printf("DEBUG: access() failed for %s\n", path);
+		return (-1); 
 	}
+
+	pid = fork();
+	if (pid == 0) {
+		printf("DEBUG: child process executing %s\n", path);
+        execve(path, args, envp);
+	}
+    else if (pid > 0)
+    {
+		printf("DEBUG: parent waiting for child %d\n", pid);
+        wait(&status);
+        if (WIFEXITED(status)) {
+			printf("DEBUG: child exited with status %d\n", WEXITSTATUS(status));
+            return (WEXITSTATUS(status));  // Return actual exit code
+		}
+		printf("DEBUG: child terminated abnormally\n");
+        return (-1);  // Process terminated abnormally
+    }
+	printf("DEBUG: fork failed\n");
+    return (-1); // Fork failed
 }
 
 void	free_source(char **path, char *slash, char *final_path, char **args)
@@ -69,34 +85,82 @@ void	free_source(char **path, char *slash, char *final_path, char **args)
 	free(slash);
 }
 
-void	search_command(t_ast_node *ast, t_env *env, char **envp)
+int	search_command(t_ast_node *ast, t_env *env, char **envp)
 {
 	char	**paths;
 	char	*slash;
 	char	*path;
 	char	**args;
 	int		i;
+	int		exit_code;
 
+	printf("DEBUG: search_command called for '%s'\n", ast->u_content.cmd.cmd);
+	if (ft_strchr(ast->u_content.cmd.cmd, '/'))
+	{
+    	printf("DEBUG: Command contains '/', treating as path\n");
+		if (access(ast->u_content.cmd.cmd, F_OK) != 0)
+    	{
+        	printf("DEBUG: File not found: %s\n", ast->u_content.cmd.cmd);
+        	return (127);  // Command not found
+    	}
+    	// Prepare arguments array
+    	args = ft_calloc((ast->u_content.cmd.arg_count + 2), sizeof(char *));
+    	args[0] = ft_strdup(ast->u_content.cmd.cmd);
+    	i = 0;
+    	while (i < ast->u_content.cmd.arg_count)
+    	{
+        	args[i + 1] = ft_strdup(ast->u_content.cmd.args[i]);
+        	i++;
+    	}
+    
+    	exit_code = fork_it(ast->u_content.cmd.cmd, args, envp);
+    
+    	// Free args
+    	i = -1;
+    	while (args[++i])
+        	free(args[i]);
+    	free(args);
+    
+    	return (exit_code);
+	}
 	i = -1;
 	slash = NULL;
 	path = NULL;
 	while (env && ft_strncmp(env->key, "PATH", 5) != 0)
 		env = env->next;
+	if (!env) {
+        printf("DEBUG: PATH not found in environment!\n");
+        return (127);
+    }
+	printf("DEBUG: PATH = %s\n", env->value);
 	paths = ft_split(env->value,':');
 	args = ft_calloc((ast->u_content.cmd.arg_count + 2), sizeof(char *));
 	args[0] = ft_strdup(ast->u_content.cmd.cmd);
+	printf("DEBUG: args[0] = '%s'\n", args[0]);
 	while (++i < ast->u_content.cmd.arg_count && ast->u_content.cmd.arg_count != 0)
 		args[i + 1] = ft_strdup(ast->u_content.cmd.args[i]);
 	path = full_path(paths, path, ast);
-	fork_it(path, args, envp);
+	printf("DEBUG: full_path returned: %s\n", path ? path : "NULL");
+	if (path)
+    {
+		printf("DEBUG: Executing %s\n", path);
+        exit_code = fork_it(path, args, envp);
+		printf("DEBUG: fork_it returned exit_code: %d\n", exit_code);
+        free_source(paths, slash, path, args);
+        return (exit_code);
+    }
+	printf("DEBUG: Command not found in PATH\n");
 	free_source(paths, slash, path, args);
+	return (127); // Command not found
 }
+
 
 void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
 	char	*expanded_cmd;
 	char	*expanded_arg;
 	int		i;
+	int		exit_code;
 
 	i = -1;
 	expanded_cmd = NULL;
@@ -147,16 +211,8 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		else
 		{
 			printf("DEBUG: No builtin found, executing as external command\n");
-			search_command(ast_node, shell->env, envp);
-			// For now, just print command info
-			printf("Would execute: %s", ast_node->u_content.cmd.cmd);
-			if (ast_node->u_content.cmd.arg_count > 0)
-			{
-				printf(" with args:");
-				for (int i = 0; i < ast_node->u_content.cmd.arg_count; i++)
-					printf(" %s", ast_node->u_content.cmd.args[i]);
-			}
-			printf("\n");
+			exit_code = search_command(ast_node, shell->env, envp);
+    		shell->last_exit_code = exit_code;
 		}
 	}
 	free(expanded_cmd);
