@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/06 10:16:09 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/10 21:32:49 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	print_tokens(t_token *tokens)
 	{
 		"TOKEN_CMD", "TOKEN_ARG", "TOKEN_PIPE", "TOKEN_REDIR_IN",
 		"TOKEN_REDIR_OUT", "TOKEN_APPEND_OUT", "TOKEN_HEREDOC",
-		"TOKEN_STRING", "TOKEN_ENV_VAR", "TOKEN_EXIT_CODE",
+		"TOKEN_DOUBLE_QUOTED", "TOKEN_SINGLE_QUOTED", "TOKEN_ENV_VAR", "TOKEN_EXIT_CODE",
 		"TOKEN_FILE", "TOKEN_DELIMITER", "TOKEN_ASSIGNMENT", "TOKEN_EOF"
 	};
 

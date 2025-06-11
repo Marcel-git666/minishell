@@ -13,10 +13,10 @@
 #include "minishell.h"
 #include "parser.h"
 #include "env.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
+// #include <sys/types.h>
+// #include <sys/stat.h>
+// #include <unistd.h>
+#include "expansion.h"
 
 char	*full_path(char **paths, char *path, t_ast_node *ast)
 {
@@ -38,7 +38,6 @@ char	*full_path(char **paths, char *path, t_ast_node *ast)
 	}
 	return (NULL);
 }
-
 void	fork_it(char *path, char **args, char **envp)
 {
 	int	pid;
@@ -95,6 +94,12 @@ void	search_command(t_ast_node *ast, t_env *env, char **envp)
 
 void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
+	char	*expanded_cmd;
+	char	*expanded_arg;
+	int		i;
+
+	i = -1;
+	expanded_cmd = NULL;
 	if (!ast_node)
 		return ;
 	if (ast_node->type == NODE_REDIR)
@@ -104,22 +109,44 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	}
 	if (ast_node->type == NODE_COMMAND)
 	{
-		if (ft_strncmp(ast_node->u_content.cmd.cmd, "exit", 5) == 0)
+		expanded_cmd = expand_variables(ast_node->u_content.cmd.cmd, 
+                shell->env, shell->last_exit_code, 0);
+		if (!expanded_cmd)
+		{
+			printf("DEBUG: Command expansion failed\n");
+			return ;
+		}
+		while (++i < ast_node->u_content.cmd.arg_count)
+        {
+            expanded_arg = expand_variables(ast_node->u_content.cmd.args[i],
+                    shell->env, shell->last_exit_code, 
+        			ast_node->u_content.cmd.arg_is_env_var[i]);
+            free(ast_node->u_content.cmd.args[i]);
+            ast_node->u_content.cmd.args[i] = expanded_arg;
+        }
+		printf("DEBUG: expanded_cmd='%s', length=%zu\n", expanded_cmd, ft_strlen(expanded_cmd));
+
+		if (ft_strncmp(expanded_cmd, "exit", 5) == 0)
+		{
+			printf("DEBUG: Found exit builtin\n");
 			builtin_exit();
-		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "env", 4) == 0)
+		}
+
+		else if (ft_strncmp(expanded_cmd, "env", 4) == 0)
 			env_print(shell->env);
-		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "pwd", 4) == 0)
+		else if (ft_strncmp(expanded_cmd, "pwd", 4) == 0)
 			builtin_pwd();
-		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "cd", 3) == 0)
+		else if (ft_strncmp(expanded_cmd, "cd", 3) == 0)
 			builtin_cd(ast_node, &shell->env);
-		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "export", 7) == 0)
+		else if (ft_strncmp(expanded_cmd, "export", 7) == 0)
 			builtin_export(ast_node, &shell->env);
-		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "unset", 6) == 0)
+		else if (ft_strncmp(expanded_cmd, "unset", 6) == 0)
 			builtin_unset(ast_node, &shell->env);
-		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "echo", 5) == 0)
+		else if (ft_strncmp(expanded_cmd, "echo", 5) == 0)
 			builtin_echo(ast_node);
 		else
 		{
+			printf("DEBUG: No builtin found, executing as external command\n");
 			search_command(ast_node, shell->env, envp);
 			// For now, just print command info
 			printf("Would execute: %s", ast_node->u_content.cmd.cmd);
@@ -132,5 +159,6 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 			printf("\n");
 		}
 	}
+	free(expanded_cmd);
 	return ;
 }

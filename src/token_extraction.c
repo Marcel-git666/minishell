@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/07 19:58:30 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/10 21:46:02 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,19 @@ char	*extract_env_var(const char *input, size_t *index)
 	size_t	start;
 
 	start = ++(*index);
+	// Handle ${VAR}
+    if (input[*index] == '{')
+    {
+        (*index)++; // Skip {
+        start = *index;
+        while (input[*index] && input[*index] != '}')
+            (*index)++;
+        if (input[*index] != '}')
+            return (error_message("syntax error: missing closing brace"), NULL);
+        char *var_name = ft_strndup(input + start, *index - start);
+        (*index)++; // Skip }
+        return (var_name);
+    }
 	if (input[*index] == '?')
 	{
 		(*index)++;	// Skip the ?

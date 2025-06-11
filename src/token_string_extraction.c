@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_string_extraction.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 17:40:18 by mmravec           #+#    #+#             */
-/*   Updated: 2025/03/06 18:46:29 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/06/10 21:25:04 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static void	extract_text_before_env_var(t_lexer *lexer, size_t *start)
 	if (lexer->i > *start)
 	{
 		substr = ft_substr(lexer->input, *start, lexer->i - *start);
-		token = create_token(TOKEN_STRING, substr);
+		token = create_token(TOKEN_DOUBLE_QUOTED, substr);
 		add_token(&(lexer->tokens), token);
 		free(substr);
 	}

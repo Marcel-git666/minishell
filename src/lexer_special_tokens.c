@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/07 19:55:24 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/10 21:31:58 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,20 +40,29 @@ static int	handle_pipe_token(t_lexer *lexer, int *is_first_word)
 	return (0);
 }
 
-static int	handle_quote_token(t_lexer *lexer)
+static int handle_quote_token(t_lexer *lexer)
 {
-	char	*quoted;
-
-	if (lexer->input[lexer->i] == '\'')
-		quoted = extract_single_quoted_string(lexer);
-	else
-		quoted = extract_double_quoted_string(lexer);
-	if (!quoted)
-		return (-1);
-	if (ft_strlen(quoted) > 0)
-		add_token(&(lexer->tokens), create_token(TOKEN_STRING, quoted));
-	free(quoted);
-	return (0);
+    char *quoted;
+    
+    if (lexer->input[lexer->i] == '\'')
+    {
+        quoted = extract_single_quoted_string(lexer);
+        if (!quoted)
+            return (-1);
+        if (ft_strlen(quoted) > 0)
+            add_token(&(lexer->tokens), create_token(TOKEN_SINGLE_QUOTED, quoted));
+    }
+    else
+    {
+        quoted = extract_double_quoted_string(lexer);
+        if (!quoted)
+            return (-1);
+        if (ft_strlen(quoted) > 0)
+            add_token(&(lexer->tokens), create_token(TOKEN_DOUBLE_QUOTED, quoted));
+    }
+    
+    free(quoted);
+    return (0);
 }
 
 int	handle_special_tokens(t_lexer *lexer, int *is_first_word)

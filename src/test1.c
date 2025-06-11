@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 20:06:22 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/04 02:12:16 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/10 21:25:04 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	test_pipe_sequences(void)
 		{TOKEN_ARG, "-la"},
 		{TOKEN_PIPE, "|"},
 		{TOKEN_CMD, "grep"},
-		{TOKEN_STRING, "*.c"},
+		{TOKEN_DOUBLE_QUOTED, "*.c"},
 		{TOKEN_PIPE, "|"},
 		{TOKEN_CMD, "wc"},
 		{TOKEN_ARG, "-l"}
@@ -57,9 +57,9 @@ void	test_env_variables(void)
 	t_token	*tokens;
 	t_expected_token	expected[] = {
 		{TOKEN_CMD, "echo"},
-		{TOKEN_STRING, "Hello "},
+		{TOKEN_DOUBLE_QUOTED, "Hello "},
 		{TOKEN_ENV_VAR, "USER"},
-		{TOKEN_STRING, "! Your home is "},
+		{TOKEN_DOUBLE_QUOTED, "! Your home is "},
 		{TOKEN_ENV_VAR, "HOME"}
 	};
 
@@ -74,7 +74,7 @@ void	test_mixed_quotes(void)
 	t_token	*tokens;
 	t_expected_token	expected[] = {
 		{TOKEN_CMD, "echo"},
-		{TOKEN_STRING, "$USER"},  // Should not expand in single quotes
+		{TOKEN_DOUBLE_QUOTED, "$USER"},  // Should not expand in single quotes
 		{TOKEN_ENV_VAR, "HOME"}   // Should expand in double quotes
 	};
 
