@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/14 18:03:26 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 18:21:23 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,15 @@ static char *extract_compound_token(t_lexer *lexer, size_t start_pos)
 {
     size_t end_pos = lexer->i;
     
-    // Najdi konec slova - pokračuj i přes $ znaky
-    while (lexer->input[end_pos] && !ft_isspace(lexer->input[end_pos]) 
-           && !(is_special_char(lexer->input[end_pos]) && lexer->input[end_pos] != '$'))
+    // Najdi konec slova - pokračuj i přes $ znaky a quotes
+    while (lexer->input[end_pos] && !ft_isspace(lexer->input[end_pos]))
+    {
+        // Zastaví se pouze na pipe a redirections, ne na $ a quotes
+        if ((lexer->input[end_pos] == '|' || lexer->input[end_pos] == '<' 
+             || lexer->input[end_pos] == '>'))
+            break;
         end_pos++;
-    
+    }
     // Zkopíruj celý compound token
     char *compound = ft_strndup(lexer->input + start_pos, end_pos - start_pos);
     
@@ -104,8 +108,8 @@ int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
         
     	// Zkontroluj, zda hned pokračuje text (compound token)
     	if (lexer->input[lexer->i] && !ft_isspace(lexer->input[lexer->i]) 
-        	&& !is_special_char(lexer->input[lexer->i]))
-    	{
+    		&& (lexer->input[lexer->i] == '$' || !is_special_char(lexer->input[lexer->i])))
+{
         	// Vytvoř compound token - celý text od $ až po konec slova
         	compound = extract_compound_token(lexer, start_pos);
         	add_token(&(lexer->tokens), create_token(TOKEN_ARG, compound));
