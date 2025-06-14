@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/28 13:44:16 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/14 19:35:46 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,10 @@ t_ast_node	*parse_command(t_parser *parser)
 	cmd_token = parser->current_token;
 	parser->current_token = parser->current_token->next;
 	while (parser->current_token && (parser->current_token->type == TOKEN_ARG
-		|| parser->current_token->type == TOKEN_STRING))
+		|| parser->current_token->type == TOKEN_DOUBLE_QUOTED
+		|| parser->current_token->type == TOKEN_SINGLE_QUOTED
+		|| parser->current_token->type == TOKEN_ENV_VAR
+		|| parser->current_token->type == TOKEN_EXIT_CODE))
 	{
 		argument_count++;
 		parser->current_token = parser->current_token->next;
@@ -120,21 +123,30 @@ t_ast_node	*parse_command(t_parser *parser)
 	if (argument_count > 0)
 	{
 		ast_node->u_content.cmd.args = malloc((argument_count + 1) * sizeof(char *));
-		if (!ast_node->u_content.cmd.args)
+		ast_node->u_content.cmd.arg_token_types = malloc(argument_count * sizeof(int));
+		if (!ast_node->u_content.cmd.args || !ast_node->u_content.cmd.arg_token_types)
 		{
-			free(ast_node->u_content.cmd.cmd);
-			free(ast_node);
-			return (NULL);
-		}
+       		free(ast_node->u_content.cmd.cmd);
+        	if (ast_node->u_content.cmd.args)
+            	free(ast_node->u_content.cmd.args);
+        	if (ast_node->u_content.cmd.arg_token_types)
+            	free(ast_node->u_content.cmd.arg_token_types);
+        	free(ast_node);
+        	return (NULL);
+    	}
 	}
 	else
+	{
 		ast_node->u_content.cmd.args = NULL;
+		ast_node->u_content.cmd.arg_token_types = NULL;
+	}
 
 	parser->current_token = parser->current_token->next;
 	while (++i < argument_count)
 	{
 		ast_node->u_content.cmd.args[i]
 			= ft_strdup(parser->current_token->value);
+		ast_node->u_content.cmd.arg_token_types[i] = parser->current_token->type;
 		parser->current_token = parser->current_token->next;
 	}
 	return (ast_node);
