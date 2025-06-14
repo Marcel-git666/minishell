@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 18:50:12 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/11 21:04:08 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 18:54:44 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,5 @@ typedef struct s_shell t_shell;
 // execution.c
 void	    execute_command(t_ast_node *ast_node, t_shell *shell, char **envp);
 int		    search_command(t_ast_node *ast, t_env *env, char **envp);
-
-// builtin.c
-void		builtin_pwd(void);
-void		builtin_cd(t_ast_node *root, t_env **env);
-void		builtin_export(t_ast_node *root, t_env **env);
 
 #endif

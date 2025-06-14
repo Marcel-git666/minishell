@@ -14,23 +14,44 @@
 #include "env.h"
 #include "builtins.h"
 
-void	builtin_exit(void)
+void	builtin_exit(t_shell *shell)
 {
+	if (shell->env)
+	{
+		t_env *current = shell->env;
+		t_env *next;
+		while (current)
+		{
+			next = current->next;
+			free(current->key);
+			free(current->value);
+			free(current);
+			current = next;
+		}
+		shell->env = NULL;
+	}
 	printf("Exiting minishell...\n");
+	shell->last_exit_code = 0; // Set last exit code to 0 before exiting
 	exit(0);
 }
 
-void	builtin_pwd(void)
+void	builtin_pwd(t_shell *shell)
 {
     char	cwd[PATH_MAX];
 
     if (getcwd(cwd, sizeof(cwd)))
+	{
         printf("%s\n", cwd);
+		shell->last_exit_code = 0;
+	}
     else
+	{
         perror("pwd");
+		shell->last_exit_code = 1;
+	}
 }
 
-void	builtin_cd(t_ast_node *root, t_env **env)
+void	builtin_cd(t_ast_node *root, t_shell *shell)
 {
 	char	*cwd;
 
@@ -40,18 +61,20 @@ void	builtin_cd(t_ast_node *root, t_env **env)
 	{
 		printf("~%s\n", cwd);
 		free(cwd);
+		shell->last_exit_code = 1; 
 		return ;
 	}
 	if (root->u_content.cmd.arg_count
 		&& ft_strncmp(root->u_content.cmd.args[0], "..", 2) == 0)
-		previous_rep(*env, cwd);	
+		previous_rep(shell->env, cwd);	
 	else
-		path(root, *env, cwd);
+		path(root, shell->env, cwd);
 	free(cwd);
 	cwd = malloc(PATH_MAX * sizeof(char));
 	getcwd(cwd, PATH_MAX);
-	env_set(env, "PWD", cwd);
+	env_set(&shell->env, "PWD", cwd);
 	free(cwd);
+	shell->last_exit_code = 0; 
 }
 
 static void handle_export_assignment(char *assignment, t_env **env)
@@ -60,7 +83,6 @@ static void handle_export_assignment(char *assignment, t_env **env)
     int 	i;
     char	*value;
 
-	printf("DEBUG: assignment = '%s'\n", assignment); 
     parts = ft_split(assignment, '=');
     if (!parts || !parts[0] || !parts[1])
     {
@@ -74,7 +96,6 @@ static void handle_export_assignment(char *assignment, t_env **env)
         }
         return;
     }
-	printf("DEBUG: key = '%s', value = '%s'\n", parts[0], parts[1]); 
 	value = parts[1];
 	// Odstraň quotes pokud jsou na začátku a konci
 	if (value[0] == '"' && value[ft_strlen(value) - 1] == '"')
@@ -82,7 +103,6 @@ static void handle_export_assignment(char *assignment, t_env **env)
     	value[ft_strlen(value) - 1] = '\0';  // Odstraň koncovou quote
     	value++;  // Přeskoč úvodní quote
 	}
-	printf("DEBUG: final value = '%s'\n", value);
 	env_set(env, parts[0], value);
     // Free parts
     i = -1;
@@ -91,12 +111,12 @@ static void handle_export_assignment(char *assignment, t_env **env)
     free(parts);
 }
 
-void	builtin_export(t_ast_node *root, t_env **env)
+void	builtin_export(t_ast_node *root, t_shell *shell)
 {
 	if (root->u_content.cmd.arg_count == 1 &&
     	ft_strchr(root->u_content.cmd.args[0], '='))
 	{
-		handle_export_assignment(root->u_content.cmd.args[0], env);
+		handle_export_assignment(root->u_content.cmd.args[0], &shell->env);
     	return ;
 	}
 	if (root->u_content.cmd.arg_count > 1  || (root->u_content.cmd.arg_count == 1
@@ -106,7 +126,7 @@ void	builtin_export(t_ast_node *root, t_env **env)
 or export -p");
 		return ;
 	}
-	t_env *current = *env;  // ← Lokální kopie pointeru
+	t_env *current = shell->env;  // ← Lokální kopie pointeru
     while (current)
     {
         if (root->u_content.cmd.arg_count == 1)
@@ -115,9 +135,10 @@ or export -p");
             printf("%s=%s\n", current->key, current->value);
         current = current->next;  // ← Posuň lokální kopii
     }
+	shell->last_exit_code = 0;
 }
 
-void	builtin_unset(t_ast_node *root, t_env **env)
+void	builtin_unset(t_ast_node *root, t_shell *shell)
 {
 	int		i;
 	t_env	*prev;
@@ -125,7 +146,7 @@ void	builtin_unset(t_ast_node *root, t_env **env)
 	t_env	*to_free;
 
 	i = -1;
-	start = *env;
+	start = shell->env;
 	if (root->u_content.cmd.arg_count == 0)
 	{
 		error_message("unset: not enough arguments");
@@ -133,6 +154,7 @@ void	builtin_unset(t_ast_node *root, t_env **env)
 	}
 	while (++i < root->u_content.cmd.arg_count && root->u_content.cmd.args[i])
 	{
+		t_env **env = &shell->env;
 		while (*env && ft_strncmp(root->u_content.cmd.args[i], (*env)->key,
 			ft_strlen(root->u_content.cmd.args[i])) != 0)
 		{
@@ -155,9 +177,10 @@ void	builtin_unset(t_ast_node *root, t_env **env)
 			to_free = NULL;
 		}
 	}
+	shell->last_exit_code = 0;
 }
 
-void	builtin_echo(t_ast_node *root)
+void	builtin_echo(t_ast_node *root, t_shell *shell)
 {
 	int		i;
 	int		newline = 1;
@@ -183,4 +206,5 @@ void	builtin_echo(t_ast_node *root)
     }
 	if (newline)
 		printf("\n");
+	shell->last_exit_code = 0;
 }
