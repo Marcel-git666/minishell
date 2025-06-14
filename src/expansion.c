@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/14 18:33:40 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 21:30:32 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,18 +134,31 @@ char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
        
        dollar_offset = dollar_pos - result;
        
-       // Získej hodnotu proměnné
-       var_value = get_variable_value(var_name, env, exit_status);
-       value_len = ft_strlen(var_value);  // ← PŘESUNUTO PŘED FREE
+        // Získej hodnotu proměnné
+        var_value = get_variable_value(var_name, env, exit_status);
+        value_len = ft_strlen(var_value);  // ← PŘESUNUTO PŘED FREE
        
-       // Vytvoř nový string s nahrazenou proměnnou
-       *dollar_pos = '\0'; // Ukončí string před $
-       temp = ft_strjoin(result, var_value);
-       
+        // Vytvoř nový string s nahrazenou proměnnou
+        *dollar_pos = '\0'; // Ukončí string před $
+        temp = ft_strjoin(result, var_value);
+        if (!temp)
+        {
+            free(result);
+            free(var_name);
+            free(var_value);
+            return (NULL);
+        }
        // Přidej zbytek po proměnné
        char *rest = dollar_pos + 1 + var_len;
        char *final_result = ft_strjoin(temp, rest);
-       
+       if (!final_result)
+       {
+            free(result);
+            free(temp);
+            free(var_name);
+            free(var_value);
+            return (NULL);
+       }
        // Uvolni paměť
        free(result);
        free(temp);
@@ -154,7 +167,7 @@ char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
        
        result = final_result;
        
-       // Pokračuj heldáním od pozice, kde skončila nahrazená hodnota
+       // Pokračuj hledáním od pozice, kde skončila nahrazená hodnota
        
        current = result + dollar_offset + value_len;  // ← POUŽÍT ULOŽENOU HODNOTU
        
