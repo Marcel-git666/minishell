@@ -81,7 +81,7 @@ static void handle_export_assignment(char *assignment, t_env **env)
 {
     char 	**parts;
     int 	i;
-    char	*value;
+	char	*clean_value;
 
     parts = ft_split(assignment, '=');
     if (!parts || !parts[0] || !parts[1])
@@ -96,14 +96,16 @@ static void handle_export_assignment(char *assignment, t_env **env)
         }
         return;
     }
-	value = parts[1];
-	// Odstraň quotes pokud jsou na začátku a konci
-	if (value[0] == '"' && value[ft_strlen(value) - 1] == '"')
+	clean_value = parts[1];
+	if (clean_value[0] == '"' && clean_value[ft_strlen(clean_value) - 1] == '"')
 	{
-    	value[ft_strlen(value) - 1] = '\0';  // Odstraň koncovou quote
-    	value++;  // Přeskoč úvodní quote
+    	char *temp = ft_substr(clean_value, 1, ft_strlen(clean_value) - 2);
+    	env_set(env, parts[0], temp);
+    	free(temp);
 	}
-	env_set(env, parts[0], value);
+	else
+	    env_set(env, parts[0], clean_value);
+
     // Free parts
     i = -1;
     while (parts[++i])
@@ -117,6 +119,7 @@ void	builtin_export(t_ast_node *root, t_shell *shell)
     	ft_strchr(root->u_content.cmd.args[0], '='))
 	{
 		handle_export_assignment(root->u_content.cmd.args[0], &shell->env);
+		shell->last_exit_code = 0;
     	return ;
 	}
 	if (root->u_content.cmd.arg_count > 1  || (root->u_content.cmd.arg_count == 1
@@ -124,6 +127,7 @@ void	builtin_export(t_ast_node *root, t_shell *shell)
 	{
 		error_message("error: export: -l: invalid option\nexport: usage: export \
 or export -p");
+		shell->last_exit_code = 1;
 		return ;
 	}
 	t_env *current = shell->env;  // ← Lokální kopie pointeru
@@ -140,42 +144,20 @@ or export -p");
 
 void	builtin_unset(t_ast_node *root, t_shell *shell)
 {
-	int		i;
-	t_env	*prev;
-	t_env	*start;
-	t_env	*to_free;
+	int	i;
 
-	i = -1;
-	start = shell->env;
 	if (root->u_content.cmd.arg_count == 0)
 	{
 		error_message("unset: not enough arguments");
+		shell->last_exit_code = 1;
 		return;
 	}
-	while (++i < root->u_content.cmd.arg_count && root->u_content.cmd.args[i])
+	
+	i = 0;
+	while (i < root->u_content.cmd.arg_count)
 	{
-		t_env **env = &shell->env;
-		while (*env && ft_strncmp(root->u_content.cmd.args[i], (*env)->key,
-			ft_strlen(root->u_content.cmd.args[i])) != 0)
-		{
-			prev = *env;
-			*env = (*env)->next;
-		}
-		if (*env && (*env)->key && ft_strncmp(root->u_content.cmd.args[i], (*env)->key,
-			ft_strlen(root->u_content.cmd.args[i])) == 0)
-		{
-			to_free = *env;
-			*env = (*env)->next;
-			prev->next = *env;
-		}
-		*env = start;
-		if (to_free)
-		{
-			free(to_free->key);
-			free(to_free->value);
-			free(to_free);
-			to_free = NULL;
-		}
+		env_unset(&shell->env, root->u_content.cmd.args[i]);
+		i++;
 	}
 	shell->last_exit_code = 0;
 }
