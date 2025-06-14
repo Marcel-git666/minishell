@@ -43,29 +43,24 @@ int	fork_it(char *path, char **args, char **envp)
 	int		pid;
 	int		status;
 
-	printf("DEBUG: fork_it called with path='%s'\n", path);
 	if (access(path, F_OK) != 0) {
-		printf("DEBUG: access() failed for %s\n", path);
-		return (-1); 
+		return (127); 
 	}
 
 	pid = fork();
 	if (pid == 0) {
-		printf("DEBUG: child process executing %s\n", path);
         execve(path, args, envp);
+		perror("error: execve failed");
+        exit(127);
 	}
     else if (pid > 0)
     {
-		printf("DEBUG: parent waiting for child %d\n", pid);
         wait(&status);
         if (WIFEXITED(status)) {
-			printf("DEBUG: child exited with status %d\n", WEXITSTATUS(status));
             return (WEXITSTATUS(status));  // Return actual exit code
 		}
-		printf("DEBUG: child terminated abnormally\n");
         return (-1);  // Process terminated abnormally
     }
-	printf("DEBUG: fork failed\n");
     return (-1); // Fork failed
 }
 
@@ -94,13 +89,10 @@ int	search_command(t_ast_node *ast, t_env *env, char **envp)
 	int		i;
 	int		exit_code;
 
-	printf("DEBUG: search_command called for '%s'\n", ast->u_content.cmd.cmd);
 	if (ft_strchr(ast->u_content.cmd.cmd, '/'))
 	{
-    	printf("DEBUG: Command contains '/', treating as path\n");
 		if (access(ast->u_content.cmd.cmd, F_OK) != 0)
     	{
-        	printf("DEBUG: File not found: %s\n", ast->u_content.cmd.cmd);
         	return (127);  // Command not found
     	}
     	// Prepare arguments array
@@ -129,27 +121,20 @@ int	search_command(t_ast_node *ast, t_env *env, char **envp)
 	while (env && ft_strncmp(env->key, "PATH", 5) != 0)
 		env = env->next;
 	if (!env) {
-        printf("DEBUG: PATH not found in environment!\n");
         return (127);
     }
-	printf("DEBUG: PATH = %s\n", env->value);
 	paths = ft_split(env->value,':');
 	args = ft_calloc((ast->u_content.cmd.arg_count + 2), sizeof(char *));
 	args[0] = ft_strdup(ast->u_content.cmd.cmd);
-	printf("DEBUG: args[0] = '%s'\n", args[0]);
 	while (++i < ast->u_content.cmd.arg_count && ast->u_content.cmd.arg_count != 0)
 		args[i + 1] = ft_strdup(ast->u_content.cmd.args[i]);
 	path = full_path(paths, path, ast);
-	printf("DEBUG: full_path returned: %s\n", path ? path : "NULL");
 	if (path)
     {
-		printf("DEBUG: Executing %s\n", path);
         exit_code = fork_it(path, args, envp);
-		printf("DEBUG: fork_it returned exit_code: %d\n", exit_code);
         free_source(paths, slash, path, args);
         return (exit_code);
     }
-	printf("DEBUG: Command not found in PATH\n");
 	free_source(paths, slash, path, args);
 	return (127); // Command not found
 }
@@ -169,9 +154,17 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		return ;
 	if (ast_node->type == NODE_REDIR)
 	{
+		// TODO: Handle redirection
 		print_ast(ast_node, 0);
 		print_ast(ast_node->u_content.redir.child, 0);
 		shell->last_exit_code = 0;  
+		return ;
+	}
+	if (ast_node->type == NODE_PIPE)
+	{
+    	// TODO: Implement pipe execution
+    	// execute_pipe(ast_node, shell, envp);
+    	return;
 	}
 	if (ast_node->type == NODE_COMMAND)
 	{
@@ -179,14 +172,12 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
                 shell->env, shell->last_exit_code, 0);
 		if (!expanded_cmd)
 		{
-			printf("DEBUG: Command expansion failed\n");
 			shell->last_exit_code = 1;  
 			return ;
 		}
 		while (++i < ast_node->u_content.cmd.arg_count)
         {
 			t_token_type token_type = ast_node->u_content.cmd.arg_token_types[i];
-			printf("DEBUG: arg[%d]='%s', token_type=%d\n", i, ast_node->u_content.cmd.args[i], token_type);
     
 			if (ast_node->u_content.cmd.arg_token_types[i] == TOKEN_SINGLE_QUOTED) 
 				continue; // Single quoted args are not expanded)
@@ -199,11 +190,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
         }
 
 		if (ft_strcmp(expanded_cmd, "exit") == 0)
-		{
-			printf("DEBUG: Found exit builtin\n");
 			builtin_exit(shell);
-		}
-
 		else if (ft_strcmp(expanded_cmd, "env") == 0)
 			env_print(shell);
 		else if (ft_strcmp(expanded_cmd, "pwd") == 0)
