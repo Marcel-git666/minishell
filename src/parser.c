@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/14 17:08:22 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 19:35:46 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,14 +124,16 @@ t_ast_node	*parse_command(t_parser *parser)
 	{
 		ast_node->u_content.cmd.args = malloc((argument_count + 1) * sizeof(char *));
 		ast_node->u_content.cmd.arg_token_types = malloc(argument_count * sizeof(int));
-		if (!ast_node->u_content.cmd.args)
+		if (!ast_node->u_content.cmd.args || !ast_node->u_content.cmd.arg_token_types)
 		{
-			free(ast_node->u_content.cmd.cmd);
-			free(ast_node->u_content.cmd.args);        
-    		free(ast_node->u_content.cmd.arg_token_types);
-			free(ast_node);
-			return (NULL);
-		}
+       		free(ast_node->u_content.cmd.cmd);
+        	if (ast_node->u_content.cmd.args)
+            	free(ast_node->u_content.cmd.args);
+        	if (ast_node->u_content.cmd.arg_token_types)
+            	free(ast_node->u_content.cmd.arg_token_types);
+        	free(ast_node);
+        	return (NULL);
+    	}
 	}
 	else
 	{
