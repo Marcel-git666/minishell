@@ -171,6 +171,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	{
 		print_ast(ast_node, 0);
 		print_ast(ast_node->u_content.redir.child, 0);
+		shell->last_exit_code = 0;  
 	}
 	if (ast_node->type == NODE_COMMAND)
 	{
@@ -179,6 +180,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		if (!expanded_cmd)
 		{
 			printf("DEBUG: Command expansion failed\n");
+			shell->last_exit_code = 1;  
 			return ;
 		}
 		while (++i < ast_node->u_content.cmd.arg_count)
