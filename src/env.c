@@ -134,13 +134,16 @@ void	env_free(t_env *env)
         free(tmp);
     }
 }
-void	env_print(t_env *env)
+void env_print(t_shell *shell)
 {
-    while (env)
+    t_env *current = shell->env;
+    
+    while (current)
     {
-        printf("%s=%s\n", env->key, env->value);
-        env = env->next;
+        printf("%s=%s\n", current->key, current->value);
+        current = current->next;  // ← Posuň jen lokální kopii
     }
+    shell->last_exit_code = 0;
 }
 int	env_set(t_env **env, const char *key, const char *value)
 {

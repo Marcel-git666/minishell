@@ -188,38 +188,31 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
     
 			if (ast_node->u_content.cmd.arg_token_types[i] == TOKEN_SINGLE_QUOTED) 
 				continue; // Single quoted args are not expanded)
-			printf("DEBUG: TOKEN_ENV_VAR=%d, TOKEN_EXIT_CODE=%d\n", TOKEN_ENV_VAR, TOKEN_EXIT_CODE);
-			printf("DEBUG: token_type=%d\n", token_type);
-			printf("DEBUG: (token_type == TOKEN_ENV_VAR)=%d\n", (token_type == TOKEN_ENV_VAR));
-			printf("DEBUG: (token_type == TOKEN_EXIT_CODE)=%d\n", (token_type == TOKEN_EXIT_CODE));
 			is_env_var = (token_type == TOKEN_ENV_VAR || token_type == TOKEN_EXIT_CODE);
-			printf("DEBUG: is_env_var=%d\n", is_env_var);
-			printf("DEBUG: is_env_var=%d for token_type=%d\n", is_env_var, token_type);
             expanded_arg = expand_variables(ast_node->u_content.cmd.args[i],
                     shell->env, shell->last_exit_code, 
         			is_env_var);
             free(ast_node->u_content.cmd.args[i]);
             ast_node->u_content.cmd.args[i] = expanded_arg;
         }
-		printf("DEBUG: expanded_cmd='%s', length=%zu\n", expanded_cmd, ft_strlen(expanded_cmd));
 
-		if (ft_strncmp(expanded_cmd, "exit", 5) == 0)
+		if (ft_strcmp(expanded_cmd, "exit") == 0)
 		{
 			printf("DEBUG: Found exit builtin\n");
 			builtin_exit(shell);
 		}
 
-		else if (ft_strncmp(expanded_cmd, "env", 4) == 0)
-			env_print(shell->env);
-		else if (ft_strncmp(expanded_cmd, "pwd", 4) == 0)
+		else if (ft_strcmp(expanded_cmd, "env") == 0)
+			env_print(shell);
+		else if (ft_strcmp(expanded_cmd, "pwd") == 0)
 			builtin_pwd(shell);
-		else if (ft_strncmp(expanded_cmd, "cd", 3) == 0)
+		else if (ft_strcmp(expanded_cmd, "cd") == 0)
 			builtin_cd(ast_node, shell);
-		else if (ft_strncmp(expanded_cmd, "export", 7) == 0)
+		else if (ft_strcmp(expanded_cmd, "export") == 0)
 			builtin_export(ast_node, shell);
-		else if (ft_strncmp(expanded_cmd, "unset", 6) == 0)
+		else if (ft_strcmp(expanded_cmd, "unset") == 0)
 			builtin_unset(ast_node, shell);
-		else if (ft_strncmp(expanded_cmd, "echo", 5) == 0)
+		else if (ft_strcmp(expanded_cmd, "echo") == 0)
 			builtin_echo(ast_node, shell);
 		else
 		{

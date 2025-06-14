@@ -31,7 +31,7 @@ t_shell	*initialize_shell(char **envp)
 		return (NULL);
 	}
 	shell->last_exit_code = 0;
-	env_print(shell->env);
+	env_print(shell);
 	load_history();
 	return (shell);
 }
