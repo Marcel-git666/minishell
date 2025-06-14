@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 09:45:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/11 17:50:22 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 17:09:01 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ void	free_ast(t_ast_node *node)
 				free(node->u_content.cmd.args[i]);
 			free(node->u_content.cmd.args);
 		}
-		if (node->u_content.cmd.arg_is_env_var) 
-        	free(node->u_content.cmd.arg_is_env_var);
+		if (node->u_content.cmd.arg_token_types) 
+    		free(node->u_content.cmd.arg_token_types);  
 	}
 	if (node->type == NODE_PIPE)
 	{

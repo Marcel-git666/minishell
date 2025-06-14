@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/11 17:43:43 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 17:38:34 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,7 @@ char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
     char *var_value;
     char *temp;
     int var_len;
+    size_t dollar_offset;
     
     printf("DEBUG: Expanding input: '%s'\n", input);
     if (!input)
@@ -132,6 +133,8 @@ char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
             continue;
         }
         
+        dollar_offset = dollar_pos - result;
+        
         // Získej hodnotu proměnné
         var_value = get_variable_value(var_name, env, exit_status);
         
@@ -152,7 +155,7 @@ char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
         result = final_result;
         
         // Pokračuj hledáním od pozice, kde skončila nahrazená hodnota
-        current = result + (dollar_pos - result) + ft_strlen(var_value);
+        current = result + dollar_offset + ft_strlen(var_value);
     }
     printf("DEBUG: Result: '%s'\n", result);
     return (result);

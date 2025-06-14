@@ -161,6 +161,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	char	*expanded_arg;
 	int		i;
 	int		exit_code;
+	int 	is_env_var;
 
 	i = -1;
 	expanded_cmd = NULL;
@@ -182,9 +183,12 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		}
 		while (++i < ast_node->u_content.cmd.arg_count)
         {
+			if (ast_node->u_content.cmd.arg_token_types[i] == TOKEN_SINGLE_QUOTED) 
+				continue; // Single quoted args are not expanded)
+			is_env_var = ast_node->u_content.cmd.arg_token_types[i] == TOKEN_ENV_VAR;
             expanded_arg = expand_variables(ast_node->u_content.cmd.args[i],
                     shell->env, shell->last_exit_code, 
-        			ast_node->u_content.cmd.arg_is_env_var[i]);
+        			is_env_var);
             free(ast_node->u_content.cmd.args[i]);
             ast_node->u_content.cmd.args[i] = expanded_arg;
         }

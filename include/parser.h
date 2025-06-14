@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:18:15 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/11 17:44:18 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 16:54:00 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ typedef struct s_command
 	char			*cmd;
 	char			**args;			// NULL-terminated array of args
 	int				arg_count;		// Number of arguments
-	int             *arg_is_env_var; // Array indicating if arg is an env var
+	int             *arg_token_types; // Array of token types for each arg
 	t_redirection	*redirections;
 }	t_command;
 

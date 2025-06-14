@@ -56,9 +56,11 @@ void	builtin_cd(t_ast_node *root, t_env **env)
 
 static void handle_export_assignment(char *assignment, t_env **env)
 {
-    char **parts;
-    int i;
-    
+    char 	**parts;
+    int 	i;
+    char	*value;
+
+	printf("DEBUG: assignment = '%s'\n", assignment); 
     parts = ft_split(assignment, '=');
     if (!parts || !parts[0] || !parts[1])
     {
@@ -72,9 +74,16 @@ static void handle_export_assignment(char *assignment, t_env **env)
         }
         return;
     }
-    
-    env_set(env, parts[0], parts[1]);
-    
+	printf("DEBUG: key = '%s', value = '%s'\n", parts[0], parts[1]); 
+	value = parts[1];
+	// Odstraň quotes pokud jsou na začátku a konci
+	if (value[0] == '"' && value[ft_strlen(value) - 1] == '"')
+	{
+    	value[ft_strlen(value) - 1] = '\0';  // Odstraň koncovou quote
+    	value++;  // Přeskoč úvodní quote
+	}
+	printf("DEBUG: final value = '%s'\n", value);
+	env_set(env, parts[0], value);
     // Free parts
     i = -1;
     while (parts[++i])

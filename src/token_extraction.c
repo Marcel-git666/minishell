@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/11 21:48:50 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 17:53:55 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,27 @@ char	*extract_word(const char *input, size_t *index, int is_delimiter_expected)
 	size_t	start;
 	char	*word;
 	int		found_equals;
+	int		in_quotes = 0; 
+    char	quote_char = 0; 
 
 	start = *index;
 	found_equals = 0;
-	while (input[*index] && !ft_isspace(input[*index]))
-	{
-		if (input[*index] == '=' && !found_equals)
-			found_equals = 1;
-		if (!is_delimiter_expected && !found_equals && *index > start
-				&& is_special_char(input[*index]) && input[*index] != '$')
-			break ;
-		(*index)++;
-	}
+	 while (input[*index] && (!ft_isspace(input[*index]) || in_quotes)) 
+    {
+        if ((input[*index] == '"' || input[*index] == '\'') && !in_quotes)
+        {
+            in_quotes = 1;
+            quote_char = input[*index];
+        }
+        else if (input[*index] == quote_char && in_quotes)
+            in_quotes = 0;
+        if (input[*index] == '=' && !found_equals)
+            found_equals = 1;
+        if (!is_delimiter_expected && !found_equals && *index > start
+                && is_special_char(input[*index]) && input[*index] != '$' && !in_quotes)
+            break ;
+        (*index)++;
+    }
 	if (*index == start)  // Prevent empty strings being returned
 		return (NULL);
 	word = ft_strndup(input + start, *index - start);
