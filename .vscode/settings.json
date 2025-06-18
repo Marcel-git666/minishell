@@ -13,7 +13,8 @@
 		"builtins.h": "c",
 		"dirent.h": "c",
 		"shell_loop.h": "c",
-		"unistd.h": "c"
+		"unistd.h": "c",
+		"history.h": "c"
 	}
 		
 }

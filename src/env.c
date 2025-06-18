@@ -134,13 +134,37 @@ void	env_free(t_env *env)
         free(tmp);
     }
 }
-void	env_print(t_env *env)
+void	env_print(t_env *env, t_ast_node *ast)
 {
-    while (env)
-    {
-        printf("%s=%s\n", env->key, env->value);
-        env = env->next;
-    }
+	int	fd;
+
+	if (ast->type == NODE_REDIR)
+		printf("REDIR\n\n\n\n\n");
+	if (ast->type == NODE_COMMAND)
+		printf("COMMAND\n\n\n\n\n");
+	if (ast->type == NODE_PIPE)
+		printf("PIPE\n\n\n\n\n");
+	if (ast->type == NODE_ASSIGNMENT)
+		printf("ASSIGNMENT\n\n\n\n\n");
+	if (ast->type == NODE_REDIR)
+	{
+		fd = open(ast->u_content.redir.redir->file_or_delimiter, O_CREAT, O_RDWR);
+		if (!fd)
+			return ;
+		while (env)
+		{
+			write(fd, &env->key, ft_strlen(env->key));
+			write(fd, "=", 1);
+			write(fd, &env->value, ft_strlen(env->value));
+			// printf("%s=%s\n", env->key, env->value);
+			env = env->next;
+		}
+	}
+	while (env)
+	{
+		printf("%s=%s\n", env->key, env->value);
+		env = env->next;
+	}
 }
 int	env_set(t_env **env, const char *key, const char *value)
 {

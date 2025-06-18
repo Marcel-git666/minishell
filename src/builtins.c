@@ -20,7 +20,7 @@ void	builtin_exit(void)
 	exit(0);
 }
 
-void	builtin_pwd(void)
+void	builtin_pwd(/*t_ast_node *ast*/)
 {
     char	cwd[PATH_MAX];
 

@@ -95,21 +95,33 @@ void	search_command(t_ast_node *ast, t_env *env, char **envp)
 
 void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
+	int	oldfd;
+
 	if (!ast_node)
 		return ;
 	if (ast_node->type == NODE_REDIR)
 	{
+		// Here resolve the redirection, you will only switch the output for the one you want
+		// this is done wrong - it doesnt close itself
+		if (ast_node->type == NODE_REDIR)
+		{
+			oldfd = open("text.txt", O_WRONLY);
+			dup2(oldfd, 1);
+			printf("HEh\n");
+			dup2(1, oldfd);
+			close(oldfd);
+		}
 		print_ast(ast_node, 0);
 		print_ast(ast_node->u_content.redir.child, 0);
 	}
 	if (ast_node->type == NODE_COMMAND)
 	{
 		if (ft_strncmp(ast_node->u_content.cmd.cmd, "exit", 5) == 0)
-			builtin_exit();
+			builtin_exit(ast_node);
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "env", 4) == 0)
-			env_print(shell->env);
+			env_print(shell->env, ast_node);
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "pwd", 4) == 0)
-			builtin_pwd();
+			builtin_pwd(ast_node);
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "cd", 3) == 0)
 			builtin_cd(ast_node, shell->env);
 		else if (ft_strncmp(ast_node->u_content.cmd.cmd, "export", 7) == 0)

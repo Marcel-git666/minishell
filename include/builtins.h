@@ -20,10 +20,10 @@
 # include <limits.h>
 
 //	exit
-void	builtin_exit(void);
+void	builtin_exit(/*t_ast_node *ast*/);
 
 // pwd
-void	builtin_pwd(void);
+void	builtin_pwd(/*t_ast_node *ast*/);
 
 // cd
 void	builtin_cd(t_ast_node *root, t_env *env);

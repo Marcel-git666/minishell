@@ -1,0 +1,25 @@
+HEh
+REDIRECTION: REDIR_OUT, FILE: text.txt
+  COMMAND:
+    COMMAND: ls
+COMMAND: ls
+[?2004h$ make
+[?2004l[TOKEN_CMD: "make"]
+Successfully created AST
+COMMAND: make
+049h[22;0;0t[>4;2m[?1h=[?2004h[?1004h[1;8r[?12h[?12l[22;2t[22;1t[?25l[8;1HEntering Ex mode.  Type "visual" to go to Normal mode.[?25h
+:[34m^[^[[m[?1004l[?2004l[?1l>[>4;m[?1049l[23;0;0tVim: Caught deadly signal HUP
+Vim: Finished.
+[8;1H[23;2t[23;1t$ 
+[?2004l[?2004h$ [?2004lmake: 'minishell' is up to date.
+Would execute: make
+[?2004h$ exi^C[?2004l
+$ [?2004h^C[?2004l
+$ [?2004h^C[?2004l
+$ [?2004h^C[?2004l
+$ [?2004h^C[?2004l
+$ [?2004h^C[?2004l
+$ [?2004h^C[?2004l
+$ [?2004h^C[?2004l
+$ [?2004h[?2004l
+Exiting minishell...
