@@ -1,32 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcmp.c                                        :+:      :+:    :+:   */
+/*   expansion.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/05 01:22:53 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/14 21:09:05 by marcel           ###   ########.fr       */
+/*   Created: 2025/06/08 20:45:37 by marcel            #+#    #+#             */
+/*   Updated: 2025/06/11 17:42:54 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#ifndef EXPANSION_H
+# define EXPANSION_H
+# include "env.h"
 
-int ft_strcmp(const char *s1, const char *s2)
-{
-	size_t  i;
+char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var);
 
-	i = 0;
-	if (s1 == NULL || s2 == NULL)
-	{
-		if (s1 == NULL && s2 == NULL)
-			return (0);
-		if (s1 == NULL)
-			return (-1);
-		return (1);
-	}
-        
-    while (s1[i] && s2[i] && s1[i] == s2[i])
-		i++;
-	return (((unsigned char)s1[i]) - (unsigned char)s2[i]);
-}
+#endif

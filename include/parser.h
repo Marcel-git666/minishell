@@ -57,6 +57,7 @@ typedef struct s_command
 	char			*cmd;
 	char			**args;			// NULL-terminated array of args
 	int				arg_count;		// Number of arguments
+	int             *arg_token_types; // Array of token types for each arg
 	t_redirection	*redirections;
 }	t_command;
 

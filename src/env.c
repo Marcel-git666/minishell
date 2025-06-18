@@ -13,63 +13,63 @@
 #include "minishell.h"
 #include "builtins.h"
 
-int	ft_envsize(t_env *lst)
-{
-	int		len;
+// int	ft_envsize(t_env *lst)
+// {
+// 	int		len;
 
-	len = 0;
-	while (lst)
-	{
-		len++;
-		lst = lst->next;
-	}
-	return (len);
-}
+// 	len = 0;
+// 	while (lst)
+// 	{
+// 		len++;
+// 		lst = lst->next;
+// 	}
+// 	return (len);
+// }
 
-static void	add_order(t_env *env, char **envp, int len)
-{
-	int		j;
-	t_env	*start;
+// static void	add_order(t_env *env, char **envp, int len)
+// {
+// 	int		j;
+// 	t_env	*start;
 
-	j = -1;
-	start = env;
-	while (++j < len)
-	{
-		while (env && ft_strncmp(env->key, envp[j], ft_strlen(env->key)) != 0)
-			env = env->next;
-		if (env && ft_strncmp(env->key, envp[j], ft_strlen(env->key)) == 0)
-			env->order = j;
-		env = start;
-	}
-}
+// 	j = -1;
+// 	start = env;
+// 	while (++j < len)
+// 	{
+// 		while (env && ft_strncmp(env->key, envp[j], ft_strlen(env->key)) != 0)
+// 			env = env->next;
+// 		if (env && ft_strncmp(env->key, envp[j], ft_strlen(env->key)) == 0)
+// 			env->order = j;
+// 		env = start;
+// 	}
+// }
 
-static void	get_order(t_env *env, char **envp)
-{
-    int		i;
-	int		j;
-	int		len;
-	t_env	*start;
-	char	*temp;
+// static void	get_order(t_env *env, char **envp)
+// {
+//     int		i;
+// 	int		j;
+// 	int		len;
+// 	t_env	*start;
+// 	char	*temp;
 
-    i = -1;
-	j = 0;
-	start = env;
-	len = ft_envsize(env);
-	while (++j < (len - 1))
-	{
-		i = -1;
-		while (++i < (len - j))
-		{
-			if (ft_strcmp(envp[i], envp[i + 1]) > 0)
-			{
-				temp = envp[i];
-				envp[i] = envp[i + 1];
-				envp[i + 1] = temp;
-			}
-		}
-	}
-	add_order(start, envp, len);
-}
+//     i = -1;
+// 	j = 0;
+// 	start = env;
+// 	len = ft_envsize(env);
+// 	while (++j < (len - 1))
+// 	{
+// 		i = -1;
+// 		while (++i < (len - j))
+// 		{
+// 			if (ft_strcmp(envp[i], envp[i + 1]) > 0)
+// 			{
+// 				temp = envp[i];
+// 				envp[i] = envp[i + 1];
+// 				envp[i + 1] = temp;
+// 			}
+// 		}
+// 	}
+// 	add_order(start, envp, len);
+// }
 
 t_env   *env_init(char **envp)
 {
@@ -90,7 +90,7 @@ t_env   *env_init(char **envp)
             // Split key and value at the equals sign
             new_node->key = ft_strndup(envp[i], equals_pos - envp[i]);
             new_node->value = ft_strdup(equals_pos + 1);
-            new_node->order = 0;
+            // new_node->order = 0;
             if (!new_node->key || !new_node->value)
             {
                 free(new_node->key);
@@ -118,7 +118,7 @@ t_env   *env_init(char **envp)
         }
         i++;
     }
-    get_order(env_list, envp);
+    // get_order(env_list, envp);
     return (env_list);
 }
 
@@ -134,41 +134,21 @@ void	env_free(t_env *env)
         free(tmp);
     }
 }
-void	env_print(t_env *env, t_ast_node *ast)
+void env_print(t_shell *shell)
 {
-	int	fd;
-
-	if (ast->type == NODE_REDIR)
-		printf("REDIR\n\n\n\n\n");
-	if (ast->type == NODE_COMMAND)
-		printf("COMMAND\n\n\n\n\n");
-	if (ast->type == NODE_PIPE)
-		printf("PIPE\n\n\n\n\n");
-	if (ast->type == NODE_ASSIGNMENT)
-		printf("ASSIGNMENT\n\n\n\n\n");
-	if (ast->type == NODE_REDIR)
-	{
-		fd = open(ast->u_content.redir.redir->file_or_delimiter, O_CREAT, O_RDWR);
-		if (!fd)
-			return ;
-		while (env)
-		{
-			write(fd, &env->key, ft_strlen(env->key));
-			write(fd, "=", 1);
-			write(fd, &env->value, ft_strlen(env->value));
-			// printf("%s=%s\n", env->key, env->value);
-			env = env->next;
-		}
-	}
-	while (env)
-	{
-		printf("%s=%s\n", env->key, env->value);
-		env = env->next;
-	}
+    t_env *current = shell->env;
+    
+    while (current)
+    {
+        printf("%s=%s\n", current->key, current->value);
+        current = current->next;  // ← Posuň jen lokální kopii
+    }
+    shell->last_exit_code = 0;
 }
 int	env_set(t_env **env, const char *key, const char *value)
 {
     t_env	*current;
+
     if (!env || !key || !value)
         return (0); // Invalid input
     current = *env;

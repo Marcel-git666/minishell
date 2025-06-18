@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 09:45:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/11 21:27:10 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/06/14 17:09:01 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ void	free_ast(t_ast_node *node)
 				free(node->u_content.cmd.args[i]);
 			free(node->u_content.cmd.args);
 		}
+		if (node->u_content.cmd.arg_token_types) 
+    		free(node->u_content.cmd.arg_token_types);  
 	}
 	if (node->type == NODE_PIPE)
 	{

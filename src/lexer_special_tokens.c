@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/07 19:55:24 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 18:21:23 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,25 +40,58 @@ static int	handle_pipe_token(t_lexer *lexer, int *is_first_word)
 	return (0);
 }
 
-static int	handle_quote_token(t_lexer *lexer)
+static int handle_quote_token(t_lexer *lexer)
 {
-	char	*quoted;
+    char *quoted;
+    
+    if (lexer->input[lexer->i] == '\'')
+    {
+        quoted = extract_single_quoted_string(lexer);
+        if (!quoted)
+            return (-1);
+        if (ft_strlen(quoted) > 0)
+            add_token(&(lexer->tokens), create_token(TOKEN_SINGLE_QUOTED, quoted));
+    }
+    else
+    {
+        quoted = extract_double_quoted_string(lexer);
+        if (!quoted)
+            return (-1);
+        if (ft_strlen(quoted) > 0)
+            add_token(&(lexer->tokens), create_token(TOKEN_DOUBLE_QUOTED, quoted));
+    }
+    
+    free(quoted);
+    return (0);
+}
 
-	if (lexer->input[lexer->i] == '\'')
-		quoted = extract_single_quoted_string(lexer);
-	else
-		quoted = extract_double_quoted_string(lexer);
-	if (!quoted)
-		return (-1);
-	if (ft_strlen(quoted) > 0)
-		add_token(&(lexer->tokens), create_token(TOKEN_STRING, quoted));
-	free(quoted);
-	return (0);
+static char *extract_compound_token(t_lexer *lexer, size_t start_pos)
+{
+    size_t end_pos = lexer->i;
+    
+    // Najdi konec slova - pokračuj i přes $ znaky a quotes
+    while (lexer->input[end_pos] && !ft_isspace(lexer->input[end_pos]))
+    {
+        // Zastaví se pouze na pipe a redirections, ne na $ a quotes
+        if ((lexer->input[end_pos] == '|' || lexer->input[end_pos] == '<' 
+             || lexer->input[end_pos] == '>'))
+            break;
+        end_pos++;
+    }
+    // Zkopíruj celý compound token
+    char *compound = ft_strndup(lexer->input + start_pos, end_pos - start_pos);
+    
+    // Nastav pozici na konec
+    lexer->i = end_pos;
+    
+    return (compound);
 }
 
 int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 {
 	char	*env;
+	size_t	start_pos;
+	char	*compound;
 
 	if (lexer->input[lexer->i] == '\'' || lexer->input[lexer->i] == '\"')
 		return (handle_quote_token(lexer));
@@ -68,17 +101,33 @@ int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 		return (handle_pipe_token(lexer, is_first_word));
 	else if (lexer->input[lexer->i] == '$')
 	{
-		env = extract_env_var(lexer->input, &(lexer->i));
-		if (!env)
-			return (-1);
-		if (ft_strncmp(env, "?", 2) == 0)
-			add_token(&(lexer->tokens), create_token(TOKEN_EXIT_CODE, "?"));
-		else
-			add_token(&(lexer->tokens), create_token(TOKEN_ENV_VAR, env));
-		free(env);
+    	start_pos = lexer->i;  // Zapamatuj začátek
+    	env = extract_env_var(lexer->input, &(lexer->i));
+    	if (!env)
+        	return (-1);
+        
+    	// Zkontroluj, zda hned pokračuje text (compound token)
+    	if (lexer->input[lexer->i] && !ft_isspace(lexer->input[lexer->i]) 
+    		&& (lexer->input[lexer->i] == '$' || !is_special_char(lexer->input[lexer->i])))
+{
+        	// Vytvoř compound token - celý text od $ až po konec slova
+        	compound = extract_compound_token(lexer, start_pos);
+        	add_token(&(lexer->tokens), create_token(TOKEN_ARG, compound));
+        	free(compound);
+    	}
+    	else
+    	{
+        	// Normální env var token
+        	if (ft_strncmp(env, "?", 2) == 0)
+            	add_token(&(lexer->tokens), create_token(TOKEN_EXIT_CODE, "?"));
+        	else
+            	add_token(&(lexer->tokens), create_token(TOKEN_ENV_VAR, env));
+    	}
+    	free(env);
 	}
 	else
 		(lexer->i)++;
 	return (0);
 }
+
 

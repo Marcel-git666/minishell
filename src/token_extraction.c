@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/07 19:58:30 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/14 17:53:55 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,27 @@ char	*extract_word(const char *input, size_t *index, int is_delimiter_expected)
 	size_t	start;
 	char	*word;
 	int		found_equals;
+	int		in_quotes = 0; 
+    char	quote_char = 0; 
 
 	start = *index;
 	found_equals = 0;
-	while (input[*index] && !ft_isspace(input[*index]))
-	{
-		if (input[*index] == '=' && !found_equals)
-			found_equals = 1;
-		if (!is_delimiter_expected && !found_equals && *index > start
-				&& is_special_char(input[*index]) && input[*index] != '$')
-			break ;
-		(*index)++;
-	}
+	 while (input[*index] && (!ft_isspace(input[*index]) || in_quotes)) 
+    {
+        if ((input[*index] == '"' || input[*index] == '\'') && !in_quotes)
+        {
+            in_quotes = 1;
+            quote_char = input[*index];
+        }
+        else if (input[*index] == quote_char && in_quotes)
+            in_quotes = 0;
+        if (input[*index] == '=' && !found_equals)
+            found_equals = 1;
+        if (!is_delimiter_expected && !found_equals && *index > start
+                && is_special_char(input[*index]) && input[*index] != '$' && !in_quotes)
+            break ;
+        (*index)++;
+    }
 	if (*index == start)  // Prevent empty strings being returned
 		return (NULL);
 	word = ft_strndup(input + start, *index - start);
@@ -67,6 +76,19 @@ char	*extract_env_var(const char *input, size_t *index)
 	size_t	start;
 
 	start = ++(*index);
+	// Handle ${VAR}
+    if (input[*index] == '{')
+    {
+        (*index)++; // Skip {
+        start = *index;
+        while (input[*index] && input[*index] != '}')
+            (*index)++;
+        if (input[*index] != '}')
+            return (error_message("syntax error: missing closing brace"), NULL);
+        char *var_name = ft_strndup(input + start, *index - start);
+        (*index)++; // Skip }
+		return (var_name);
+    }
 	if (input[*index] == '?')
 	{
 		(*index)++;	// Skip the ?

@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   env.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:23:08 by mmravec           #+#    #+#             */
 /*   Updated: 2025/06/08 20:38:07 by lformank         ###   ########.fr       */
@@ -21,13 +21,20 @@ typedef struct s_env
 	char			*key;
 	char			*value;
 	struct s_env	*next;
-	int				order;
+	// int				order;
 }	t_env;
+
+// Forward declarations
+struct s_shell;
+typedef struct s_shell t_shell;
+struct s_ast_node;
+typedef struct s_ast_node t_ast_node;
+
 
 // env.c
 t_env	*env_init(char **envp);
 void	env_free(t_env *env);
-void	env_print(t_env *env, t_ast_node *ast);
+void	env_print(t_shell *shell);
 int		env_set(t_env **env, const char *key, const char *value);
 char	*env_get(t_env *env, const char *key);
 int		env_unset(t_env **env, const char *key);

@@ -66,7 +66,7 @@ There is a 5-byte "still reachable" memory block from a static variable `last_ex
 
 6. **Environment Variable Management**
    - [x] Environment variable storage
-   - [ ] Variable expansion
+   - [x] Variable expansion
    - [x] Handle $? special variable
 
 ### Lada's Tasks

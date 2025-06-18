@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 14:26:56 by mmravec           #+#    #+#             */
-/*   Updated: 2025/05/04 02:09:13 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/10 21:25:33 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ typedef enum e_token_type
 	TOKEN_REDIR_OUT,	// Output Redirection (>)
 	TOKEN_APPEND_OUT,	// Append (>>)
 	TOKEN_HEREDOC,		// Here-document (<<)
-	TOKEN_STRING,		// Quoted string ("hello world")
+	TOKEN_DOUBLE_QUOTED, // Quoted expandable string ("hello world")
+	TOKEN_SINGLE_QUOTED, // Single quoted non expandable string ('hello world')
 	TOKEN_ENV_VAR,		// Environment variable ($HOME)
 	TOKEN_EXIT_CODE,	// Special variable ($?)
 	TOKEN_FILE,			// File name for redirection
