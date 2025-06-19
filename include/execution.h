@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 18:50:12 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/08 21:44:13 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/18 19:24:22 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@ typedef struct s_shell t_shell;
 
 // execution.c
 void		execute_command(t_ast_node *ast_node, t_shell *shell, char **envp);
-void		search_command(t_ast_node *ast, t_env *env, char **envp);
+int			search_command(t_ast_node *ast, t_env *env, char **envp);
 
 // builtin.c
 void		builtin_pwd(/*t_ast_node *ast*/);
-void		builtin_cd(t_ast_node *root, t_env *env);
-void		builtin_export(t_ast_node *root, t_env *env);
+void		builtin_cd(t_ast_node *root, t_shell *shell);
+void		builtin_export(t_ast_node *root, t_shell *shell);
 
 #endif

@@ -175,7 +175,6 @@ void	builtin_echo(t_ast_node *root, t_shell *shell)
 	}
 	else
 		i = -1; // Start from the first argument
-	
 	while (++i < root->u_content.cmd.arg_count && root->u_content.cmd.args[i])
     {
         if (root->u_content.cmd.args[i])

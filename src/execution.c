@@ -49,16 +49,15 @@ int	fork_it(char *path, char **args, char **envp)
 
 	pid = fork();
 	if (pid == 0) {
-        execve(path, args, envp);
-		perror("error: execve failed");
+        if (execve(path, args, envp) == -1)
+			perror("error: execve failed");
         exit(127);
 	}
     else if (pid > 0)
     {
         wait(&status);
-        if (WIFEXITED(status)) {
+        if (WIFEXITED(status))
             return (WEXITSTATUS(status));  // Return actual exit code
-		}
         return (-1);  // Process terminated abnormally
     }
     return (-1); // Fork failed
@@ -92,9 +91,7 @@ int	search_command(t_ast_node *ast, t_env *env, char **envp)
 	if (ft_strchr(ast->u_content.cmd.cmd, '/'))
 	{
 		if (access(ast->u_content.cmd.cmd, F_OK) != 0)
-    	{
         	return (127);  // Command not found
-    	}
     	// Prepare arguments array
     	args = ft_calloc((ast->u_content.cmd.arg_count + 2), sizeof(char *));
     	args[0] = ft_strdup(ast->u_content.cmd.cmd);
@@ -104,15 +101,12 @@ int	search_command(t_ast_node *ast, t_env *env, char **envp)
         	args[i + 1] = ft_strdup(ast->u_content.cmd.args[i]);
         	i++;
     	}
-    
     	exit_code = fork_it(ast->u_content.cmd.cmd, args, envp);
-    
     	// Free args
     	i = -1;
     	while (args[++i])
         	free(args[i]);
     	free(args);
-    
     	return (exit_code);
 	}
 	i = -1;
@@ -120,9 +114,8 @@ int	search_command(t_ast_node *ast, t_env *env, char **envp)
 	path = NULL;
 	while (env && ft_strncmp(env->key, "PATH", 5) != 0)
 		env = env->next;
-	if (!env) {
+	if (!env)
         return (127);
-    }
 	paths = ft_split(env->value,':');
 	args = ft_calloc((ast->u_content.cmd.arg_count + 2), sizeof(char *));
 	args[0] = ft_strdup(ast->u_content.cmd.cmd);
@@ -142,34 +135,39 @@ int	search_command(t_ast_node *ast, t_env *env, char **envp)
 
 void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
-	int	oldfd;
-
-	char	*expanded_cmd;
-	char	*expanded_arg;
-	int		i;
-	int		exit_code;
-	int 	is_env_var;
+	int			newfd;
+	int			oldfd;
+	char		*expanded_cmd;
+	char		*expanded_arg;
+	int			i;
+	int			exit_code;
+	int 		is_env_var;
 
 	i = -1;
+	oldfd = 0;
 	expanded_cmd = NULL;
 	if (!ast_node)
 		return ;
-	if (ast_node->type == NODE_REDIR)
+	while (ast_node->type == NODE_REDIR)
 	{
 		// Here resolve the redirection, you will only switch the output for the one you want
-		// this is done wrong - it doesnt close itself
-		if (ast_node->type == NODE_REDIR)
+		if (ast_node->u_content.redir.redir->type == REDIR_OUT)
 		{
-			oldfd = open("text.txt", O_WRONLY);
-			dup2(oldfd, 1);
-			printf("HEh\n");
-			dup2(1, oldfd);
-			close(oldfd);
+			oldfd = dup(1);
+			newfd = open(ast_node->u_content.redir.redir->file_or_delimiter, O_WRONLY);
+			if (newfd > -1)
+			{
+				dup2(newfd, 1);
+				if (ast_node->u_content.redir.child)
+				{
+					ast_node = ast_node->u_content.redir.child;
+					shell->last_exit_code = 0; 
+					break;
+				}
+				dup2(oldfd, 1);
+				close(oldfd);
+			}
 		}
-		print_ast(ast_node, 0);
-		print_ast(ast_node->u_content.redir.child, 0);
-		shell->last_exit_code = 0;  
-		return ;
 	}
 	if (ast_node->type == NODE_PIPE)
 	{
@@ -220,6 +218,11 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 			exit_code = search_command(ast_node, shell->env, envp);
     		shell->last_exit_code = exit_code;
 		}
+	}
+	if (oldfd)
+	{
+		dup2(oldfd, 1);
+		close(oldfd);
 	}
 	free(expanded_cmd);
 	return ;
