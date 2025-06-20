@@ -142,31 +142,23 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	int			i;
 	int			exit_code;
 	int 		is_env_var;
+	t_ast_node	*orig;
 
 	i = -1;
 	oldfd = 0;
+	orig = ast_node;
 	expanded_cmd = NULL;
 	if (!ast_node)
 		return ;
 	while (ast_node->type == NODE_REDIR)
 	{
 		// Here resolve the redirection, you will only switch the output for the one you want
-		if (ast_node->u_content.redir.redir->type == REDIR_OUT)
+		redirection(ast_node, &newfd, &oldfd);
+		if (ast_node->u_content.redir.child)
 		{
-			oldfd = dup(1);
-			newfd = open(ast_node->u_content.redir.redir->file_or_delimiter, O_WRONLY);
-			if (newfd > -1)
-			{
-				dup2(newfd, 1);
-				if (ast_node->u_content.redir.child)
-				{
-					ast_node = ast_node->u_content.redir.child;
-					shell->last_exit_code = 0; 
-					break;
-				}
-				dup2(oldfd, 1);
-				close(oldfd);
-			}
+			ast_node = ast_node->u_content.redir.child;
+			shell->last_exit_code = 0;
+			break;
 		}
 	}
 	if (ast_node->type == NODE_PIPE)
@@ -197,7 +189,6 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
             free(ast_node->u_content.cmd.args[i]);
             ast_node->u_content.cmd.args[i] = expanded_arg;
         }
-
 		if (ft_strcmp(expanded_cmd, "exit") == 0)
 			builtin_exit(shell);
 		else if (ft_strcmp(expanded_cmd, "env") == 0)
@@ -221,7 +212,10 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	}
 	if (oldfd)
 	{
-		dup2(oldfd, 1);
+		if (orig->u_content.redir.redir->type == REDIR_OUT)
+			dup2(oldfd, 1);
+		else if (orig->u_content.redir.redir->type == REDIR_IN)
+			dup2(oldfd, 0);
 		close(oldfd);
 	}
 	free(expanded_cmd);
