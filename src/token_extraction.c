@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/14 17:53:55 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/22 12:58:19 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,33 +18,48 @@ int	is_special_char(char c)
 		|| c == '\'' || c == '"');
 }
 
-char	*extract_word(const char *input, size_t *index, int is_delimiter_expected)
+static int	handle_quotes_and_special(const char *input, size_t *index,
+				int *in_quotes, char *quote_char)
+{
+	int	found_equals;
+
+	found_equals = 0;
+	if ((input[*index] == '"' || input[*index] == '\'') && !*in_quotes)
+	{
+		*in_quotes = 1;
+		*quote_char = input[*index];
+	}
+	else if (input[*index] == *quote_char && *in_quotes)
+		*in_quotes = 0;
+	if (input[*index] == '=')
+		found_equals = 1;
+	return (found_equals);
+}
+
+char	*extract_word(const char *input, size_t *index,
+			int is_delimiter_expected)
 {
 	size_t	start;
 	char	*word;
 	int		found_equals;
-	int		in_quotes = 0; 
-    char	quote_char = 0; 
+	int		in_quotes;
+	char	quote_char;
 
+	in_quotes = 0;
 	start = *index;
 	found_equals = 0;
-	 while (input[*index] && (!ft_isspace(input[*index]) || in_quotes)) 
-    {
-        if ((input[*index] == '"' || input[*index] == '\'') && !in_quotes)
-        {
-            in_quotes = 1;
-            quote_char = input[*index];
-        }
-        else if (input[*index] == quote_char && in_quotes)
-            in_quotes = 0;
-        if (input[*index] == '=' && !found_equals)
-            found_equals = 1;
-        if (!is_delimiter_expected && !found_equals && *index > start
-                && is_special_char(input[*index]) && input[*index] != '$' && !in_quotes)
-            break ;
-        (*index)++;
-    }
-	if (*index == start)  // Prevent empty strings being returned
+	quote_char = 0;
+	while (input[*index] && (!ft_isspace(input[*index]) || in_quotes))
+	{
+		if (handle_quotes_and_special(input, index, &in_quotes, &quote_char))
+			found_equals = 1;
+		if (!is_delimiter_expected && !found_equals && *index > start
+			&& is_special_char(input[*index]) && input[*index] != '$'
+			&& !in_quotes)
+			break ;
+		(*index)++;
+	}
+	if (*index == start) // Prevent empty strings being returned
 		return (NULL);
 	word = ft_strndup(input + start, *index - start);
 	return (word);
@@ -69,35 +84,4 @@ t_token	*extract_operator(const char *input, size_t *index)
 			return ((*index)++, create_token(TOKEN_REDIR_IN, "<"));
 	}
 	return (NULL);
-}
-
-char	*extract_env_var(const char *input, size_t *index)
-{
-	size_t	start;
-
-	start = ++(*index);
-	// Handle ${VAR}
-    if (input[*index] == '{')
-    {
-        (*index)++; // Skip {
-        start = *index;
-        while (input[*index] && input[*index] != '}')
-            (*index)++;
-        if (input[*index] != '}')
-            return (error_message("syntax error: missing closing brace"), NULL);
-        char *var_name = ft_strndup(input + start, *index - start);
-        (*index)++; // Skip }
-		return (var_name);
-    }
-	if (input[*index] == '?')
-	{
-		(*index)++;	// Skip the ?
-		return (ft_strdup("?"));
-	}
-	if (!ft_isalpha(input[*index]) && input[*index] != '_')
-		return (error_message("syntax error: invalid environment variable name"), NULL);
-	(*index)++;
-	while (ft_isalnum(input[*index]) || input[*index] == '_')
-		(*index)++;
-	return (ft_strndup(input + start, *index - start));
 }
