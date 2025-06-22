@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_redir.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 20:17:10 by mmravec           #+#    #+#             */
-/*   Updated: 2025/04/27 22:47:04 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/22 22:25:34 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 
 t_ast_node	*parse_redirection(t_parser *parser)
 {
-	t_ast_node *node;
-	t_redirection *redir;
-	t_token_type redir_type;
+	t_ast_node		*node;
+	t_redirection	*redir;
+	t_token_type	redir_type;
 
 	// Save the redirection type
 	redir_type = parser->current_token->type;
-
+	printf("current: %d\n", parser->current_token->type);
 	// Create the redirection structure
 	redir = malloc(sizeof(t_redirection));
 	if (!redir)
@@ -36,10 +36,9 @@ t_ast_node	*parse_redirection(t_parser *parser)
 		redir->type = REDIR_APPEND;
 	else if (redir_type == TOKEN_HEREDOC)
 		redir->type = REDIR_HEREDOC;
-
 	// Move to the next token (should be file or delimiter)
 	get_next_token(parser);
-
+		
 	// Check if we have a filename token
 	if (!parser->current_token || (parser->current_token->type != TOKEN_FILE
 			&& parser->current_token->type != TOKEN_DELIMITER))
@@ -52,10 +51,10 @@ t_ast_node	*parse_redirection(t_parser *parser)
 	// Save the filename
 	redir->file_or_delimiter = ft_strdup(parser->current_token->value);
 	redir->next = NULL;
-
+	
 	// Move past the filename
 	get_next_token(parser);
-
+	
 	// Create the AST node
 	node = malloc(sizeof(t_ast_node));
 	if (!node)
@@ -64,7 +63,6 @@ t_ast_node	*parse_redirection(t_parser *parser)
 		free(redir);
 		return (NULL);
 	}
-
 	node->type = NODE_REDIR;
 	node->u_content.redir.redir = redir;
 	node->u_content.redir.child = NULL;  // Will be set later
@@ -87,23 +85,24 @@ t_ast_node	*parse_redirection(t_parser *parser)
 			// If we already have a command, use it
 			if (node->u_content.redir.child)
 				next_redir->u_content.redir.child = node->u_content.redir.child;
-
-			node->u_content.redir.child = next_redir;
+        	node->u_content.redir.child = next_redir;
 		}
 	}
-
 	return (node);
 }
 
 t_ast_node *attach_redirection_to_command(t_ast_node *cmd_node, t_parser *parser)
 {
 	t_ast_node	*redir_node = parse_redirection(parser);
+	t_ast_node	*original;
 
 	if (!redir_node)
 		return (cmd_node);  // Return original if redirection parsing failed
 
+	original = redir_node;
+	while (redir_node->u_content.redir.child)
+		redir_node = redir_node->u_content.redir.child;
 	// Attach the command to the redirection
 	redir_node->u_content.redir.child = cmd_node;
-
-	return (redir_node);
+	return (original);
 }

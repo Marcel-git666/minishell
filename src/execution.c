@@ -211,13 +211,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		}
 	}
 	if (oldfd)
-	{
-		if (orig->u_content.redir.redir->type == REDIR_OUT)
-			dup2(oldfd, 1);
-		else if (orig->u_content.redir.redir->type == REDIR_IN)
-			dup2(oldfd, 0);
-		close(oldfd);
-	}
+		reset_fd(&oldfd, orig);
 	free(expanded_cmd);
 	return ;
 }

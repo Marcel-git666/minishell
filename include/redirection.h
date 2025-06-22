@@ -16,5 +16,6 @@
 # include "minishell.h"
 
 void	redirection(t_ast_node *ast_node, int *newfd, int *oldfd);
+void	reset_fd(int *oldfd, t_ast_node *orig);
 
 #endif

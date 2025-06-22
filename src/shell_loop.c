@@ -90,7 +90,6 @@ void	run_shell_loop(t_shell *shell, char **envp)
 					// For now, just print that parsing succeeded
 					printf("Successfully created AST\n");
 					print_ast(ast, 0);
-					// redirection(ast, shell);
 					execute_command(ast, shell, envp);
 					free_ast(ast);
 				}
