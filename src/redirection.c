@@ -13,60 +13,44 @@
 #include "minishell.h"
 #include "redirection.h"
 
-void	redirection(t_ast_node *root, t_shell *shell, char **envp)
+static void	restore_fds(int saved_stdin, int saved_stdout)
 {
-    int saved_stdout;
-    char *filename;
-    t_ast_node *child_command;
-
-    saved_stdout = dup(STDOUT_FILENO);
-    if (saved_stdout < 0)
-    {
-        perror("Error saving stdout");
-       return ;
-    }
-    filename = root->u_content.redir.redir->file_or_delimiter;
-    handle_output_redirection(filename);
-    if (!filename) 
-    {
-        perror("Error: No filename provided for redirection");
-        dup2(saved_stdout, STDOUT_FILENO);
-        close(saved_stdout);
-        return ;
-    }
-    
-    
-    child_command = root->u_content.redir.child;
-    if (!child_command || child_command->type != NODE_COMMAND)
-    {
-        perror("Error: No command to execute after redirection");
-        dup2(saved_stdout, STDOUT_FILENO);
-        close(saved_stdout);
-        return ;
-    }
-    execute_command(child_command, shell, envp);
-    
-    // 4. Obnovit původní stdout
-    dup2(saved_stdout, STDOUT_FILENO);
-    close(saved_stdout);
+	if (saved_stdin >= 0)
+	{
+		dup2(saved_stdin, STDIN_FILENO);
+		close(saved_stdin);
+	}
+	if (saved_stdout >= 0)
+	{
+		dup2(saved_stdout, STDOUT_FILENO);
+		close(saved_stdout);
+	}
 }
 
-int handle_output_redirection(char *filename)
+void	redirection(t_ast_node *root, t_shell *shell, char **envp)
 {
-    int fd;
+	int				saved_stdin;
+	int				saved_stdout;
+	t_redirection	*redir;
+	t_ast_node		*child_command;
 
-    fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (fd < 0)
-    {
-        perror("Error opening file for output redirection");
-        return -1;
-    }
-    if (dup2(fd, STDOUT_FILENO) < 0)
-    {
-        perror("Error redirecting stdout");
-        close(fd);
-        return -1;
-    }
-    close(fd);
-    return 0;
+	saved_stdin = -1;
+	saved_stdout = -1;
+	if (!root || !root->u_content.redir.redir)
+	{
+		error_message("invalid redirection node");
+		shell->last_exit_code = 1;
+		return ;
+	}
+	redir = root->u_content.redir.redir;
+	child_command = root->u_content.redir.child;
+	if (setup_redirection(redir, &saved_stdin, &saved_stdout) < 0)
+	{
+		shell->last_exit_code = 1;
+		restore_fds(saved_stdin, saved_stdout);
+		return ;
+	}
+	if (child_command)
+		execute_command(child_command, shell, envp);
+	restore_fds(saved_stdin, saved_stdout);
 }

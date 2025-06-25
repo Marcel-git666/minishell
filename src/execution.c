@@ -13,10 +13,8 @@
 #include "minishell.h"
 #include "parser.h"
 #include "env.h"
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <unistd.h>
 #include "expansion.h"
+#include "redirection.h"
 
 char	*full_path(char **paths, char *path, char *cmd)
 {
@@ -158,10 +156,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	}
 	if (ast_node->type == NODE_REDIR)
 	{
-		// TODO: Handle redirection
-		print_ast(ast_node, 0);
-		print_ast(ast_node->u_content.redir.child, 0);
-		shell->last_exit_code = 0;  
+		redirection(ast_node, shell, envp);
 		return ;
 	}
 	if (ast_node->type == NODE_PIPE)
