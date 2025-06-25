@@ -13,8 +13,25 @@
 #include "minishell.h"
 #include "redirection.h"
 
+void	heredoc(t_ast_node *ast_node, int *newfd)
+{
+	char	*input;
+
+	*newfd = open("temp.txt", O_CREAT | O_WRONLY | O_TRUNC); // temporary memory for all lines of heredoc
+	input = readline(">");
+	while (input && ft_strcmp(input,
+		ast_node->u_content.redir.redir->file_or_delimiter))
+	{
+		write(*newfd, &input, ft_strlen(input));
+		free(input);
+		input = readline(">");
+	}
+	close(*newfd);
+}
+
 void	redirection(t_ast_node *ast_node, int *newfd, int *oldfd)
 {
+
 	if (ast_node->u_content.redir.redir->type == REDIR_OUT)
 	{
 		while (ast_node->u_content.redir.child)
@@ -47,24 +64,19 @@ void	redirection(t_ast_node *ast_node, int *newfd, int *oldfd)
 		if (*newfd > -1)
 			dup2(*newfd, 1);
 	}
-	// if (ast_node)
-	// else if (ast_node->u_content.redir.redir->type == REDIR_HEREDOC)
-	// {
-
-	// }
-
+	else if (ast_node->u_content.redir.redir->type == REDIR_HEREDOC)
+		heredoc(ast_node, newfd);
 }
 
 void	reset_fd(int *oldfd, t_ast_node *orig)
 {
 	if (oldfd)
 	{
-		if (orig->u_content.redir.redir->type == REDIR_OUT)
+		if (orig->u_content.redir.redir->type == REDIR_OUT || 
+			orig->u_content.redir.redir->type == REDIR_APPEND)
 			dup2(*oldfd, 1);
 		else if (orig->u_content.redir.redir->type == REDIR_IN)
 			dup2(*oldfd, 0);
-		else if (orig->u_content.redir.redir->type == REDIR_APPEND)
-			dup2(*oldfd, 1);
 		close(*oldfd);
 	}
 }
