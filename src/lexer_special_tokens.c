@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/14 18:21:23 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/23 15:24:24 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static int	handle_pipe_token(t_lexer *lexer, int *is_first_word)
 	return (0);
 }
 
-static int handle_quote_token(t_lexer *lexer)
+static int handle_quote_token(t_lexer *lexer, int *is_first_word)
 {
     char *quoted;
     
@@ -60,7 +60,8 @@ static int handle_quote_token(t_lexer *lexer)
         if (ft_strlen(quoted) > 0)
             add_token(&(lexer->tokens), create_token(TOKEN_DOUBLE_QUOTED, quoted));
     }
-    
+    if (*is_first_word)
+        *is_first_word = 0;
     free(quoted);
     return (0);
 }
@@ -94,7 +95,7 @@ int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 	char	*compound;
 
 	if (lexer->input[lexer->i] == '\'' || lexer->input[lexer->i] == '\"')
-		return (handle_quote_token(lexer));
+		return (handle_quote_token(lexer, is_first_word));
 	else if (lexer->input[lexer->i] == '>' || lexer->input[lexer->i] == '<')
 		return (process_redirections(lexer));
 	else if (lexer->input[lexer->i] == '|')
@@ -123,6 +124,8 @@ int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
         	else
             	add_token(&(lexer->tokens), create_token(TOKEN_ENV_VAR, env));
     	}
+		if (*is_first_word)
+        	*is_first_word = 0;
     	free(env);
 	}
 	else
