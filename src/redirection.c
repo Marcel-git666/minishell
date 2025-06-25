@@ -13,59 +13,86 @@
 #include "minishell.h"
 #include "redirection.h"
 
+char	*new_tempfile(void)
+{
+	char		*name;
+	char		*name_temp;
+	char		*num;
+	static int	i;
+
+	num = ft_itoa(i++);
+	name = ft_strjoin("temp", num);
+	name_temp = ft_strjoin(name, ".txt");
+	free(name);
+	free(num);
+	return (name_temp);
+}
+
 void	heredoc(t_ast_node *ast_node, int *newfd)
 {
 	char	*input;
+	char	*name_temp;
 
-	*newfd = open("temp.txt", O_CREAT | O_WRONLY | O_TRUNC); // temporary memory for all lines of heredoc
-	input = readline(">");
+	// temporary memory for all lines of heredoc
+	name_temp = new_tempfile();
+	*newfd = open(name_temp, O_CREAT | O_RDWR | O_TRUNC);
+	input = readline("> ");
 	while (input && ft_strcmp(input,
 		ast_node->u_content.redir.redir->file_or_delimiter))
 	{
-		write(*newfd, &input, ft_strlen(input));
+		write(*newfd, input, ft_strlen(input));
+		write(*newfd, "\n", 1);
 		free(input);
-		input = readline(">");
+		input = readline("> ");
 	}
+	free(input);
 	close(*newfd);
+	ast_node->u_content.redir.redir->type = REDIR_IN; // change heredoc to in
+	free(ast_node->u_content.redir.redir->file_or_delimiter);
+	ast_node->u_content.redir.redir->file_or_delimiter = ft_strdup(name_temp);
+	free(name_temp);
+}
+
+void	fd(t_ast_node *ast, int *newfd, int *oldfd, enum e_redir_type type)
+{
+	int			default_fd;
+	// static int	i;
+
+	default_fd = -1;
+	if (type == REDIR_OUT || type == REDIR_APPEND)
+		default_fd = 1;
+	else if (type == REDIR_IN)
+		default_fd = 0;
+	*oldfd = dup(default_fd);
+	if (type == REDIR_OUT)
+		*newfd = open(ast->u_content.redir.redir->file_or_delimiter,
+			O_TRUNC | O_CREAT | O_WRONLY);
+	else if (type == REDIR_IN)
+		*newfd = open(ast->u_content.redir.redir->file_or_delimiter, O_RDONLY);
+	else if (type == REDIR_APPEND)
+		*newfd = open(ast->u_content.redir.redir->file_or_delimiter,
+			O_APPEND | O_WRONLY | O_CREAT);
+	if (*newfd > -1)
+		dup2(*newfd, default_fd);
 }
 
 void	redirection(t_ast_node *ast_node, int *newfd, int *oldfd)
 {
-
-	if (ast_node->u_content.redir.redir->type == REDIR_OUT)
+	while (ast_node->type == NODE_REDIR)
 	{
-		while (ast_node->u_content.redir.child)
-		{
+		if (ast_node->u_content.redir.redir->type == REDIR_HEREDOC)
+			heredoc(ast_node, newfd);
+		if (ast_node->u_content.redir.redir->type == REDIR_OUT)
+			fd(ast_node, newfd, oldfd, ast_node->u_content.redir.redir->type);
+		else if (ast_node->u_content.redir.redir->type == REDIR_IN)
+			fd(ast_node, newfd, oldfd, ast_node->u_content.redir.redir->type);
+		else if (ast_node->u_content.redir.redir->type == REDIR_APPEND)
+			fd(ast_node, newfd, oldfd, ast_node->u_content.redir.redir->type);
+		if (ast_node->u_content.redir.child)
 			ast_node = ast_node->u_content.redir.child;
-			if (ast_node->type != 0 && ast_node->u_content.redir.redir->type != REDIR_OUT)
-				break;
-			*oldfd = dup(1);
-			*newfd = open(ast_node->u_content.redir.redir->file_or_delimiter, O_WRONLY | O_CREAT | O_TRUNC);
-			if (ast_node->type != 0 && ast_node->u_content.redir.redir->type != REDIR_OUT)
-			{
-				close (*newfd);
-				return ;
-			}
-			if (*newfd > -1)
-				dup2(*newfd, 1);
-		}
+		else
+			return ;
 	}
-	else if (ast_node->u_content.redir.redir->type == REDIR_IN)
-	{
-		*oldfd = dup(0);
-		*newfd = open(ast_node->u_content.redir.redir->file_or_delimiter, O_RDONLY);
-		if (*newfd > -1)
-			dup2(*newfd, 0);
-	}
-	else if (ast_node->u_content.redir.redir->type == REDIR_APPEND)
-	{
-		*oldfd = dup(1);
-		*newfd = open(ast_node->u_content.redir.redir->file_or_delimiter, O_APPEND | O_WRONLY |O_CREAT);
-		if (*newfd > -1)
-			dup2(*newfd, 1);
-	}
-	else if (ast_node->u_content.redir.redir->type == REDIR_HEREDOC)
-		heredoc(ast_node, newfd);
 }
 
 void	reset_fd(int *oldfd, t_ast_node *orig)

@@ -132,7 +132,6 @@ int	search_command(t_ast_node *ast, t_env *env, char **envp)
 	return (127); // Command not found
 }
 
-
 void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
 	int			newfd;
@@ -150,7 +149,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	expanded_cmd = NULL;
 	if (!ast_node)
 		return ;
-	while (ast_node->type == NODE_REDIR)
+	if (ast_node->type == NODE_REDIR)
 	{
 		// Here resolve the redirection, you will only switch the output for the one you want
 		redirection(ast_node, &newfd, &oldfd);
@@ -158,7 +157,6 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		{
 			ast_node = ast_node->u_content.redir.child;
 			shell->last_exit_code = 0;
-			break;
 		}
 	}
 	if (ast_node->type == NODE_PIPE)
