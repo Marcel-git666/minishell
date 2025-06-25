@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/07 20:24:39 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/23 15:21:30 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,11 +106,7 @@ t_token	*lexer(const char *input)
 		skip_whitespace(lexer.input, &(lexer.i));
 		if (lexer.input[lexer.i] == '\0')
 			break ;
-		if (is_first_word && lexer.input[lexer.i] == '$')
-		{
-    		error_message("syntax error: variable assignments cannot start with $");
-    		return (NULL);
-		}
+
 		if (is_special_char(lexer.input[lexer.i]) && !lexer.is_delimiter_expected)
 		{
 			if (handle_special_tokens(&lexer, &is_first_word) == -1)

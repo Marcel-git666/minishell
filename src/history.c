@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   history.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 19:41:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/09 12:22:26 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/06/22 23:00:37 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,10 @@ void	load_history(void)
 
 void	save_history(void)
 {
-	struct _hist_entry	**history_array;
-	int					i;
-	int					fd;
-	int					history_count;
+	HIST_ENTRY	**history_array;
+	int			i;
+	int			fd;
+	int			history_count;
 
 	history_count = history_length;
 	if (history_count <= 0)
@@ -59,4 +59,36 @@ void	save_history(void)
 		}
 	}
 	close(fd);
+}
+
+static int	should_add_to_history(char *input, char *last_executed)
+{
+	HIST_ENTRY	**history_array;
+
+	history_array = history_list();
+	if (history_length == 0)
+		return (1);
+	if (history_array && history_array[history_length - 1]
+		&& ft_strncmp(input, history_array[history_length - 1]->line,
+			ft_strlen(input) + 1) != 0
+		&& (!last_executed || ft_strncmp(input, last_executed,
+				ft_strlen(input) + 1) != 0))
+		return (1);
+	return (0);
+}
+
+void	handle_input(char *input)
+{
+	static char	*last_executed = NULL;
+
+	if (*input)
+	{
+		if (should_add_to_history(input, last_executed))
+		{
+			add_history(input);
+			save_history();
+		}
+		free(last_executed);
+		last_executed = ft_strdup(input);
+	}
 }

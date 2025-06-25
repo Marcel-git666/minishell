@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/14 19:20:28 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/22 13:07:15 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,8 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_shell	*shell;
 	
-	if (argc > 1 && ft_strncmp(argv[1], "--test", 7) == 0)
-	{
-		run_test_suite();
-		return (0);
-	}
+	(void)argc;
+	(void)argv;
 	shell = initialize_shell(envp);
 	if (!shell)
 		return (1);
