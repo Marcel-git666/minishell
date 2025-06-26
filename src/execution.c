@@ -17,6 +17,7 @@
 // #include <sys/stat.h>
 // #include <unistd.h>
 #include "expansion.h"
+#include "pipes.h"
 
 char	*full_path(char **paths, char *path, char *cmd)
 {
@@ -166,9 +167,8 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	}
 	if (ast_node->type == NODE_PIPE)
 	{
-    	// TODO: Implement pipe execution
-    	// execute_pipe(ast_node, shell, envp);
-    	return;
+    	execute_pipe(ast_node, shell, envp);
+    	return ;
 	}
 	if (ast_node->type == NODE_ASSIGNMENT)
 	{

@@ -24,7 +24,7 @@ LIBFT_DIR = libft
 SRCS = main.c utils.c token.c token_extraction.c lexer.c history.c \
 	builtins.c execution.c ft_strtok.c file_manipulation.c shell_loop.c \
 	token_string_extraction.c lexer_special_tokens.c signals.c \
-	lexer_process_redirections.c parser.c \
+	lexer_process_redirections.c parser.c pipes.c \
 	parser_utils.c parser_redir.c parser_error.c env.c cd.c redirection.c \
 	expansion.c token_extracttion_env.c
 
