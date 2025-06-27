@@ -133,10 +133,8 @@ or export -p");
 	t_env *current = shell->env;  // ← Lokální kopie pointeru
     while (current)
     {
-        if (root->u_content.cmd.arg_count == 1)
-            printf("export %s=%s\n", current->key, current->value);
-        else
-            printf("%s=%s\n", current->key, current->value);
+        if (root->u_content.cmd.arg_count == 0)
+            printf("declare -x %s=%s\n", current->key, current->value);
         current = current->next;  // ← Posuň lokální kopii
     }
 	shell->last_exit_code = 0;

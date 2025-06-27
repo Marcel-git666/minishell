@@ -53,10 +53,36 @@ void	heredoc(t_ast_node *ast_node, int *newfd)
 	free(name_temp);
 }
 
+void	closing(int out, int in, int append, int *oldfd)
+{
+	if (out > 1)
+	{
+		dup2(*oldfd, 1);
+		close(*oldfd);
+	}
+	else if (in > 1)
+	{
+		dup2(*oldfd, 0);
+		close(*oldfd);
+	}
+	else if (append > 1)
+	{
+		dup2(*oldfd, 1);
+		close(*oldfd);
+	}
+	// if (out > 1 || in > 1 || append > 1)
+	// {
+	// 	close(*oldfd);
+	// 	*oldfd = 0;
+	// }
+}
+
 void	fd(t_ast_node *ast, int *newfd, int *oldfd, enum e_redir_type type)
 {
 	int			default_fd;
-	// static int	i;
+	static int	in;
+	static int	out;
+	static int	append;
 
 	default_fd = -1;
 	if (type == REDIR_OUT || type == REDIR_APPEND)
@@ -65,13 +91,24 @@ void	fd(t_ast_node *ast, int *newfd, int *oldfd, enum e_redir_type type)
 		default_fd = 0;
 	*oldfd = dup(default_fd);
 	if (type == REDIR_OUT)
+	{
 		*newfd = open(ast->u_content.redir.redir->file_or_delimiter,
 			O_TRUNC | O_CREAT | O_WRONLY);
+		out++;
+	}
 	else if (type == REDIR_IN)
+	{
 		*newfd = open(ast->u_content.redir.redir->file_or_delimiter, O_RDONLY);
+		in++;
+	}
 	else if (type == REDIR_APPEND)
+	{
 		*newfd = open(ast->u_content.redir.redir->file_or_delimiter,
 			O_APPEND | O_WRONLY | O_CREAT);
+		append++;
+	}
+	if (out > 1 || in > 1 || append > 1)
+		closing(out, in, append, oldfd);
 	if (*newfd > -1)
 		dup2(*newfd, default_fd);
 }
