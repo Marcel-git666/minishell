@@ -15,9 +15,21 @@
 
 # include "minishell.h"
 
-void	redirection(t_ast_node *ast_node, int *newfd, int *oldfd);
-void	reset_fd(int *oldfd, t_ast_node *orig);
+typedef struct s_fds
+{
+	int	in_new;
+	int	in_old;
+	int	out_new;
+	int out_old;
+	int	append_new;
+	int	append_old;
+	int	here_new;
+} t_fds;
 
-void	heredoc(t_ast_node *ast_node, int *newfd);
+void	redirection(t_ast_node *ast_node, t_fds *fd_red);
+void	reset_fd(t_fds *fd);
+
+void	heredoc(t_ast_node *ast_node, t_fds *fd);
+void	set_fd(t_fds *fd);
 
 #endif

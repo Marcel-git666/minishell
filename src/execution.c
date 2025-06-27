@@ -134,8 +134,7 @@ int	search_command(t_ast_node *ast, t_env *env, char **envp)
 
 void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
-	int			newfd;
-	int			oldfd;
+	t_fds		*fd_red;
 	char		*expanded_cmd;
 	char		*expanded_arg;
 	int			i;
@@ -144,7 +143,8 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	t_ast_node	*orig;
 
 	i = -1;
-	oldfd = 0;
+	fd_red = malloc(1 * sizeof(t_fds));
+	set_fd(fd_red);
 	orig = ast_node;
 	expanded_cmd = NULL;
 	if (!ast_node)
@@ -152,7 +152,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	if (ast_node->type == NODE_REDIR)
 	{
 		// Here resolve the redirection, you will only switch the output for the one you want
-		redirection(ast_node, &newfd, &oldfd);
+		redirection(ast_node, fd_red);
 		if (ast_node->u_content.redir.child)
 		{
 			ast_node = ast_node->u_content.redir.child;
@@ -208,8 +208,8 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
     		shell->last_exit_code = exit_code;
 		}
 	}
-	if (oldfd)
-		reset_fd(&oldfd, orig);
+	if (fd_red->append_old || fd_red->in_old || fd_red->out_old)
+		reset_fd(fd_red);
 	free(expanded_cmd);
 	return ;
 }
