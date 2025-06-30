@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:59:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/18 18:03:28 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/06/30 22:03:58 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,3 +39,20 @@ void	setup_signals(void)
 	sigaction(SIGINT, &sa, NULL);
 	signal(SIGQUIT, SIG_IGN);
 }
+
+// void	signal_handler_heredoc(int signum)
+// {
+	
+// }
+
+// void	signals_heredoc(void)
+// {
+// 	struct sigaction	sa;
+
+// 	sa.sa_handler = signal_handler_heredoc;
+// 	sigemptyset(&sa.sa_mask);
+// 	sa.sa_flags = 0;
+
+// 	sigaction(SIGQUIT, &sa, NULL);
+// 	signal(SIGINT, SIG_IGN);
+// }

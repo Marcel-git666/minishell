@@ -24,39 +24,60 @@ char	*new_tempfile(void)
 	num = ft_itoa(i++);
 	name = ft_strjoin("temp", num);
 	name_temp = ft_strjoin(name, ".txt");
-	free(name);
 	free(num);
+	free(name);
 	return (name_temp);
+}
+
+char	*find_heredocs(t_ast_node *ast)
+{
+	char		*delimiter;
+
+	delimiter = NULL;
+	while (ast && ast->type == NODE_REDIR)
+	{
+		if (ast->u_content.redir.redir->type == REDIR_HEREDOC)
+		{
+			if (delimiter != NULL)
+				free(delimiter);
+			delimiter = ft_strdup(ast->u_content.redir.redir->file_or_delimiter);
+		}
+		ast = ast->u_content.redir.child;
+	}
+	return (delimiter);
 }
 
 void	heredoc(t_ast_node *ast_node, t_fds *fd)
 {
-	char	*input;
-	char	*name_temp;
+	char		*input;
+	char		*delimiter;
 
-	// temporary memory for all lines of heredoc
-	name_temp = new_tempfile();
-	fd->here_new = open(name_temp, O_CREAT | O_RDWR | O_TRUNC);
-	input = readline("> ");
-	while (input && ft_strcmp(input,
-		ast_node->u_content.redir.redir->file_or_delimiter))
+	delimiter = find_heredocs(ast_node);
+	fd->temp_file = new_tempfile();
+	fd->here_new = open(fd->temp_file, O_CREAT | O_RDWR | O_TRUNC);
+	while (1)
 	{
+		input = readline("> ");
+		if (!input || ft_strcmp(input, delimiter) == 0)
+		{
+			if (input)
+				free(input);
+			break;
+		}
 		write(fd->here_new, input, ft_strlen(input));
 		write(fd->here_new, "\n", 1);
 		free(input);
-		input = readline("> ");
 	}
-	free(input);
 	close(fd->here_new);
 	ast_node->u_content.redir.redir->type = REDIR_IN;
 	free(ast_node->u_content.redir.redir->file_or_delimiter);
-	ast_node->u_content.redir.redir->file_or_delimiter = ft_strdup(name_temp);
-	free(name_temp);
+	ast_node->u_content.redir.redir->file_or_delimiter = ft_strdup(fd->temp_file);
+	free(fd->temp_file);
+	fd->temp_file = NULL;
 }
 
 void	close_fd(t_fds *fd, enum e_redir_type type)
 {
-	printf("new: %d: %d\n", fd->out_new, type);
 	if (fd->out_new != -1 && type == REDIR_OUT)
 	{
 		dup2(fd->out_old, 1);
@@ -67,81 +88,54 @@ void	close_fd(t_fds *fd, enum e_redir_type type)
 		dup2(fd->in_old, 0);
 		close(fd->in_old);
 	}
-	else if (fd->append_new != -1 && type == REDIR_APPEND)
-	{
-		dup2(fd->append_old, 1);
-		close(fd->append_old);
-	}
-	// if (fd->out_old > -1 && type == REDIR_OUT)
-	// {
-	// 	dup2(fd->out_old, 1);
-	// 	close(fd->out_old);
-	// }
-	// else if (fd->in_old > -1 && type == REDIR_IN)
-	// {
-	// 	dup2(fd->in_old, 0);
-	// 	close(fd->in_old);
-	// }
-	// else if (fd->append_old > -1 && type == REDIR_APPEND)
-	// {
-	// 	dup2(fd->append_old, 1);
-	// 	close(fd->append_old);
-	// }
 }
 
-void	fd(t_ast_node *ast, t_fds *fd, enum e_redir_type type)
+void	save_old(t_ast_node *ast, t_fds *fd)
 {
-	printf("out: %d, in: %d, append: %d\n", fd->out_new, fd->in_new, fd->append_new);
-	if (fd->out_new != -1 || fd->in_new != -1 || fd->append_new != -1)
-		close_fd(fd, type);
-	if (type == REDIR_OUT)
+	if (ast->u_content.redir.redir->type == REDIR_OUT)
 		fd->out_old = dup(STDOUT_FILENO);
-	else if (type == REDIR_APPEND)
-		fd->append_old = dup(STDOUT_FILENO);
-	else if (type == REDIR_IN)
+	else if (ast->u_content.redir.redir->type == REDIR_IN)
 		fd->in_old = dup(STDIN_FILENO);
-	if (type == REDIR_OUT)
-		fd->out_new = open(ast->u_content.redir.redir->file_or_delimiter,
-			O_WRONLY | O_CREAT | O_TRUNC, 0666);
+}
+
+int	fd(t_ast_node *ast, t_fds *fd, enum e_redir_type type)
+{
+	if (type == REDIR_OUT || type == REDIR_APPEND)
+	{
+		if (fd->out_new != -1)
+			close(fd->out_new);
+		if (type == REDIR_OUT)
+			fd->out_new = open(ast->u_content.redir.redir->file_or_delimiter,
+				O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		else
+			fd->out_new = open(ast->u_content.redir.redir->file_or_delimiter,
+				O_WRONLY | O_CREAT | O_APPEND, 0666);
+	}
 	else if (type == REDIR_IN)
+	{
+		if (fd->in_new != -1)
+			close(fd->in_new);
 		fd->in_new = open(ast->u_content.redir.redir->file_or_delimiter,
 			O_RDONLY, 0666);
-	else if (type == REDIR_APPEND)
-		fd->append_new = open(ast->u_content.redir.redir->file_or_delimiter,
-			O_APPEND | O_WRONLY | O_CREAT, 0666);
-	if (type == REDIR_OUT && fd->out_new > -1)
-		dup2(fd->out_new, 1);
-	else if (type == REDIR_IN && fd->in_new > -1)
-		dup2(fd->in_new, 0);
-	else if (type == REDIR_APPEND && fd->append_new > -1)
-		dup2(fd->append_new, 1);
+	}
+	return (0);
 }
 
-void	redirection(t_ast_node *ast_node, t_fds *fd_)
+int	redirection(t_ast_node *ast_node, t_fds *fd_)
 {
-	while (ast_node->type == NODE_REDIR)
+	save_old(ast_node, fd_);
+	heredoc(ast_node, fd_);
+	while (ast_node && ast_node->type == NODE_REDIR)
 	{
-		printf("%u:%s\n", ast_node->u_content.redir.redir->type, ast_node->u_content.redir.redir->file_or_delimiter);
-		if (ast_node->u_content.redir.redir->type == REDIR_HEREDOC)
-			heredoc(ast_node, fd_);
-		if (ast_node->u_content.redir.redir->type == REDIR_OUT)
-			fd(ast_node, fd_, ast_node->u_content.redir.redir->type);
-		else if (ast_node->u_content.redir.redir->type == REDIR_IN)
-			fd(ast_node, fd_, ast_node->u_content.redir.redir->type);
-		else if (ast_node->u_content.redir.redir->type == REDIR_APPEND)
-			fd(ast_node, fd_, ast_node->u_content.redir.redir->type);
-		if (ast_node->u_content.redir.child)
-		{
-			ast_node = ast_node->u_content.redir.child;
-			if (ast_node->type == NODE_REDIR)
-				if (fd_->out_new != -1 || fd_->in_new != -1 || fd_->append_new != -1)
-					close_fd(fd_, ast_node->u_content.redir.redir->type);
-		}
-		else
-			return ;
-		// if (fd_->out_new != -1 || fd_->in_new != -1 || fd_->append_new != -1)
-		// 	close_fd(fd_, ast_node->u_content.redir.redir->type);
+		if (fd(ast_node, fd_, ast_node->u_content.redir.redir->type) == -1)
+			return (-1);
+		ast_node = ast_node->u_content.redir.child;
 	}
+	if (fd_->out_new != -1)
+		dup2(fd_->out_new, 1);
+	if (fd_->in_new != -1)
+		dup2(fd_->in_new, 0);
+	return (0);
 }
 
 void	set_fd(t_fds *fd)
@@ -150,27 +144,26 @@ void	set_fd(t_fds *fd)
 	fd->in_old = -1;
 	fd->out_new = -1;
 	fd->out_old = -1;
-	fd->append_new = -1;
-	fd->append_old = -1;
 	fd->here_new = -1;
 }
 
 void	reset_fd(t_fds *fd)
 {
-	if (fd->append_old > -1)
-	{
-		dup2(fd->append_old, 1);
-		close(fd->append_old);
-	}
-	if (fd->out_old > -1)
+	if (!fd)
+		return ;
+	if (fd->out_old != -1)
 	{
 		dup2(fd->out_old, 1);
 		close(fd->out_old);
+		if (fd->out_new)
+			close(fd->out_new);
 	}
-	if (fd->in_old > -1)
+	if (fd->in_old != -1)
 	{
 		dup2(fd->in_old, 0);
 		close(fd->in_old);
+		if (fd->in_new)
+			close(fd->in_new);
 	}
 	free(fd);
 }

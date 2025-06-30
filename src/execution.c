@@ -140,20 +140,19 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	int			i;
 	int			exit_code;
 	int 		is_env_var;
-	t_ast_node	*orig;
 
 	i = -1;
 	fd_red = malloc(1 * sizeof(t_fds));
 	set_fd(fd_red);
-	orig = ast_node;
 	expanded_cmd = NULL;
 	if (!ast_node)
 		return ;
 	if (ast_node->type == NODE_REDIR)
 	{
 		// Here resolve the redirection, you will only switch the output for the one you want
-		redirection(ast_node, fd_red);
-		if (ast_node->u_content.redir.child)
+		if (redirection(ast_node, fd_red) == -1)
+			reset_fd(fd_red);
+		while (ast_node->type == NODE_REDIR && ast_node)
 		{
 			ast_node = ast_node->u_content.redir.child;
 			shell->last_exit_code = 0;
@@ -208,7 +207,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
     		shell->last_exit_code = exit_code;
 		}
 	}
-	if (fd_red->append_old || fd_red->in_old || fd_red->out_old)
+	if (fd_red->in_old || fd_red->out_old)
 		reset_fd(fd_red);
 	free(expanded_cmd);
 	return ;

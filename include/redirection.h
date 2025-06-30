@@ -17,19 +17,19 @@
 
 typedef struct s_fds
 {
-	int	in_new;
-	int	in_old;
-	int	out_new;
-	int out_old;
-	int	append_new;
-	int	append_old;
-	int	here_new;
+	int		in_new;
+	int		in_old;
+	int		out_new;
+	int 	out_old;
+	int 	here_new;
+	char	*temp_file;
 } t_fds;
 
-void	redirection(t_ast_node *ast_node, t_fds *fd_red);
+int		redirection(t_ast_node *ast_node, t_fds *fd_);
 void	reset_fd(t_fds *fd);
 
 void	heredoc(t_ast_node *ast_node, t_fds *fd);
 void	set_fd(t_fds *fd);
+void	save_old(t_ast_node *ast, t_fds *fd);
 
 #endif
