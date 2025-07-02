@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/20 09:56:32 by lformank         ###   ########.fr       */
+/*   Updated: 2025/07/02 22:29:27 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@
 # include "libft.h"
 # include <fcntl.h>
 # include <sys/wait.h>
+# include <sys/types.h>
+# include <signal.h>
 
 # include "token.h"
 # include "builtins.h"

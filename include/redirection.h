@@ -25,11 +25,17 @@ typedef struct s_fds
 	char	*temp_file;
 } t_fds;
 
+/*redirections*/
 int		redirection(t_ast_node *ast_node, t_fds *fd_);
+int		heredoc(t_ast_node *ast_node, t_fds *fd);
+
+/*file descriptors*/
+void	save_old(t_fds *fd);
+t_fds	*set_fd(void);
 void	reset_fd(t_fds *fd);
 
-void	heredoc(t_ast_node *ast_node, t_fds *fd);
-void	set_fd(t_fds *fd);
-void	save_old(t_ast_node *ast, t_fds *fd);
+/*signals*/
+void	signals_heredoc(void);
+void	signal_handler_heredoc(int signum);
 
 #endif

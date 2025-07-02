@@ -46,7 +46,6 @@ int	fork_it(char *path, char **args, char **envp)
 	if (access(path, F_OK) != 0) {
 		return (127); 
 	}
-
 	pid = fork();
 	if (pid == 0) {
         if (execve(path, args, envp) == -1)
@@ -142,29 +141,32 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	int 		is_env_var;
 
 	i = -1;
-	fd_red = malloc(1 * sizeof(t_fds));
-	set_fd(fd_red);
 	expanded_cmd = NULL;
+	fd_red = set_fd();
 	if (!ast_node)
 		return ;
 	if (ast_node->type == NODE_REDIR)
 	{
 		// Here resolve the redirection, you will only switch the output for the one you want
 		if (redirection(ast_node, fd_red) == -1)
+		{
 			reset_fd(fd_red);
+			shell->last_exit_code = 1;
+			return;
+		}
 		while (ast_node->type == NODE_REDIR && ast_node)
 		{
 			ast_node = ast_node->u_content.redir.child;
 			shell->last_exit_code = 0;
 		}
 	}
-	if (ast_node->type == NODE_PIPE)
+	if (ast_node && ast_node->type == NODE_PIPE)
 	{
     	// TODO: Implement pipe execution
     	// execute_pipe(ast_node, shell, envp);
     	return;
 	}
-	if (ast_node->type == NODE_COMMAND)
+	if (ast_node && ast_node->type == NODE_COMMAND)
 	{
 		expanded_cmd = expand_variables(ast_node->u_content.cmd.cmd, 
                 shell->env, shell->last_exit_code, 0);
