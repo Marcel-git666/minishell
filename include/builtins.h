@@ -26,26 +26,27 @@ typedef struct s_ast_node t_ast_node;
 typedef struct s_fds t_fds;
 
 //	exit
-void	builtin_exit(t_shell *shell, t_fds *fd_red, t_ast_node *ast,
-		char *exp_arg);
+void		builtin_exit(t_shell *shell, t_fds *fd_red, t_ast_node *ast);
 
 // pwd
-void	builtin_pwd(t_shell *shell);
+void		builtin_pwd(t_shell *shell);
 
 // cd
-void	builtin_cd(t_ast_node *root, t_shell *shell);
-char	*get_pwd(void);
-void	path(t_ast_node *root, t_env *env, char *cwd);
-void	previous_rep(t_env *env, char *cwd);
-int		absolute_path(t_ast_node *root, int i, int j);
+void		builtin_cd(t_ast_node *root, t_shell *shell);
+char		*get_pwd(void);
+void		path(t_ast_node *root, t_env *env, char *cwd);
+void		previous_rep(t_env *env, char *cwd);
+int			absolute_path(t_ast_node *root, int i, int j);
 
 // export
-void	builtin_export(t_ast_node *root, t_shell *shell);
+void		builtin_export(t_ast_node *root, t_shell *shell);
+int			check_parts(char **parts, int *i);
+static void handle_export_assignment(char *assignment, t_env **env);
 
 // unset
-void	builtin_unset(t_ast_node *root, t_shell *shell);
+void		builtin_unset(t_ast_node *root, t_shell *shell);
 
 // echo
-void	builtin_echo(t_ast_node *root, t_shell *shell);
+void		builtin_echo(t_ast_node *root, t_shell *shell);
 
 #endif
