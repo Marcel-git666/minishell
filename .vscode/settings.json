@@ -16,7 +16,19 @@
 		"unistd.h": "c",
 		"history.h": "c",
 		"redirection.h": "c",
-		"expansion.h": "c"
+		"expansion.h": "c",
+		"deque": "c",
+		"string": "c",
+		"unordered_map": "c",
+		"vector": "c",
+		"string_view": "c",
+		"initializer_list": "c",
+		"termios.h": "c",
+		"signal.h": "c",
+		"signals.h": "c",
+		"lexer.h": "c",
+		"errno.h": "c",
+		"stdlib.h": "c"
 	}
 		
 }

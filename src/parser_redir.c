@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 20:17:10 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/22 22:25:34 by lformank         ###   ########.fr       */
+/*   Updated: 2025/07/05 16:35:53 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ t_ast_node	*parse_redirection(t_parser *parser)
 
 	// Save the redirection type
 	redir_type = parser->current_token->type;
-	printf("current: %d\n", parser->current_token->type);
 	// Create the redirection structure
 	redir = malloc(sizeof(t_redirection));
 	if (!redir)

@@ -23,9 +23,11 @@ struct s_shell;
 typedef struct s_shell t_shell;
 struct s_ast_node;
 typedef struct s_ast_node t_ast_node;
+typedef struct s_fds t_fds;
 
 //	exit
-void	builtin_exit(t_shell *shell);
+void	builtin_exit(t_shell *shell, t_fds *fd_red, t_ast_node *ast,
+		char *exp_arg);
 
 // pwd
 void	builtin_pwd(t_shell *shell);

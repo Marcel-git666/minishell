@@ -14,12 +14,13 @@
 #include "env.h"
 #include "builtins.h"
 
-void	builtin_exit(t_shell *shell)
+void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast, char *exp_arg)
 {
+	t_env *current = shell->env;
+	t_env *next;
+
 	if (shell->env)
 	{
-		t_env *current = shell->env;
-		t_env *next;
 		while (current)
 		{
 			next = current->next;
@@ -30,6 +31,10 @@ void	builtin_exit(t_shell *shell)
 		}
 		shell->env = NULL;
 	}
+	free_ast(ast);
+	free(fd->temp_file);
+	free(fd);
+	free(exp_arg);
 	printf("Exiting minishell...\n");
 	shell->last_exit_code = 0; // Set last exit code to 0 before exiting
 	exit(0);

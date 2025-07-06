@@ -1,4 +1,0 @@
-heh.txt out: 10, in: -1, append: -1
-typ: 0, heh.txt
-DEBUG: No builtin found, executing as external command
-heheheh

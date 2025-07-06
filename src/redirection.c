@@ -31,7 +31,8 @@ char	*new_tempfile(void)
 char	*find_heredocs(t_ast_node *ast)
 {
 	char		*delimiter;
-		delimiter = NULL;
+
+	delimiter = NULL;
 	while (ast && ast->type == NODE_REDIR)
 	{
 		if (ast->u_content.redir.redir->type == REDIR_HEREDOC)
@@ -57,10 +58,11 @@ int	heredoc(t_ast_node *ast_node, t_fds *fd)
 	fd->temp_file = ft_strdup("temp.txt");
 	if (delimiter)
 		pid = fork();
+	else
+		return (0);
 	if (pid == -1)
 	{
 		free(delimiter);
-		// signal(SIGINT, original_sigint_handler);
 		return (-1);
 	}
 	else if (pid > 0)
@@ -81,10 +83,8 @@ int	heredoc(t_ast_node *ast_node, t_fds *fd)
 			return (-1);
 		}
 	}
-	// signals_heredoc();
 	signal(SIGINT, signal_handler_heredoc);
 	signal(SIGQUIT, SIG_DFL);
-	// fd->temp_file = new_tempfile();
 	fd->here_new = open(fd->temp_file, O_CREAT | O_RDWR | O_TRUNC, 0666);
 	if (fd->here_new == -1)
 	{
@@ -162,6 +162,7 @@ int	redirection(t_ast_node *ast_node, t_fds *fd_)
 		return (-1);
 	while (ast_node && ast_node->type == NODE_REDIR)
 	{
+		printf("in: %d, out: %d\n", fd_->in_new, fd_->out_new);
 		if (fd(ast_node, fd_, ast_node->u_content.redir.redir->type) == -1)
 			return (-1);
 		ast_node = ast_node->u_content.redir.child;

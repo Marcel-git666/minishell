@@ -139,9 +139,11 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	int			i;
 	int			exit_code;
 	int 		is_env_var;
+	t_ast_node	*ast_orig;
 
 	i = -1;
 	expanded_cmd = NULL;
+	ast_orig = ast_node;
 	fd_red = set_fd();
 	if (!ast_node)
 		return ;
@@ -189,7 +191,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
             ast_node->u_content.cmd.args[i] = expanded_arg;
         }
 		if (ft_strcmp(expanded_cmd, "exit") == 0)
-			builtin_exit(shell);
+			builtin_exit(shell, fd_red, ast_orig, expanded_arg);
 		else if (ft_strcmp(expanded_cmd, "env") == 0)
 			env_print(shell);
 		else if (ft_strcmp(expanded_cmd, "pwd") == 0)
