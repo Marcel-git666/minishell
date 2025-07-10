@@ -1,31 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strjoin.c                                       :+:      :+:    :+:   */
+/*   fd.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/16 10:12:46 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/21 23:51:01 by marcel           ###   ########.fr       */
+/*   Created: 2025/07/06 22:50:07 by lformank          #+#    #+#             */
+/*   Updated: 2025/07/06 23:06:37 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#ifndef FD_H
+# define FD_H
 
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	char	*result;
-	size_t	len1;
-	size_t	len2;
+# include "minishell.h"
 
-	if (!s1 || !s2)
-		return (NULL);
-	len1 = ft_strlen(s1);
-	len2 = ft_strlen(s2);
-	result = (char *)malloc((len1 + len2 + 1) * sizeof(char));
-	if (!result)
-		return (NULL);
-	ft_strlcpy(result, s1, len1 + 1);
-	ft_strlcpy(result + len1, s2, len2 + 1);
-	return (result);
-}
+char	*new_tempfile(void);
+void	close_fd(t_fds *fd, enum e_redir_type type);
+int		fd(t_ast_node *ast, t_fds *fd, enum e_redir_type type);
+t_fds	*set_fd(void);
+void	reset_fd(t_fds *fd);
+
+#endif

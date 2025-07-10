@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 09:45:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/14 17:09:01 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/22 16:53:28 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	free_ast(t_ast_node *node)
 		if (node->u_content.cmd.arg_token_types) 
     		free(node->u_content.cmd.arg_token_types);  
 	}
-	if (node->type == NODE_PIPE)
+	else if (node->type == NODE_PIPE)
 	{
 		if (node->u_content.pipe.left)
 			free_ast(node->u_content.pipe.left);
@@ -115,7 +115,7 @@ void	print_ast(t_ast_node *node, int depth)
 
 		for (int j = 0; j < depth + 1; j++)
 			printf("  ");
-		printf("COMMAND:\n");
+		printf("CHILD:\n");
 		print_ast(node->u_content.redir.child, depth + 2);
 	}
 }

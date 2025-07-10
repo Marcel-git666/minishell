@@ -38,3 +38,9 @@ void	setup_signals(void)
 	sigaction(SIGINT, &sa, NULL);
 	signal(SIGQUIT, SIG_IGN);
 }
+
+void	signal_handler_heredoc(int signum)
+{
+	if (signum == SIGINT)
+		exit(1);
+}
