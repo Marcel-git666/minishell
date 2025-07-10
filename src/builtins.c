@@ -59,27 +59,47 @@ void	builtin_pwd(t_shell *shell)
 void	builtin_cd(t_ast_node *root, t_shell *shell)
 {
 	char	*cwd;
+	char	*test_cwd;
 
 	cwd = malloc(PATH_MAX * sizeof(char));
 	getcwd(cwd, PATH_MAX);
 	if (root->u_content.cmd.arg_count > 1)
 	{
-		printf("~%s\n", cwd);
+		error_message("cd: too many arguments");
 		free(cwd);
 		shell->last_exit_code = 1;
 		return ;
 	}
-	if (root->u_content.cmd.arg_count
-		&& ft_strncmp(root->u_content.cmd.args[0], "..", 2) == 0)
-		previous_rep(shell->env, cwd);
+	if (root->u_content.cmd.arg_count == 1 && 
+    	ft_strcmp(root->u_content.cmd.args[0], "-") == 0)
+	{
+    char *oldpwd = env_get(shell->env, "OLDPWD");
+    if (!oldpwd)
+	{
+        error_message("cd: OLDPWD not set\n");
+        shell->last_exit_code = 1;
+        free(cwd);
+        return;
+    }
+    env_set(&shell->env, "OLDPWD", cwd);
+    chdir(oldpwd);
+	}
+	else if (root->u_content.cmd.arg_count
+    	&& ft_strncmp(root->u_content.cmd.args[0], "..", 2) == 0)
+    previous_rep(shell->env, cwd);
 	else
 		path(root, shell->env, cwd);
 	free(cwd);
 	cwd = malloc(PATH_MAX * sizeof(char));
 	getcwd(cwd, PATH_MAX);
 	env_set(&shell->env, "PWD", cwd);
+	test_cwd = malloc(PATH_MAX * sizeof(char));
+	if (getcwd(test_cwd, PATH_MAX) && ft_strcmp(test_cwd, cwd) != 0)
+    	shell->last_exit_code = 0;  // CD se povedlo
+	else
+    	shell->last_exit_code = 1;  // CD selhalo
+	free(test_cwd);
 	free(cwd);
-	shell->last_exit_code = 0;
 }
 
 void	builtin_unset(t_ast_node *root, t_shell *shell)

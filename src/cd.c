@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 15:07:52 by lformank          #+#    #+#             */
-/*   Updated: 2025/07/06 23:39:25 by lformank         ###   ########.fr       */
+/*   Updated: 2025/07/10 19:27:36 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int	only_cd(t_ast_node *root, t_env *env, char *cwd)
 	return (1);
 }
 
-int	absolute_path(t_ast_node *root, int i, int j)
+int	absolute_path(t_ast_node *root, int i, int j, t_shell *shell)
 {
 	if (i == 0 && ft_strlen(root->u_content.cmd.args[0]) > 1)
 	{
@@ -63,13 +63,14 @@ int	absolute_path(t_ast_node *root, int i, int j)
 			while (root->u_content.cmd.args[0][j])
 				write(2, &root->u_content.cmd.args[0][j++], 1);
 			write(2, "\n", 1);
+			shell->last_exit_code = 1;
 			return (0);
 		}
 	}
 	return (1);
 }
 
-void	path(t_ast_node *root, t_env *env, char *cwd)
+void	path(t_ast_node *root, t_env *env, char *cwd, t_shell *shell)
 {
 	int		i;
 	int		j;
@@ -85,7 +86,7 @@ void	path(t_ast_node *root, t_env *env, char *cwd)
 		i++;
 	if (i == 0 && ft_strlen(root->u_content.cmd.args[0]) == 1)
 		chdir("/");
-	else if (absolute_path(root, i, j) == 0)
+	else if (absolute_path(root, i, j, shell) == 0)
 		return ;
 	else if (chdir(root->u_content.cmd.args[0]) == -1)
 	{
@@ -93,6 +94,7 @@ void	path(t_ast_node *root, t_env *env, char *cwd)
 		while (root->u_content.cmd.args[0][j])
 			write(2, &root->u_content.cmd.args[0][j++], 1);
 		write(2, "\n", 1);
+		shell->last_exit_code = 1;
 		return ;
 	}
 	env_set(&env, "OLDPWD", cwd);

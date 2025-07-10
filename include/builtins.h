@@ -34,9 +34,9 @@ void		builtin_pwd(t_shell *shell);
 // cd
 void		builtin_cd(t_ast_node *root, t_shell *shell);
 char		*get_pwd(void);
-void		path(t_ast_node *root, t_env *env, char *cwd);
-void		previous_rep(t_env *env, char *cwd);
-int			absolute_path(t_ast_node *root, int i, int j);
+void        previous_rep(t_env *env, char *cwd);
+void        path(t_ast_node *root, t_env *env, char *cwd, t_shell *shell);
+int         absolute_path(t_ast_node *root, int i, int j, t_shell *shell);
 
 // export
 void		builtin_export(t_ast_node *root, t_shell *shell);
