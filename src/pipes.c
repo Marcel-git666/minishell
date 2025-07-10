@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 22:39:40 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/10 18:46:13 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/10 18:50:53 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,21 @@ static void	execute_right_child(int *pipe_fd, t_ast_node *right_node,
 	exit(0);
 }
 
-static void	handle_parent_process(int *pipe_fd)
+static void handle_parent_process(int *pipe_fd, pid_t left_pid, pid_t right_pid, t_shell *shell)
 {
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
-	wait(NULL);
-	wait(NULL);
+    int status;
+    
+    close(pipe_fd[0]);
+    close(pipe_fd[1]);
+    
+    waitpid(left_pid, &status, 0);
+    waitpid(right_pid, &status, 0);
+    
+    // Set exit code based on the last command in pipeline (right side)
+    if (WIFEXITED(status))
+        shell->last_exit_code = WEXITSTATUS(status);
+    else
+        shell->last_exit_code = 1;
 }
 
 void	execute_pipe(t_ast_node *pipe_node, t_shell *shell, char **envp)
@@ -74,5 +83,5 @@ void	execute_pipe(t_ast_node *pipe_node, t_shell *shell, char **envp)
 	if (right_pid == 0)
 		execute_right_child(pipe_fd, pipe_node->u_content.pipe.right,
 			shell, envp);
-	handle_parent_process(pipe_fd);
+	handle_parent_process(pipe_fd, left_pid, right_pid, shell);
 }
