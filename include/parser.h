@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:18:15 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/08 22:18:00 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/23 16:09:30 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ typedef struct s_command
 	char			**args;			// NULL-terminated array of args
 	int				arg_count;		// Number of arguments
 	int             *arg_token_types; // Array of token types for each arg
+	int				cmd_token_type;	// Type of the command token (TOKEN_CMD, TOKEN_ENV_VAR, etc.)
 	t_redirection	*redirections;
 }	t_command;
 
@@ -109,7 +110,7 @@ t_ast_node	*parse_tokens(t_token *tokens);
 t_ast_node	*parse_command(t_parser *parser);
 t_ast_node	*parse_expression(t_parser *parser);
 t_ast_node	*create_pipe_node(t_ast_node *left_node, t_parser *parser);
-
+t_ast_node	*parse_assignment(t_parser *parser);
 // parser_error.c
 int			set_parser_error(t_parser *parser, const char *msg);
 

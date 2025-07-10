@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 18:50:12 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/02 22:29:25 by lformank         ###   ########.fr       */
+/*   Updated: 2025/06/23 15:48:12 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,8 @@ void		save_old(t_fds *fd);
 void		builtin_pwd(t_shell *shell);
 void		builtin_cd(t_ast_node *root, t_shell *shell);
 void		builtin_export(t_ast_node *root, t_shell *shell);
+void	    execute_command(t_ast_node *ast_node, t_shell *shell, char **envp);
+int		    search_command(char *expanded_cmd, t_ast_node *ast, t_env *env, char **envp);
+char	    *full_path(char **paths, char *path, char *cmd);
 
 #endif
