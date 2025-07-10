@@ -92,6 +92,7 @@ int	search_command(char *expanded_cmd, t_ast_node *ast, t_env *env, char **envp)
 		if (access(expanded_cmd, F_OK) != 0)
     	{
         	return (127);  // Command not found
+		}
     	// Prepare arguments array
     	args = ft_calloc((ast->u_content.cmd.arg_count + 2), sizeof(char *));
     	args[0] = ft_strdup(expanded_cmd);
@@ -225,7 +226,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
         }
 		printf("DEBUG: Checking builtins for command: '%s'\n", expanded_cmd);
 		if (ft_strcmp(expanded_cmd, "exit") == 0)
-			builtin_exit(shell, fd_red, ast_orig, expanded_arg);
+			builtin_exit(shell, fd_red, ast_orig);
 		else if (ft_strcmp(expanded_cmd, "env") == 0)
 			env_print(shell);
 		else if (ft_strcmp(expanded_cmd, "pwd") == 0)

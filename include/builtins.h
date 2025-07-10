@@ -41,7 +41,6 @@ int			absolute_path(t_ast_node *root, int i, int j);
 // export
 void		builtin_export(t_ast_node *root, t_shell *shell);
 int			check_parts(char **parts, int *i);
-static void handle_export_assignment(char *assignment, t_env **env);
 
 // unset
 void		builtin_unset(t_ast_node *root, t_shell *shell);
