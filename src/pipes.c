@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 22:39:40 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/26 23:04:57 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/10 18:46:13 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,24 @@ void	execute_pipe(t_ast_node *pipe_node, t_shell *shell, char **envp)
 		return ;
 	}
 	left_pid = fork();
+	if (left_pid == -1)
+	{
+		perror("fork");
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		return ;
+	}
 	if (left_pid == 0)
 		execute_left_child(pipe_fd, pipe_node->u_content.pipe.left,
 			shell, envp);
 	right_pid = fork();
+	if (right_pid == -1)
+	{
+		perror("fork");
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		return ;
+	}
 	if (right_pid == 0)
 		execute_right_child(pipe_fd, pipe_node->u_content.pipe.right,
 			shell, envp);
