@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 15:07:52 by lformank          #+#    #+#             */
-/*   Updated: 2025/06/06 17:39:15 by lformank         ###   ########.fr       */
+/*   Updated: 2025/07/06 23:39:25 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,4 +97,3 @@ void	path(t_ast_node *root, t_env *env, char *cwd)
 	}
 	env_set(&env, "OLDPWD", cwd);
 }
-

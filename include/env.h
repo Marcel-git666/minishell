@@ -6,12 +6,15 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:23:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/14 21:19:03 by marcel           ###   ########.fr       */
+/*   Updated: 2025/06/08 20:38:07 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ENV_H
 # define ENV_H
+
+# include "minishell.h"
+# include "parser.h"
 
 typedef struct s_env
 {

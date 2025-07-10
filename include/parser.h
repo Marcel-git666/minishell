@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   parser.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:18:15 by mmravec           #+#    #+#             */
 /*   Updated: 2025/06/23 16:09:30 by marcel           ###   ########.fr       */
@@ -22,10 +22,10 @@ typedef struct s_token t_token;
  */
 typedef enum e_node_type
 {
-	NODE_COMMAND,		// Simple command (cmd + args)
-	NODE_PIPE,			// Pipeline
-	NODE_REDIR,			// Redirection
-	NODE_ASSIGNMENT		// Variable assignment
+	NODE_COMMAND = 0,		// Simple command (cmd + args)
+	NODE_PIPE = 1,			// Pipeline
+	NODE_REDIR = 2,			// Redirection
+	NODE_ASSIGNMENT = 3		// Variable assignment
 }	t_node_type;
 
 /*
