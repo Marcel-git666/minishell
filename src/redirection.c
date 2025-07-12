@@ -103,7 +103,7 @@ int	heredoc(t_ast_node *ast_node, t_fds *fd)
 			return (-1);
 	}
 	signal(SIGINT, signal_handler_heredoc);
-	signal(SIGQUIT, SIG_DFL);
+	signal(SIGQUIT, SIG_IGN);
 	read_loop(delimiter, fd);
 	close(fd->here_new);
 	free(delimiter);
