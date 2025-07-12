@@ -6,13 +6,13 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 21:31:47 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/12 21:35:20 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/12 22:50:44 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static t_env	*create_new_env_node(const char *key, const char *value)
+static t_env	*create_env_node(const char *key, const char *value)
 {
 	t_env	*new_node;
 
@@ -54,7 +54,7 @@ int	env_set(t_env **env, const char *key, const char *value)
 			return (update_existing_env(current, value));
 		current = current->next;
 	}
-	new_node = create_new_env_node(key, value);
+	new_node = create_env_node(key, value);
 	if (!new_node)
 		return (0);
 	new_node->next = *env;

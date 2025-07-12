@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 21:10:06 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/12 21:27:57 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/12 21:53:57 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ void	env_print_sorted(t_shell *shell)
 	char	**env_array;
 	int		count;
 	int		i;
+    char	*equals;
 
 	env_array = env_to_array(shell->env);
 	if (!env_array)
@@ -76,7 +77,15 @@ void	env_print_sorted(t_shell *shell)
 	i = 0;
 	while (env_array[i])
 	{
-		printf("declare -x %s\n", env_array[i]);
+		equals = ft_strchr(env_array[i], '=');
+		if (equals)
+		{	// Temporarily replace '=' with '\0' to print the key	
+    		*equals = '\0';
+    		printf("declare -x %s=\"%s\"\n", env_array[i], equals + 1);
+    		*equals = '=';  // Restore
+		}
+		else
+    		printf("declare -x %s\n", env_array[i]);
 		i++;
 	}
 	free_env_array(env_array);

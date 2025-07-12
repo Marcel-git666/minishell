@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 23:26:09 by lformank          #+#    #+#             */
-/*   Updated: 2025/07/06 23:31:29 by lformank         ###   ########.fr       */
+/*   Updated: 2025/07/12 21:54:45 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,12 +71,10 @@ or export -p");
 		shell->last_exit_code = 1;
 		return ;
 	}
-	t_env *current = shell->env;  // ← Lokální kopie pointeru
-    while (current)
-    {
-        if (root->u_content.cmd.arg_count == 0)
-            printf("declare -x %s=%s\n", current->key, current->value);
-        current = current->next;  // ← Posuň lokální kopii
-    }
+    if (root->u_content.cmd.arg_count == 0)
+	{
+		env_print_sorted(shell);
+		return ;
+	}
 	shell->last_exit_code = 0;
 }

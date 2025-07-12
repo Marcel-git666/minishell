@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static t_env	*create_env_node(char *envp_line)
+static t_env	*parse_envp_line(char *envp_line)
 {
 	t_env	*new_node;
 	char	*equals_pos;
@@ -51,7 +51,7 @@ t_env	*env_init(char **envp)
 	i = 0;
 	while (envp[i])
 	{
-		new_node = create_env_node(envp[i]);
+		new_node = parse_envp_line(envp[i]);
 		if (!new_node)
 			return (NULL);
 		new_node->next = env_list;
