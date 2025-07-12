@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 21:10:06 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/12 21:53:57 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/12 23:27:55 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,25 @@ static void	free_env_array(char **env_array)
 {
 	int	i;
 
-	i = 0;
-	while (env_array[i])
-		free(env_array[i++]);
+	i = -1;
+	while (env_array[++i])
+		free(env_array[i]);
 	free(env_array);
+}
+
+static void	print_sorted_env_line(char *env_line)
+{
+	char	*equals;
+
+	equals = ft_strchr(env_line, '=');
+	if (equals)
+	{
+		*equals = '\0';
+		printf("declare -x %s=\"%s\"\n", env_line, equals + 1);
+		*equals = '=';
+	}
+	else
+		printf("declare -x %s\n", env_line);
 }
 
 void	env_print_sorted(t_shell *shell)
@@ -64,7 +79,6 @@ void	env_print_sorted(t_shell *shell)
 	char	**env_array;
 	int		count;
 	int		i;
-    char	*equals;
 
 	env_array = env_to_array(shell->env);
 	if (!env_array)
@@ -74,20 +88,9 @@ void	env_print_sorted(t_shell *shell)
 	}
 	count = ft_envsize(shell->env);
 	sort_env_array(env_array, count);
-	i = 0;
-	while (env_array[i])
-	{
-		equals = ft_strchr(env_array[i], '=');
-		if (equals)
-		{	// Temporarily replace '=' with '\0' to print the key	
-    		*equals = '\0';
-    		printf("declare -x %s=\"%s\"\n", env_array[i], equals + 1);
-    		*equals = '=';  // Restore
-		}
-		else
-    		printf("declare -x %s\n", env_array[i]);
-		i++;
-	}
+	i = -1;
+	while (env_array[++i])
+		print_sorted_env_line(env_array[i]);
 	free_env_array(env_array);
 	shell->last_exit_code = 0;
 }

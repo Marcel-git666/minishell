@@ -13,9 +13,6 @@
 #include "minishell.h"
 #include "parser.h"
 #include "env.h"
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <unistd.h>
 #include "expansion.h"
 #include "pipes.h"
 
