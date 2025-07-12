@@ -154,6 +154,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	if (!ast_node)
 	{
 		printf("DEBUG: ast_node is NULL\n");
+		reset_fd(fd_red);
 		return ;
 	}
 	if (ast_node->type == NODE_REDIR)
@@ -173,6 +174,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	}
 	if (ast_node && ast_node->type == NODE_PIPE)
 	{
+		reset_fd(fd_red);
     	execute_pipe(ast_node, shell, envp);
     	return ;
 	}
@@ -186,6 +188,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		env_set(&shell->env, ast_node->u_content.assign.name, ast_node->u_content.assign.value);
 		shell->last_exit_code = 0;
 		printf("DEBUG: Assignment completed\n");
+		reset_fd(fd_red);
 		return ;
 	}
 	if (ast_node->type == NODE_COMMAND)
@@ -202,6 +205,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		{
 			printf("DEBUG: Expansion failed\n");
 			shell->last_exit_code = 1;  
+			reset_fd(fd_red);
 			return ;
 		}
 		if (ft_strlen(expanded_cmd) == 0)
@@ -209,6 +213,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 			printf("minishell: : command not found\n");
 			shell->last_exit_code = 127;
 			free(expanded_cmd);
+			reset_fd(fd_red);
 			return ;
 		}
 		while (++i < ast_node->u_content.cmd.arg_count)
@@ -246,9 +251,8 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
     		shell->last_exit_code = exit_code;
 			printf("DEBUG: External command finished with exit code: %d\n", exit_code);
 		}
-	}
-	if (fd_red->in_old || fd_red->out_old)
-		reset_fd(fd_red);
+	}	
+    reset_fd(fd_red);
 	free(expanded_cmd);
 	printf("DEBUG: execute_command finished\n");
 	return ;
