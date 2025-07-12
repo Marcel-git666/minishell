@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 18:50:12 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/10 17:39:58 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/13 00:59:43 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,21 @@ typedef struct s_shell t_shell;
 typedef struct s_fds t_fds;
 
 // execution.c
-void	    execute_command(t_ast_node *ast_node, t_shell *shell, char **envp);
-int		    search_command(char *expanded_cmd, t_ast_node *ast, t_env *env, char **envp);
-char	    *full_path(char **paths, char *path, char *cmd);
-void		save_old(t_fds *fd);
+void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp);
+void	save_old(t_fds *fd);
 
-// builtin.c
-void		builtin_pwd(t_shell *shell);
-void		builtin_cd(t_ast_node *root, t_shell *shell);
-void		builtin_export(t_ast_node *root, t_shell *shell);
+// execution_command.c
+void	handle_command(t_ast_node *ast_node, t_shell *shell,
+		char **envp, char *expanded_cmd);
+
+// execution_search.c  
+int		search_command(char *expanded_cmd, t_ast_node *ast, t_env *env, char **envp);
+int		fork_it(char *path, char **args, char **envp);
+
+// execution_utils.c
+char	*full_path(char **paths, char *path, char *cmd);
+void	free_source(char **path, char *slash, char *final_path, char **args);
+char	**prepare_args(char *cmd, t_ast_node *ast);
+void	free_args(char **args);
 
 #endif
