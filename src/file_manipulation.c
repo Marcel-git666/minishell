@@ -6,12 +6,16 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 21:44:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/18 23:31:16 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/18 23:37:41 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Appends buffer content to existing file_content string
+ * Returns 1 on success, 0 on memory allocation failure
+ */
 static int	append_to_content(char **file_content, char *buffer)
 {
 	char	*temp;
@@ -28,12 +32,17 @@ static int	append_to_content(char **file_content, char *buffer)
 	return (1);
 }
 
+/*
+ * Creates and opens a file with given flags and mode
+ * Handles file creation if O_CREAT flag is set
+ * Returns file descriptor on success, -1 on failure
+ */
 static int	create_and_open_file(char *name, int oflag, mode_t mode)
 {
 	int	fd;
 
 	fd = open(name, oflag, mode);
-	if (fd == -1 && (oflag & O_CREAT)) // ✅ Create file only if O_CREAT is used
+	if (fd == -1 && (oflag & O_CREAT))
 	{
 		fd = open(name, oflag | O_CREAT, mode);
 		if (fd == -1)
@@ -42,6 +51,11 @@ static int	create_and_open_file(char *name, int oflag, mode_t mode)
 	return (fd);
 }
 
+/*
+ * Reads entire file content into a dynamically allocated string
+ * Reads file in 4096-byte chunks and concatenates them
+ * Returns 1 on success, -1 on read error, 0 on memory error
+ */
 static int	read_file_content(int fd, char **file_content)
 {
 	int		ret;
@@ -64,6 +78,12 @@ static int	read_file_content(int fd, char **file_content)
 	return (1);
 }
 
+/*
+ * Opens a file and optionally reads its content
+ * If O_WRONLY flag is set, returns fd without reading
+ * Otherwise reads entire file content into file_content parameter
+ * Returns fd for write-only mode, 1 for successful read, -1 for errors
+ */
 int	open_file(char *name, char **file_content, int oflag)
 {
 	int	fd;
@@ -71,7 +91,7 @@ int	open_file(char *name, char **file_content, int oflag)
 	fd = create_and_open_file(name, oflag, 0644);
 	if (fd == -1)
 		return (-1);
-	if (oflag & O_WRONLY) // ✅ If in write mode, do not read the file
+	if (oflag & O_WRONLY)
 		return (fd);
 	return (read_file_content(fd, file_content));
 }
