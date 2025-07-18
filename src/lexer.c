@@ -6,61 +6,30 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/23 15:21:30 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/18 23:51:38 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "lexer.h"
 
+#include "minishell.h"
+#include "lexer.h"
+
+/*
+ * Skips whitespace characters in input string
+ * Updates index pointer to next non-whitespace character
+ */
 void	skip_whitespace(const char *input, size_t *i)
 {
 	while (input[*i] && ft_isspace(input[*i]))
 		(*i)++;
 }
 
-static int	is_valid_var_name(const char *word, int len)
-{
-	int		i;
-
-	if (!len || (!ft_isalpha(word[0]) && word[0] != '_'))
-		return (0);
-	i = 0;
-	while (i < len)
-	{
-		if (!ft_isalnum(word[i]) && word[i] != '_')
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-static int	check_assignment(char *word)
-{
-	int		i;
-	char	*equal_pos;
-
-	i = 0;
-	// Skip any whitespace at start (shouldn't be any)
-	while (word[i] && ft_isspace(word[i]))
-		i++;
-	if (!word[i])
-		return (0);
-	// Find first '='
-	equal_pos = ft_strchr(word, '=');
-	if (!equal_pos)
-		return (0);
-	// Check no space before =
-	i = equal_pos - word - 1;
-	if (i < 0 || ft_isspace(word[i]))
-		return (0);
-	// Check no space after =
-	if (ft_isspace(*(equal_pos + 1)))
-		return (0);
-	// Check if variable name is valid
-	return (is_valid_var_name(word, equal_pos - word));
-}
-
+/*
+ * Adds appropriate token based on lexer state and word content
+ * Handles delimiter, file, command, assignment, and argument tokens
+ */
 void	add_token_from_input(t_lexer *lexer, int *is_first_word)
 {
 	char	*word;
@@ -90,42 +59,62 @@ void	add_token_from_input(t_lexer *lexer, int *is_first_word)
 	free(word);
 }
 
+/*
+ * Initializes lexer structure with default values
+ */
+static void	init_lexer(t_lexer *lexer, const char *input)
+{
+	lexer->i = 0;
+	lexer->tokens = NULL;
+	lexer->input = input;
+	lexer->is_file_expected = 0;
+	lexer->is_delimiter_expected = 0;
+}
+
+/*
+ * Processes current character in lexer loop
+ * Returns -1 on error, 0 to continue, 1 to break
+ */
+static int	process_current_char(t_lexer *lexer, int *is_first_word)
+{
+	if (lexer->input[lexer->i] == '\0')
+		return (1);
+	if (is_special_char(lexer->input[lexer->i])
+		&& !lexer->is_delimiter_expected)
+	{
+		if (handle_special_tokens(lexer, is_first_word) == -1)
+			return (-1);
+		return (0);
+	}
+	if (handle_assignment_error(lexer) == -1)
+		return (-1);
+	if (is_word_char(lexer->input[lexer->i], lexer->is_delimiter_expected))
+		add_token_from_input(lexer, is_first_word);
+	else
+		lexer->i++;
+	return (0);
+}
+
+/*
+ * Main lexer function that tokenizes input string
+ * Returns linked list of tokens or NULL on error
+ */
 t_token	*lexer(const char *input)
 {
 	t_lexer	lexer;
 	int		is_first_word;
+	int		result;
 
-	lexer.i = 0;
-	lexer.tokens = NULL;
-	lexer.input = input;
-	lexer.is_file_expected = 0;
-	lexer.is_delimiter_expected = 0;
+	init_lexer(&lexer, input);
 	is_first_word = 1;
 	while (lexer.input[lexer.i])
 	{
 		skip_whitespace(lexer.input, &(lexer.i));
-		if (lexer.input[lexer.i] == '\0')
-			break ;
-
-		if (is_special_char(lexer.input[lexer.i]) && !lexer.is_delimiter_expected)
-		{
-			if (handle_special_tokens(&lexer, &is_first_word) == -1)
-				return (NULL);
-			continue ;
-		}
-		if (lexer.input[lexer.i] == '=' && (ft_isspace(lexer.input[lexer.i - 1])
-			|| ft_isspace(lexer.input[lexer.i + 1])))
-		{
-			error_message("syntax error: spaces not allowed around '='. Use VAR=value instead");
+		result = process_current_char(&lexer, &is_first_word);
+		if (result == -1)
 			return (NULL);
-		}
-		if (ft_isalnum(lexer.input[lexer.i]) || lexer.input[lexer.i] == '-'
-			|| lexer.input[lexer.i] == '/' || lexer.is_delimiter_expected
-			|| lexer.input[lexer.i] == '.' || lexer.input[lexer.i] == '~'
-			|| lexer.input[lexer.i] == '?' || lexer.input[lexer.i] == '*')
-			add_token_from_input(&lexer, &is_first_word);
-		else
-			lexer.i++;
+		if (result == 1)
+			break ;
 	}
 	return ((lexer.tokens));
 }
