@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   file_manipulation.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 21:44:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/08 21:59:52 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/18 23:31:16 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ static int	read_file_content(int fd, char **file_content)
 	*file_content = ft_strdup("");
 	if (!*file_content)
 		return (write(2, "Error: Memory allocation failed.\n", 34), 0);
-
 	ret = read(fd, buffer, 4096);
 	while (ret > 0)
 	{
@@ -60,7 +59,9 @@ static int	read_file_content(int fd, char **file_content)
 		ret = read(fd, buffer, 4096);
 	}
 	close(fd);
-	return (ret == -1 ? -1 : 1);
+	if (ret == -1)
+		return (-1);
+	return (1);
 }
 
 int	open_file(char *name, char **file_content, int oflag)
@@ -74,4 +75,3 @@ int	open_file(char *name, char **file_content, int oflag)
 		return (fd);
 	return (read_file_content(fd, file_content));
 }
-
