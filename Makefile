@@ -29,7 +29,7 @@ SRCS = main.c utils.c token.c token_extraction.c lexer.c history.c \
 	expansion.c fd.c export.c token_extracttion_env.c builtin_exit.c \
 	cd_utils.c builtin_cd.c env_print.c env_utils.c env_operations.c \
 	env_path.c execution_utils.c execution_search.c \
-	execution_command.c 
+	execution_command.c expansion_utils.c
 
 # Add src/ prefix to source files
 SRCS := $(addprefix $(SRC_DIR)/,$(SRCS))

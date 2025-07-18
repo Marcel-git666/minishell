@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/14 21:30:32 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/18 23:05:44 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,163 +14,76 @@
 #include "expansion.h"
 #include "env.h"
 
-/**
- * Najde další výskyt $ v stringu a vrátí jeho pozici
- */
-static char *find_next_dollar(char *str)
+static char	*handle_expansion_error(char *result, char *var_name,
+			char *var_value)
 {
-    while (*str)
-    {
-        if (*str == '$')
-            return (str);
-        str++;
-    }
-    return (NULL);
+	free(result);
+	free(var_name);
+	free(var_value);
+	return (NULL);
 }
 
-/**
- * Parsuje název proměnné po $
- * Vrací délku názvu proměnné
- */
-static int parse_var_name(char *str, char **var_name)
+static char	*join_parts(char *result, char *var_value, char *rest)
 {
-    int len;
-    int i;
-    
-    len = 0;
-    i = 0;
-    
-    // Speciální případ: $?
-    if (str[0] == '?')
-    {
-        *var_name = ft_strdup("?");
-        return (1);
-    }
-    
-    // Speciální případ: ${VAR}
-    if (str[0] == '{')
-    {
-        i = 1;
-        while (str[i] && str[i] != '}')
-        {
-            len++;
-            i++;
-        }
-        if (str[i] == '}')
-        {
-            *var_name = ft_substr(str, 1, len);
-            return (len + 2); // +2 pro { a }
-        }
-        return (0); // Chyba - nezavřené {}
-    }
-    
-    // Normální případ: $VAR
-    while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
-    {
-        len++;
-        i++;
-    }
-    
-    if (len > 0)
-        *var_name = ft_substr(str, 0, len);
-    
-    return (len);
+	char	*temp;
+	char	*final_result;
+
+	temp = ft_strjoin(result, var_value);
+	if (!temp)
+		return (NULL);
+	final_result = ft_strjoin(temp, rest);
+	free(temp);
+	return (final_result);
 }
 
-/**
- * Získá hodnotu proměnné z environment
- */
-static char *get_variable_value(char *var_name, t_env *env, int exit_status)
+static char	*process_variable(char *result, char *dollar_pos,
+			t_env *env, int exit_status)
 {
-    char *value;
-    
-    // Speciální proměnná $?
-    if (ft_strcmp(var_name, "?") == 0)
-        return (ft_itoa(exit_status));
-    
-    // Hledej v environment
-    value = env_get(env, var_name);
-    if (value)
-        return (ft_strdup(value));
-    
-    // Proměnná neexistuje - vrať prázdný string
-    return (ft_strdup(""));
+	char	*var_name;
+	char	*var_value;
+	char	*final_result;
+	int		var_len;
+
+	var_len = parse_var_name(dollar_pos + 1, &var_name);
+	if (var_len == 0)
+		return (result);
+	*dollar_pos = '\0';
+	var_value = get_variable_value(var_name, env, exit_status);
+	final_result = join_parts(result, var_value, dollar_pos + 1 + var_len);
+	if (!final_result)
+		return (handle_expansion_error(result, var_name, var_value));
+	free(result);
+	free(var_name);
+	free(var_value);
+	return (final_result);
 }
 
-/**
- * Hlavní funkce pro variable expansion
- * Nahradí všechny $VAR a ${VAR} v input stringu
- */
-
-char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
+char	*expand_variables(char *input, t_env *env, int exit_status,
+		int is_env_var)
 {
-   char *result;
-   char *current;
-   char *dollar_pos;
-   char *var_name;
-   char *var_value;
-   char *temp;
-   int  var_len;
-   size_t dollar_offset;
-   size_t value_len;  // ← PŘIDÁNO
-   
-   if (!input)
-       return (NULL);
-   if (is_env_var)
-       return (get_variable_value(input, env, exit_status));
-   result = ft_strdup(input);
-   current = result;
-   
-   while ((dollar_pos = find_next_dollar(current)) != NULL)
-   {
-       // Přeskoč $ a parsuj název proměnné
-       var_len = parse_var_name(dollar_pos + 1, &var_name);
-       if (var_len == 0)
-       {
-           // Není to validní proměnná, přeskoč $
-           current = dollar_pos + 1;
-           continue;
-       }
-       
-       dollar_offset = dollar_pos - result;
-       
-        // Získej hodnotu proměnné
-        var_value = get_variable_value(var_name, env, exit_status);
-        value_len = ft_strlen(var_value);  // ← PŘESUNUTO PŘED FREE
-       
-        // Vytvoř nový string s nahrazenou proměnnou
-        *dollar_pos = '\0'; // Ukončí string před $
-        temp = ft_strjoin(result, var_value);
-        if (!temp)
-        {
-            free(result);
-            free(var_name);
-            free(var_value);
-            return (NULL);
-        }
-       // Přidej zbytek po proměnné
-       char *rest = dollar_pos + 1 + var_len;
-       char *final_result = ft_strjoin(temp, rest);
-       if (!final_result)
-       {
-            free(result);
-            free(temp);
-            free(var_name);
-            free(var_value);
-            return (NULL);
-       }
-       // Uvolni paměť
-       free(result);
-       free(temp);
-       free(var_name);
-       free(var_value);
-       
-       result = final_result;
-       
-       // Pokračuj hledáním od pozice, kde skončila nahrazená hodnota
-       
-       current = result + dollar_offset + value_len;  // ← POUŽÍT ULOŽENOU HODNOTU
-       
-   }
-   return (result);
+	char	*result;
+	char	*current;
+	char	*dollar_pos;
+	size_t	dollar_offset;
+	char	*temp_value;
+
+	if (!input)
+		return (NULL);
+	if (is_env_var)
+		return (get_variable_value(input, env, exit_status));
+	result = ft_strdup(input);
+	current = result;
+	dollar_pos = find_next_dollar(current);
+	while (dollar_pos != NULL)
+	{
+		dollar_offset = dollar_pos - result;
+		result = process_variable(result, dollar_pos, env, exit_status);
+		if (!result)
+			return (NULL);
+		temp_value = get_variable_value(dollar_pos + 1, env, exit_status);
+		current = result + dollar_offset + ft_strlen(temp_value);
+		free(temp_value);
+		dollar_pos = find_next_dollar(current);
+	}
+	return (result);
 }
