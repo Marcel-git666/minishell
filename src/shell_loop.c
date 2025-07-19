@@ -48,7 +48,6 @@ static void	process_tokens_and_execute(t_token *tokens, t_shell *shell,
 	if (ast)
 	{
 		printf("Successfully created AST\n");
-		print_ast(ast, 0);
 		execute_command(ast, shell, envp);
 		free_ast(ast);
 	}

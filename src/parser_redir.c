@@ -3,58 +3,93 @@
 /*                                                        :::      ::::::::   */
 /*   parser_redir.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 20:17:10 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/05 16:35:53 by lformank         ###   ########.fr       */
+/*   Updated: 2025/07/20 00:31:13 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
 
-t_ast_node	*parse_redirection(t_parser *parser)
+/*
+ * Maps token type to redirection type enum
+ */
+static t_redir_type	get_redir_type(t_token_type token_type)
 {
-	t_ast_node		*node;
-	t_redirection	*redir;
-	t_token_type	redir_type;
+	if (token_type == TOKEN_REDIR_IN)
+		return (REDIR_IN);
+	else if (token_type == TOKEN_REDIR_OUT)
+		return (REDIR_OUT);
+	else if (token_type == TOKEN_APPEND_OUT)
+		return (REDIR_APPEND);
+	else if (token_type == TOKEN_HEREDOC)
+		return (REDIR_HEREDOC);
+	return (REDIR_IN);
+}
 
-	// Save the redirection type
-	redir_type = parser->current_token->type;
-	// Create the redirection structure
+/*
+ * Creates and initializes redirection structure
+ */
+static t_redirection	*create_redirection(t_parser *parser)
+{
+	t_redirection	*redir;
+
 	redir = malloc(sizeof(t_redirection));
 	if (!redir)
 		return (NULL);
-
-	// Set redirection type
-	if (redir_type == TOKEN_REDIR_IN)
-		redir->type = REDIR_IN;
-	else if (redir_type == TOKEN_REDIR_OUT)
-		redir->type = REDIR_OUT;
-	else if (redir_type == TOKEN_APPEND_OUT)
-		redir->type = REDIR_APPEND;
-	else if (redir_type == TOKEN_HEREDOC)
-		redir->type = REDIR_HEREDOC;
-	// Move to the next token (should be file or delimiter)
+	redir->type = get_redir_type(parser->current_token->type);
+	redir->next = NULL;
 	get_next_token(parser);
-		
-	// Check if we have a filename token
 	if (!parser->current_token || (parser->current_token->type != TOKEN_FILE
 			&& parser->current_token->type != TOKEN_DELIMITER))
 	{
-		set_parser_error(parser, "syntax error: expected filename or delimiter after redirection");
+		set_parser_error(parser,
+			"syntax error: expected filename or delimiter after redirection");
 		free(redir);
 		return (NULL);
 	}
-
-	// Save the filename
 	redir->file_or_delimiter = ft_strdup(parser->current_token->value);
-	redir->next = NULL;
-	
-	// Move past the filename
 	get_next_token(parser);
-	
-	// Create the AST node
+	return (redir);
+}
+
+/*
+ * Handles recursive redirection parsing and linking
+ */
+static void	handle_recursive_redirections(t_ast_node *node, t_parser *parser)
+{
+	t_ast_node	*next_redir;
+
+	if (parser->current_token && parser->current_token->type == TOKEN_CMD)
+		node->u_content.s_redir.child = parse_command(parser);
+	if (parser->current_token
+		&& is_redirection_token(parser->current_token->type))
+	{
+		next_redir = parse_redirection(parser);
+		if (next_redir && next_redir->type == NODE_REDIR)
+		{
+			if (node->u_content.s_redir.child)
+				next_redir->u_content.s_redir.child = node->u_content.s_redir.child;
+			node->u_content.s_redir.child = next_redir;
+		}
+	}
+}
+
+/*
+ * Parses redirection tokens into AST redirection node
+ * Creates both redirection structure and AST node, handles recursive 
+ * redirections
+ */
+t_ast_node	*parse_redirection(t_parser *parser)
+{
+	t_redirection	*redir;
+	t_ast_node		*node;
+
+	redir = create_redirection(parser);
+	if (!redir)
+		return (NULL);
 	node = malloc(sizeof(t_ast_node));
 	if (!node)
 	{
@@ -63,45 +98,29 @@ t_ast_node	*parse_redirection(t_parser *parser)
 		return (NULL);
 	}
 	node->type = NODE_REDIR;
-	node->u_content.redir.redir = redir;
-	node->u_content.redir.child = NULL;  // Will be set later
+	node->u_content.s_redir.redir = redir;
+	node->u_content.s_redir.child = NULL;
 	node->next = NULL;
-
-	// If the next token is a command, parse it
-	if (parser->current_token && parser->current_token->type == TOKEN_CMD)
-	{
-		node->u_content.redir.child = parse_command(parser);
-	}
-
-	// If the next token is another redirection, handle it recursively
-	if (parser->current_token && is_redirection_token(parser->current_token->type))
-	{
-		t_ast_node *next_redir = parse_redirection(parser);
-
-		// Link the redirections
-		if (next_redir && next_redir->type == NODE_REDIR)
-		{
-			// If we already have a command, use it
-			if (node->u_content.redir.child)
-				next_redir->u_content.redir.child = node->u_content.redir.child;
-        	node->u_content.redir.child = next_redir;
-		}
-	}
+	handle_recursive_redirections(node, parser);
 	return (node);
 }
 
-t_ast_node *attach_redirection_to_command(t_ast_node *cmd_node, t_parser *parser)
+/*
+ * Attaches redirection to existing command node
+ * Returns redirection node with command as child
+ */
+t_ast_node	*attach_redirection_to_command(t_ast_node *cmd_node,
+		t_parser *parser)
 {
-	t_ast_node	*redir_node = parse_redirection(parser);
+	t_ast_node	*redir_node;
 	t_ast_node	*original;
 
+	redir_node = parse_redirection(parser);
 	if (!redir_node)
-		return (cmd_node);  // Return original if redirection parsing failed
-
+		return (cmd_node);
 	original = redir_node;
-	while (redir_node->u_content.redir.child)
-		redir_node = redir_node->u_content.redir.child;
-	// Attach the command to the redirection
-	redir_node->u_content.redir.child = cmd_node;
+	while (redir_node->u_content.s_redir.child)
+		redir_node = redir_node->u_content.s_redir.child;
+	redir_node->u_content.s_redir.child = cmd_node;
 	return (original);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 22:47:54 by lformank          #+#    #+#             */
-/*   Updated: 2025/07/06 23:02:37 by lformank         ###   ########.fr       */
+/*   Updated: 2025/07/20 00:31:13 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,17 @@ int	fd(t_ast_node *ast, t_fds *fd, enum e_redir_type type)
 		if (fd->out_new != -1)
 			close(fd->out_new);
 		if (type == REDIR_OUT)
-			fd->out_new = open(ast->u_content.redir.redir->file_or_delimiter,
+			fd->out_new = open(ast->u_content.s_redir.redir->file_or_delimiter,
 					O_WRONLY | O_CREAT | O_TRUNC, 0666);
 		else
-			fd->out_new = open(ast->u_content.redir.redir->file_or_delimiter,
+			fd->out_new = open(ast->u_content.s_redir.redir->file_or_delimiter,
 					O_WRONLY | O_CREAT | O_APPEND, 0666);
 	}
 	else if (type == REDIR_IN)
 	{
 		if (fd->in_new != -1)
 			close(fd->in_new);
-		fd->in_new = open(ast->u_content.redir.redir->file_or_delimiter,
+		fd->in_new = open(ast->u_content.s_redir.redir->file_or_delimiter,
 				O_RDONLY, 0666);
 	}
 	return (0);

@@ -26,7 +26,7 @@ static void	handle_redirection(t_ast_node **ast_node, t_fds *fd_red,
 	}
 	while ((*ast_node)->type == NODE_REDIR && *ast_node)
 	{
-		*ast_node = (*ast_node)->u_content.redir.child;
+		*ast_node = (*ast_node)->u_content.s_redir.child;
 		shell->last_exit_code = 0;
 	}
 }
@@ -35,9 +35,9 @@ static void	handle_assignment(t_ast_node *ast_node, t_shell *shell)
 {
 	printf("DEBUG: Processing NODE_ASSIGNMENT\n");
 	printf("DEBUG: Setting %s = %s\n",
-		ast_node->u_content.assign.name, ast_node->u_content.assign.value);
-	env_set(&shell->env, ast_node->u_content.assign.name,
-		ast_node->u_content.assign.value);
+		ast_node->u_content.s_assign.name, ast_node->u_content.s_assign.value);
+	env_set(&shell->env, ast_node->u_content.s_assign.name,
+		ast_node->u_content.s_assign.value);
 	shell->last_exit_code = 0;
 	printf("DEBUG: Assignment completed\n");
 }

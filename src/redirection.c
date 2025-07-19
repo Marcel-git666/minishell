@@ -21,13 +21,13 @@ char	*find_heredocs(t_ast_node *ast)
 	delim = NULL;
 	while (ast && ast->type == NODE_REDIR)
 	{
-		if (ast->u_content.redir.redir->type == REDIR_HEREDOC)
+		if (ast->u_content.s_redir.redir->type == REDIR_HEREDOC)
 		{
 			if (delim != NULL)
 				free(delim);
-			delim = ft_strdup(ast->u_content.redir.redir->file_or_delimiter);
+			delim = ft_strdup(ast->u_content.s_redir.redir->file_or_delimiter);
 		}
-		ast = ast->u_content.redir.child;
+		ast = ast->u_content.s_redir.child;
 	}
 	return (delim);
 }
@@ -41,9 +41,9 @@ int	parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd)
 	free(delimiter);
 	if (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS)
 	{
-		ast->u_content.redir.redir->type = REDIR_IN;
-		free(ast->u_content.redir.redir->file_or_delimiter);
-		ast->u_content.redir.redir->file_or_delimiter = ft_strdup(fd->temp);
+		ast->u_content.s_redir.redir->type = REDIR_IN;
+		free(ast->u_content.s_redir.redir->file_or_delimiter);
+		ast->u_content.s_redir.redir->file_or_delimiter = ft_strdup(fd->temp);
 		return (0);
 	}
 	else
@@ -119,9 +119,9 @@ int	redirection(t_ast_node *ast_node, t_fds *fd_)
 	while (ast_node && ast_node->type == NODE_REDIR)
 	{
 		printf("in: %d, out: %d\n", fd_->in_new, fd_->out_new);
-		if (fd(ast_node, fd_, ast_node->u_content.redir.redir->type) == -1)
+		if (fd(ast_node, fd_, ast_node->u_content.s_redir.redir->type) == -1)
 			return (-1);
-		ast_node = ast_node->u_content.redir.child;
+		ast_node = ast_node->u_content.s_redir.child;
 	}
 	if (fd_->out_new != -1)
 		dup2(fd_->out_new, 1);
