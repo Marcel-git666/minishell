@@ -14,6 +14,10 @@
 #include "env.h"
 #include "builtins.h"
 
+/*
+ * Prints current working directory using getcwd()
+ * Sets exit code to 0 on success, 1 on failure
+ */
 void	builtin_pwd(t_shell *shell)
 {
 	char	cwd[PATH_MAX];
@@ -30,6 +34,10 @@ void	builtin_pwd(t_shell *shell)
 	}
 }
 
+/*
+ * Removes environment variables specified as arguments
+ * Requires at least one argument, unsets each variable from shell environment
+ */
 void	builtin_unset(t_ast_node *root, t_shell *shell)
 {
 	int	i;
@@ -49,6 +57,10 @@ void	builtin_unset(t_ast_node *root, t_shell *shell)
 	shell->last_exit_code = 0;
 }
 
+/*
+ * Removes environment variables specified as arguments
+ * Requires at least one argument, unsets each variable from shell environment
+ */
 void	builtin_echo(t_ast_node *root, t_shell *shell)
 {
 	int		i;
@@ -59,16 +71,15 @@ void	builtin_echo(t_ast_node *root, t_shell *shell)
 		&& ft_strncmp(root->u_content.cmd.args[0], "-n", 2) == 0)
 	{
 		newline = 0;
-		i = 0; // Start from the second argument
+		i = 0;
 	}
 	else
-		i = -1; // Start from the first argument
+		i = -1;
 	while (++i < root->u_content.cmd.arg_count && root->u_content.cmd.args[i])
 	{
 		if (root->u_content.cmd.args[i])
 		{
 			printf("%s", root->u_content.cmd.args[i]);
-			// Add space only if not the last argument
 			if (i < root->u_content.cmd.arg_count - 1)
 				printf(" ");
 		}

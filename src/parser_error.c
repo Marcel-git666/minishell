@@ -6,13 +6,12 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 22:30:09 by marcel            #+#    #+#             */
-/*   Updated: 2025/04/27 22:38:52 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/19 00:10:01 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
-
 
 int set_parser_error(t_parser *parser, const char *msg)
 {
