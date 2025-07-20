@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:23:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/12 21:34:19 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 18:02:05 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,10 @@ typedef struct s_env
 }	t_env;
 
 // Forward declarations
-struct s_shell;
-typedef struct s_shell t_shell;
-struct s_ast_node;
-typedef struct s_ast_node t_ast_node;
-
+struct						s_shell;
+typedef struct s_shell		t_shell;
+struct						s_ast_node;
+typedef struct s_ast_node	t_ast_node;
 
 // env.c
 t_env	*env_init(char **envp);

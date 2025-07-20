@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 14:14:51 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 13:23:01 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 18:04:25 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 # define LEXER_H
 
 // Forward declarations
-struct s_token;
-typedef struct s_token t_token;
-typedef enum e_token_type t_token_type;
+struct						s_token;
+typedef struct s_token		t_token;
+typedef enum e_token_type	t_token_type;
 
 typedef struct s_lexer
 {

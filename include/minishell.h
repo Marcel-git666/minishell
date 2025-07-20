@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/12 21:25:23 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 18:10:23 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@
 // Shell state structure
 typedef struct s_shell
 {
-    t_env *env;           // Environment variables
-    int last_exit_code;   // For $? expansion
-} t_shell;
+	t_env	*env;
+	int		last_exit_code;
+}	t_shell;
 
 // global variable
 extern int	g_signal_received;
@@ -60,10 +60,7 @@ int			open_file(char *name, char **file_content, int oflag);
 // ft_strtok.c
 char		*ft_strtok(char *s1, const char *s2);
 
-
 // main.c
 void		print_tokens(t_token *tokens);
-
-
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 14:26:56 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 11:18:16 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 18:08:05 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 # include <stddef.h>
 
 // Forward declaration
-struct s_lexer;
-typedef struct s_lexer t_lexer;
+struct					s_lexer;
+typedef struct s_lexer	t_lexer;
 
 typedef enum e_token_type
 {
@@ -62,6 +62,5 @@ int			check_next_token(t_lexer *lexer, size_t next_pos);
 // token_string_extraction.c
 char		*extract_single_quoted_string(t_lexer *lexer);
 char		*extract_double_quoted_string(t_lexer *lexer);
-
 
 #endif

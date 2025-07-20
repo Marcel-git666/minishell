@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:45:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 17:51:12 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 18:02:32 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 # include "env.h"
 
 /* Main expansion function */
-char	*expand_variables(char *input, t_env *env, int exit_status, 
+char	*expand_variables(char *input, t_env *env, int exit_status,
 			int is_env_var);
 
 /* Helper functions from expansion_utils.c */
