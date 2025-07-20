@@ -20,10 +20,10 @@ typedef struct s_fds
 	int		in_new;
 	int		in_old;
 	int		out_new;
-	int 	out_old;
-	int 	here_new;
+	int		out_old;
+	int		here_new;
 	char	*temp;
-} t_fds;
+}	t_fds;
 
 /*redirections*/
 int		redirection(t_ast_node *ast_node, t_fds *fd_);
