@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 15:25:28 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 11:17:20 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 17:40:48 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,17 @@ void	error_message(const char *error)
 	write(2, "minishell: ", 11);
 	write(2, error, ft_strlen(error));
 	write(2, "\n", 1);
+}
+
+/*
+ * Prints command not found error message
+ * Formats: "minishell: command: command not found"
+ */
+void	print_command_not_found(char *command)
+{
+	write(2, "minishell: ", 11);
+	write(2, command, ft_strlen(command));
+	write(2, ": command not found\n", 20);
 }
 
 /*

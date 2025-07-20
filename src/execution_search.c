@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:32:54 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 11:50:56 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 17:42:25 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,10 @@ static int	handle_direct_path(char *expanded_cmd, t_ast_node *ast, char **envp)
 	int		exit_code;
 
 	if (access(expanded_cmd, F_OK) != 0)
+	{
+		print_command_not_found(expanded_cmd);
 		return (127);
+	}
 	args = prepare_args(expanded_cmd, ast);
 	if (!args)
 		return (127);
@@ -88,7 +91,10 @@ static int	search_in_path(char *expanded_cmd, t_ast_node *ast, t_env *env,
 
 	env = find_path_env(env);
 	if (!env)
+	{
+		print_command_not_found(expanded_cmd);
 		return (127);
+	}
 	paths = ft_split(env->value, ':');
 	args = prepare_args(expanded_cmd, ast);
 	if (!paths || !args)
@@ -101,6 +107,7 @@ static int	search_in_path(char *expanded_cmd, t_ast_node *ast, t_env *env,
 		return (exit_code);
 	}
 	free_source(paths, NULL, NULL, args);
+	print_command_not_found(expanded_cmd);
 	return (127);
 }
 
