@@ -3,21 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 15:25:28 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 17:22:06 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/20 11:17:20 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Checks if character is a whitespace character
+ * Returns 1 for space, tab, newline, vertical tab, form feed, carriage return
+ */
 int	ft_isspace(int c)
 {
 	return (c == ' ' || c == '\t' || c == '\n' || c == '\v'
 		|| c == '\f' || c == '\r');
 }
 
+/*
+ * Prints error message to stderr with minishell prefix
+ * Formats: "minishell: [error]\n"
+ */
 void	error_message(const char *error)
 {
 	write(2, "minishell: ", 11);
@@ -25,6 +33,11 @@ void	error_message(const char *error)
 	write(2, "\n", 1);
 }
 
+/*
+ * Creates duplicate of string with maximum length n
+ * Allocates memory and copies up to n characters
+ * Returns allocated string or NULL on failure
+ */
 char	*ft_strndup(const char *s, size_t n)
 {
 	size_t	i;
@@ -41,15 +54,4 @@ char	*ft_strndup(const char *s, size_t n)
 	}
 	copy[i] = '\0';
 	return (copy);
-}
-
-int	check_next_token(t_lexer *lexer, size_t next_pos)
-{
-	while (lexer->input[next_pos] && ft_isspace(lexer->input[next_pos]))
-		next_pos++;
-	if (!lexer->input[next_pos] || lexer->input[next_pos] == '>'
-		|| lexer->input[next_pos] == '<' || lexer->input[next_pos] == '|')
-		return (error_message("syntax error: redirection requires a filename"),
-			-1);
-	return (0);
 }

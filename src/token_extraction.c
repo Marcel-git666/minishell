@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 11:10:06 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:17:36 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,4 +102,20 @@ t_token	*extract_operator(const char *input, size_t *index)
 			return ((*index)++, create_token(TOKEN_REDIR_IN, "<"));
 	}
 	return (NULL);
+}
+
+/*
+ * Validates that redirection operator has valid filename following it
+ * Skips whitespace and checks for filename (not another operator or EOF)
+ * Returns 0 on valid syntax, -1 on error with error message
+ */
+int	check_next_token(t_lexer *lexer, size_t next_pos)
+{
+	while (lexer->input[next_pos] && ft_isspace(lexer->input[next_pos]))
+		next_pos++;
+	if (!lexer->input[next_pos] || lexer->input[next_pos] == '>'
+		|| lexer->input[next_pos] == '<' || lexer->input[next_pos] == '|')
+		return (error_message("syntax error: redirection requires a filename"),
+			-1);
+	return (0);
 }
