@@ -14,6 +14,11 @@
 #include "redirection.h"
 #include <errno.h>
 
+/*
+ * Finds and returns the last heredoc delimiter in AST chain
+ * Traverses redirection nodes to find REDIR_HEREDOC type
+ * Returns duplicated delimiter string or NULL if none found
+ */
 char	*find_heredocs(t_ast_node *ast)
 {
 	char		*delim;
@@ -32,6 +37,11 @@ char	*find_heredocs(t_ast_node *ast)
 	return (delim);
 }
 
+/*
+ * Handles parent process after heredoc child completes
+ * Waits for child, converts heredoc to input redirection on success
+ * Returns 0 on success, -1 on failure
+ */
 int	parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd)
 {
 	int		status;
@@ -53,6 +63,11 @@ int	parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd)
 	}
 }
 
+/*
+ * Reads heredoc input from user until delimiter is encountered
+ * Creates temporary file and writes input lines to it
+ * Handles EOF and delimiter matching for termination
+ */
 void	read_loop(char *delimiter, t_fds *fd)
 {
 	char	*newline;
@@ -82,6 +97,11 @@ delimited by end-of-file (wanted `EOF')\n", 79);
 	}
 }
 
+/*
+ * Implements heredoc functionality (<<) by forking child process
+ * Child process reads input, parent waits and processes result
+ * Returns 0 on success, -1 on failure
+ */
 int	heredoc(t_ast_node *ast_node, t_fds *fd)
 {
 	char	*delimiter;
@@ -110,6 +130,11 @@ int	heredoc(t_ast_node *ast_node, t_fds *fd)
 	exit(EXIT_SUCCESS);
 }
 
+/*
+ * Main redirection handler - processes all redirection types
+ * Saves original stdin/stdout, handles heredocs, applies redirections
+ * Returns 0 on success, -1 on failure
+ */
 int	redirection(t_ast_node *ast_node, t_fds *fd_)
 {
 	fd_->out_old = dup(STDOUT_FILENO);
