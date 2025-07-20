@@ -6,33 +6,43 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 12:57:22 by marcel            #+#    #+#             */
-/*   Updated: 2025/06/22 13:03:23 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:13:28 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Extracts braced variable name from ${VAR} syntax
+ * Validates closing brace and returns variable name
+ * Returns NULL on syntax error (missing closing brace)
+ */
 static char	*extract_braced_var(const char *input, size_t *index)
 {
 	size_t	start;
 	char	*var_name;
 
-	(*index)++; // Skip {
+	(*index)++;
 	start = *index;
 	while (input[*index] && input[*index] != '}')
 		(*index)++;
 	if (input[*index] != '}')
 		return (error_message("syntax error: missing closing brace"), NULL);
 	var_name = ft_strndup(input + start, *index - start);
-	(*index)++; // Skip }
+	(*index)++;
 	return (var_name);
 }
 
+/*
+ * Extracts simple variable name from $VAR syntax
+ * Handles special case $? and validates variable naming rules
+ * Returns variable name or NULL on invalid syntax
+ */
 static char	*extract_simple_var(const char *input, size_t *index, size_t start)
 {
 	if (input[*index] == '?')
 	{
-		(*index)++; // Skip the ?
+		(*index)++;
 		return (ft_strdup("?"));
 	}
 	if (!ft_isalpha(input[*index]) && input[*index] != '_')
@@ -44,12 +54,17 @@ static char	*extract_simple_var(const char *input, size_t *index, size_t start)
 	return (ft_strndup(input + start, *index - start));
 }
 
+/*
+ * Main environment variable extraction function
+ * Handles both ${VAR} and $VAR syntax, delegates to appropriate helper
+ * Returns variable name string or NULL on error
+ */
 char	*extract_env_var(const char *input, size_t *index)
 {
 	size_t	start;
 
 	start = ++(*index);
-	if (input[*index] == '{') // Handle ${VAR}
+	if (input[*index] == '{')
 		return (extract_braced_var(input, index));
 	return (extract_simple_var(input, index, start));
 }

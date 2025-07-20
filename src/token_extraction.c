@@ -6,18 +6,26 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/22 12:58:19 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:10:06 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Checks if character is a special shell character
+ * Returns 1 for pipe, redirections, quotes, and variable expansion
+ */
 int	is_special_char(char c)
 {
 	return (c == '|' || c == '<' || c == '>' || c == '$'
 		|| c == '\'' || c == '"');
 }
 
+/*
+ * Handles quote state tracking and equals sign detection
+ * Updates quote state and returns 1 if equals sign found
+ */
 static int	handle_quotes_and_special(const char *input, size_t *index,
 				int *in_quotes, char *quote_char)
 {
@@ -36,6 +44,11 @@ static int	handle_quotes_and_special(const char *input, size_t *index,
 	return (found_equals);
 }
 
+/*
+ * Extracts word tokens from input, handling quotes and special characters
+ * Respects quote boundaries and stops at delimiters appropriately
+ * Returns allocated word string or NULL if no word found
+ */
 char	*extract_word(const char *input, size_t *index,
 			int is_delimiter_expected)
 {
@@ -59,12 +72,17 @@ char	*extract_word(const char *input, size_t *index,
 			break ;
 		(*index)++;
 	}
-	if (*index == start) // Prevent empty strings being returned
+	if (*index == start)
 		return (NULL);
 	word = ft_strndup(input + start, *index - start);
 	return (word);
 }
 
+/*
+ * Extracts operator tokens (pipes and redirections) from input
+ * Handles single and double character operators (>, >>, <, <<, |)
+ * Returns appropriate token or NULL if no operator found
+ */
 t_token	*extract_operator(const char *input, size_t *index)
 {
 	if (input[*index] == '|')
