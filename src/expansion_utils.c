@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 22:57:32 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 11:38:53 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 17:50:47 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,4 +98,29 @@ char	*get_variable_value(char *var_name, t_env *env, int exit_status)
 	if (value)
 		return (ft_strdup(value));
 	return (ft_strdup(""));
+}
+
+/*
+ * Expands tilde (~) to HOME directory path
+ * Returns expanded path or original path if no tilde or HOME not set
+ * Caller must free returned string
+ */
+char	*expand_tilde(const char *path, t_env *env)
+{
+	char	*home;
+	char	*expanded;
+
+	if (!path || path[0] != '~')
+		return (ft_strdup(path));
+	home = env_get(env, "HOME");
+	if (!home)
+		return (ft_strdup(path));
+	if (path[1] == '\0')
+		return (ft_strdup(home));
+	if (path[1] == '/')
+	{
+		expanded = ft_strjoin(home, path + 1);
+		return (expanded);
+	}
+	return (ft_strdup(path));
 }

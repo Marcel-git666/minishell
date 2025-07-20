@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:45:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/18 23:03:34 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 17:51:12 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,5 +22,6 @@ char	*expand_variables(char *input, t_env *env, int exit_status,
 char	*find_next_dollar(char *str);
 int		parse_var_name(char *str, char **var_name);
 char	*get_variable_value(char *var_name, t_env *env, int exit_status);
+char	*expand_tilde(const char *path, t_env *env);
 
 #endif
