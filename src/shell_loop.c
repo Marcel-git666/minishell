@@ -27,6 +27,7 @@ t_shell	*initialize_shell(char **envp)
 		error_message("Failed to allocate shell state");
 		return (NULL);
 	}
+	shell->last_exit_code = 0;
 	printf("Welcome to mini shell!\n");
 	shell->env = env_init(envp);
 	if (!shell->env)
@@ -35,7 +36,6 @@ t_shell	*initialize_shell(char **envp)
 		error_message("Failed to initialize environment");
 		return (NULL);
 	}
-	shell->last_exit_code = 0;
 	load_history();
 	return (shell);
 }
