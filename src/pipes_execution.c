@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:42:33 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 10:45:30 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 16:56:34 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,17 +45,22 @@ void	execute_right_child(int *pipe_fd, t_ast_node *right_node,
  * Handles parent process cleanup and wait for children
  * Sets shell exit code based on right side command result
  */
+/*
+ * Handles parent process cleanup and wait for children
+ * Sets shell exit code based on right side command result
+ */
 void	handle_parent_process(int *pipe_fd, pid_t left_pid,
 			pid_t right_pid, t_shell *shell)
 {
-	int	status;
+	int	left_status;
+	int	right_status;
 
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
-	waitpid(left_pid, &status, 0);
-	waitpid(right_pid, &status, 0);
-	if (WIFEXITED(status))
-		shell->last_exit_code = WEXITSTATUS(status);
+	waitpid(left_pid, &left_status, 0);
+	waitpid(right_pid, &right_status, 0);
+	if (WIFEXITED(right_status))
+		shell->last_exit_code = WEXITSTATUS(right_status);
 	else
 		shell->last_exit_code = 1;
 }
