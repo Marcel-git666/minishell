@@ -12,6 +12,11 @@
 
 #include "minishell.h"
 
+/*
+ * Initializes shell state with environment and history
+ * Creates shell structure, loads environment variables, and sets up history
+ * Returns shell pointer on success, NULL on failure
+ */
 t_shell	*initialize_shell(char **envp)
 {
 	t_shell	*shell;
@@ -36,6 +41,10 @@ t_shell	*initialize_shell(char **envp)
 	return (shell);
 }
 
+/*
+ * Processes token list into AST and executes commands
+ * Handles token validation, AST creation, execution, and cleanup
+ */
 static void	process_tokens_and_execute(t_token *tokens, t_shell *shell,
 				char **envp)
 {
@@ -54,6 +63,10 @@ static void	process_tokens_and_execute(t_token *tokens, t_shell *shell,
 	free_tokens(tokens);
 }
 
+/*
+ * Processes a single input line from user
+ * Handles empty input, history, lexing, and command execution
+ */
 static void	process_input_line(char *input, t_shell *shell, char **envp)
 {
 	t_token	*tokens;
@@ -65,6 +78,10 @@ static void	process_input_line(char *input, t_shell *shell, char **envp)
 	process_tokens_and_execute(tokens, shell, envp);
 }
 
+/*
+ * Returns appropriate prompt based on signal state
+ * Empty prompt after signal, normal prompt otherwise
+ */
 static char	*get_prompt(void)
 {
 	if (g_signal_received)
@@ -73,6 +90,10 @@ static char	*get_prompt(void)
 		return ("$ ");
 }
 
+/*
+ * Main shell loop - reads input, processes commands, handles signals
+ * Continues until EOF (Ctrl+D) or exit command
+ */
 void	run_shell_loop(t_shell *shell, char **envp)
 {
 	char	*input;
