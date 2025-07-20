@@ -6,12 +6,11 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 13:41:13 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 18:14:19 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "test.h"
 
 /*
  * Main entry point for minishell
