@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 00:26:50 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 11:49:17 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 12:04:14 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 
 /*
  * Expands environment variables in command arguments
- * Processes each argument based on its token type, skipping single-quoted strings
+ * Processes each argument based on its token type, skipping single-quoted
+ * strings
  * Updates the AST node's arguments with expanded values
  */
 static void	expand_command_args(t_ast_node *ast_node, t_shell *shell)

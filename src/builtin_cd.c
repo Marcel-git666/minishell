@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:51:13 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/12 20:14:26 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 12:14:36 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 #include "env.h"
 #include "builtins.h"
 
+/*
+ * Handles 'cd -' command to change to previous directory
+ * Uses OLDPWD environment variable to get previous directory
+ * Returns 1 if handled (success or failure), 0 if not applicable
+ */
 static int	handle_oldpwd(t_ast_node *root, t_shell *shell, char *cwd)
 {
 	char	*oldpwd;
@@ -42,6 +47,11 @@ static int	handle_oldpwd(t_ast_node *root, t_shell *shell, char *cwd)
 	return (0);
 }
 
+/*
+ * Updates PWD environment variable with current working directory
+ * Uses getcwd to get current directory and sets PWD variable
+ * Sets appropriate exit code based on success or failure
+ */
 static void	update_pwd(t_shell *shell)
 {
 	char	*cwd;
@@ -57,6 +67,11 @@ static void	update_pwd(t_shell *shell)
 	free(cwd);
 }
 
+/*
+ * Handles main cd logic for different path types
+ * Distinguishes between parent directory (..) and other paths
+ * Updates OLDPWD and calls appropriate path handling function
+ */
 static void	handle_cd_logic(t_ast_node *root, t_shell *shell, char *cwd)
 {
 	if (root->u_content.cmd.arg_count
@@ -72,12 +87,42 @@ static void	handle_cd_logic(t_ast_node *root, t_shell *shell, char *cwd)
 	}
 }
 
-void	builtin_cd(t_ast_node *root, t_shell *shell)
+/*
+ * Initializes current working directory for cd operations
+ * Allocates buffer and gets current directory path
+ * Returns allocated cwd string or NULL on failure
+ */
+static char	*init_cwd(t_shell *shell)
 {
 	char	*cwd;
 
 	cwd = malloc(PATH_MAX * sizeof(char));
-	getcwd(cwd, PATH_MAX);
+	if (!cwd)
+	{
+		shell->last_exit_code = 1;
+		return (NULL);
+	}
+	if (!getcwd(cwd, PATH_MAX))
+	{
+		free(cwd);
+		shell->last_exit_code = 1;
+		return (NULL);
+	}
+	return (cwd);
+}
+
+/*
+ * Main cd builtin implementation
+ * Handles argument validation, special cases, and directory changes
+ * Updates PWD and OLDPWD environment variables appropriately
+ */
+void	builtin_cd(t_ast_node *root, t_shell *shell)
+{
+	char	*cwd;
+
+	cwd = init_cwd(shell);
+	if (!cwd)
+		return ;
 	if (root->u_content.cmd.arg_count > 1)
 	{
 		error_message("cd: too many arguments");

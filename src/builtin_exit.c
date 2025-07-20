@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/12 19:47:48 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 12:19:07 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 #include "env.h"
 #include "builtins.h"
 
+/*
+ * Frees entire environment linked list and all allocated memory
+ * Iterates through environment nodes freeing key, value and node
+ * Sets shell->env to NULL after cleanup to prevent double free
+ */
 static void	free_env_list(t_shell *shell)
 {
 	t_env	*current;
@@ -34,11 +39,17 @@ static void	free_env_list(t_shell *shell)
 	}
 }
 
+/*
+ * Implements exit builtin command with complete cleanup
+ * Frees all allocated memory including environment, AST, and file descriptors
+ * Prints exit message and terminates shell with exit code 0
+ */
 void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 {
 	free_env_list(shell);
 	free_ast(ast);
-	free(fd->temp);
+	if (fd->temp)
+		free(fd->temp);
 	free(fd);
 	printf("Exiting minishell...\n");
 	shell->last_exit_code = 0;

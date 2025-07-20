@@ -6,12 +6,17 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 21:10:06 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/12 23:27:55 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 12:01:32 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Prints all environment variables in key=value format
+ * Iterates through environment list printing each variable
+ * Sets shell exit code to 0 on successful completion
+ */
 void	env_print(t_shell *shell)
 {
 	t_env	*current;
@@ -25,6 +30,11 @@ void	env_print(t_shell *shell)
 	shell->last_exit_code = 0;
 }
 
+/*
+ * Sorts array of environment strings alphabetically using bubble sort
+ * Compares adjacent strings and swaps if out of order
+ * Modifies array in-place for use by export -p functionality
+ */
 void	sort_env_array(char **array, int count)
 {
 	int		i;
@@ -49,6 +59,11 @@ void	sort_env_array(char **array, int count)
 	}
 }
 
+/*
+ * Frees array of environment strings and the array itself
+ * Iterates through array freeing each string, then frees array
+ * Prevents memory leaks when cleaning up sorted environment array
+ */
 static void	free_env_array(char **env_array)
 {
 	int	i;
@@ -59,6 +74,11 @@ static void	free_env_array(char **env_array)
 	free(env_array);
 }
 
+/*
+ * Prints single environment line in export format
+ * Splits on '=' and formats as 'declare -x KEY="VALUE"'
+ * Handles variables without values by omitting quotes
+ */
 static void	print_sorted_env_line(char *env_line)
 {
 	char	*equals;
@@ -74,6 +94,11 @@ static void	print_sorted_env_line(char *env_line)
 		printf("declare -x %s\n", env_line);
 }
 
+/*
+ * Prints environment variables in sorted export format
+ * Creates array from environment, sorts it, prints in declare format
+ * Sets appropriate exit code based on success or failure
+ */
 void	env_print_sorted(t_shell *shell)
 {
 	char	**env_array;

@@ -6,12 +6,17 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 21:08:26 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/12 21:39:55 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 12:02:33 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Counts number of nodes in environment linked list
+ * Iterates through list incrementing counter for each node
+ * Returns total count of environment variables
+ */
 int	ft_envsize(t_env *lst)
 {
 	int	len;
@@ -25,6 +30,11 @@ int	ft_envsize(t_env *lst)
 	return (len);
 }
 
+/*
+ * Creates environment string in KEY=VALUE format from env node
+ * Concatenates key with "=" and value using ft_strjoin
+ * Returns allocated string or NULL on allocation failure
+ */
 static char	*create_env_string(t_env *current)
 {
 	char	*temp;
@@ -38,6 +48,11 @@ static char	*create_env_string(t_env *current)
 	return (result);
 }
 
+/*
+ * Cleans up partially allocated environment array on failure
+ * Frees all successfully allocated strings up to count
+ * Prevents memory leaks during array creation failures
+ */
 static void	cleanup_env_array(char **env_array, int count)
 {
 	while (count > 0)
@@ -45,6 +60,11 @@ static void	cleanup_env_array(char **env_array, int count)
 	free(env_array);
 }
 
+/*
+ * Converts environment linked list to NULL-terminated string array
+ * Creates array suitable for execve and other system functions
+ * Returns allocated array or NULL on failure with proper cleanup
+ */
 char	**env_to_array(t_env *env)
 {
 	int		count;
