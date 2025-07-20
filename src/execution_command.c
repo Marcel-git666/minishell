@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 00:26:50 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/13 00:54:08 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:49:17 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 #include "env.h"
 #include "expansion.h"
 
+/*
+ * Expands environment variables in command arguments
+ * Processes each argument based on its token type, skipping single-quoted strings
+ * Updates the AST node's arguments with expanded values
+ */
 static void	expand_command_args(t_ast_node *ast_node, t_shell *shell)
 {
 	char			*expanded_arg;
@@ -36,6 +41,11 @@ static void	expand_command_args(t_ast_node *ast_node, t_shell *shell)
 	}
 }
 
+/*
+ * Checks if a command is a shell builtin
+ * Returns 1 for builtin commands, 0 for external commands
+ * Supports: exit, env, pwd, cd, export, unset, echo
+ */
 static int	is_builtin_command(char *cmd)
 {
 	if (ft_strcmp(cmd, "exit") == 0)
@@ -55,6 +65,11 @@ static int	is_builtin_command(char *cmd)
 	return (0);
 }
 
+/*
+ * Executes shell builtin commands
+ * Dispatches to appropriate builtin function based on command name
+ * Handles: env, pwd, cd, export, unset, echo
+ */
 static void	execute_builtin_cmd(char *cmd, t_ast_node *ast_node, t_shell *shell)
 {
 	if (ft_strcmp(cmd, "env") == 0)
@@ -71,6 +86,11 @@ static void	execute_builtin_cmd(char *cmd, t_ast_node *ast_node, t_shell *shell)
 		builtin_echo(ast_node, shell);
 }
 
+/*
+ * Handles command execution (both builtin and external commands)
+ * Expands command arguments, checks if command is builtin or external
+ * Updates shell exit code based on command execution result
+ */
 void	handle_command(t_ast_node *ast_node, t_shell *shell,
 		char **envp, char *expanded_cmd)
 {

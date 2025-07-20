@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 22:57:32 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/18 22:59:57 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:38:53 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 #include "expansion.h"
 #include "env.h"
 
+/*
+ * Finds next dollar sign in string for variable expansion
+ * Returns pointer to '$' character or NULL if none found
+ */
 char	*find_next_dollar(char *str)
 {
 	while (*str)
@@ -25,6 +29,11 @@ char	*find_next_dollar(char *str)
 	return (NULL);
 }
 
+/*
+ * Parses braced variable name from ${VAR} syntax
+ * Extracts variable name between braces and validates closing brace
+ * Returns length including braces or 0 on error
+ */
 static int	parse_braced_var(char *str, char **var_name)
 {
 	int	len;
@@ -45,6 +54,11 @@ static int	parse_braced_var(char *str, char **var_name)
 	return (0);
 }
 
+/*
+ * Parses variable name from expansion syntax
+ * Handles $?, ${VAR}, and $VAR formats
+ * Returns length of parsed variable or 0 if invalid
+ */
 int	parse_var_name(char *str, char **var_name)
 {
 	int	len;
@@ -69,6 +83,11 @@ int	parse_var_name(char *str, char **var_name)
 	return (len);
 }
 
+/*
+ * Gets variable value from environment or special variables
+ * Handles $? (exit status) and regular environment variables
+ * Returns allocated string with value or empty string if not found
+ */
 char	*get_variable_value(char *var_name, t_env *env, int exit_status)
 {
 	char	*value;

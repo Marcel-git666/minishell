@@ -6,12 +6,17 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:33:05 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/13 00:12:46 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:52:12 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Constructs full path by searching through PATH directories
+ * Concatenates each path with "/" and command name, checks accessibility
+ * Returns allocated string with full path or NULL if not found
+ */
 char	*full_path(char **paths, char *path, char *cmd)
 {
 	char	*slash;
@@ -33,6 +38,11 @@ char	*full_path(char **paths, char *path, char *cmd)
 	return (NULL);
 }
 
+/*
+ * Comprehensive cleanup function for memory allocated during path search
+ * Frees argument array, final path, path directories and temporary slash
+ * Handles all allocated memory to prevent leaks
+ */
 void	free_source(char **path, char *slash, char *final_path, char **args)
 {
 	int	i;
@@ -49,6 +59,11 @@ void	free_source(char **path, char *slash, char *final_path, char **args)
 	free(slash);
 }
 
+/*
+ * Frees argument array and all its string elements
+ * Iterates through array freeing each string, then frees array itself
+ * Safely handles NULL arrays
+ */
 void	free_args(char **args)
 {
 	int		i;
@@ -61,6 +76,11 @@ void	free_args(char **args)
 	free(args);
 }
 
+/*
+ * Allocates memory for argument array with specified size
+ * Uses ft_calloc to ensure all pointers are initialized to NULL
+ * Returns allocated array or NULL on allocation failure
+ */
 static char	**allocate_args_array(int size)
 {
 	char	**args;
@@ -71,6 +91,11 @@ static char	**allocate_args_array(int size)
 	return (args);
 }
 
+/*
+ * Prepares argument array for command execution
+ * Creates array with command name as first argument, followed by AST arguments
+ * Returns NULL-terminated array suitable for execve or NULL on failure
+ */
 char	**prepare_args(char *cmd, t_ast_node *ast)
 {
 	char	**args;

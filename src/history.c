@@ -6,12 +6,17 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 19:41:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/06/22 23:00:37 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:26:08 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Loads command history from .history file on shell startup
+ * Reads file content, tokenizes by newlines, and adds to readline history
+ * Silently fails if file doesn't exist or can't be read
+ */
 void	load_history(void)
 {
 	char	*history;
@@ -32,6 +37,11 @@ void	load_history(void)
 	}
 }
 
+/*
+ * Saves current readline history to .history file
+ * Creates/truncates file and writes each history entry on separate line
+ * Handles empty history gracefully
+ */
 void	save_history(void)
 {
 	HIST_ENTRY	**history_array;
@@ -61,6 +71,11 @@ void	save_history(void)
 	close(fd);
 }
 
+/*
+ * Determines if input should be added to history
+ * Prevents duplicate consecutive entries and empty commands
+ * Returns 1 to add, 0 to skip
+ */
 static int	should_add_to_history(char *input, char *last_executed)
 {
 	HIST_ENTRY	**history_array;
@@ -77,6 +92,11 @@ static int	should_add_to_history(char *input, char *last_executed)
 	return (0);
 }
 
+/*
+ * Handles user input for history management
+ * Adds non-duplicate commands to history and saves to file
+ * Maintains static reference to last executed command
+ */
 void	handle_input(char *input)
 {
 	static char	*last_executed = NULL;

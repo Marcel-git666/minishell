@@ -15,6 +15,11 @@
 #include "expansion.h"
 #include "pipes.h"
 
+/*
+ * Handles redirection setup and processing for commands
+ * Sets up file descriptors and processes redirection nodes
+ * Updates shell exit code and traverses redirection chain
+ */
 static void	handle_redirection(t_ast_node **ast_node, t_fds *fd_red,
 	t_shell *shell)
 {
@@ -31,33 +36,34 @@ static void	handle_redirection(t_ast_node **ast_node, t_fds *fd_red,
 	}
 }
 
+/*
+ * Processes variable assignment nodes
+ * Sets environment variable with given name and value
+ * Updates shell exit code to indicate success
+ */
 static void	handle_assignment(t_ast_node *ast_node, t_shell *shell)
 {
-	printf("DEBUG: Processing NODE_ASSIGNMENT\n");
-	printf("DEBUG: Setting %s = %s\n",
-		ast_node->u_content.s_assign.name, ast_node->u_content.s_assign.value);
 	env_set(&shell->env, ast_node->u_content.s_assign.name,
 		ast_node->u_content.s_assign.value);
 	shell->last_exit_code = 0;
-	printf("DEBUG: Assignment completed\n");
 }
 
+/*
+ * Expands environment variables in command strings
+ * Handles both regular commands and environment variable references
+ * Returns expanded command string or NULL on failure/empty result
+ */
 static char	*expand_command(t_ast_node *ast_node, t_shell *shell)
 {
 	int		cmd_is_env_var;
 	char	*expanded_cmd;
 
-	printf("DEBUG: Processing NODE_COMMAND\n");
 	cmd_is_env_var = (ast_node->u_content.cmd.cmd_token_type == TOKEN_ENV_VAR
 			|| ast_node->u_content.cmd.cmd_token_type == TOKEN_EXIT_CODE);
-	printf("DEBUG: Original cmd: '%s', cmd_token_type: %d, is_env_var: %d\n",
-		ast_node->u_content.cmd.cmd, ast_node->u_content.cmd.cmd_token_type,
-		cmd_is_env_var);
 	expanded_cmd = expand_variables(ast_node->u_content.cmd.cmd,
 			shell->env, shell->last_exit_code, cmd_is_env_var);
 	if (!expanded_cmd)
 	{
-		printf("DEBUG: Expansion failed\n");
 		shell->last_exit_code = 1;
 		return (NULL);
 	}
@@ -71,6 +77,11 @@ static char	*expand_command(t_ast_node *ast_node, t_shell *shell)
 	return (expanded_cmd);
 }
 
+/*
+ * Handles command execution with special case for exit builtin
+ * Expands command, handles exit specially due to shell termination
+ * Delegates to handle_command for other commands
+ */
 static void	handle_command_execution(t_ast_node *ast_node, t_shell *shell,
 		char **envp, t_fds *fd_red)
 {
@@ -86,6 +97,11 @@ static void	handle_command_execution(t_ast_node *ast_node, t_shell *shell,
 	free(expanded_cmd);
 }
 
+/*
+ * Main execution dispatcher for AST nodes
+ * Handles redirections, pipes, assignments and commands
+ * Sets up file descriptors and manages execution flow
+ */
 void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
 	t_fds	*fd_red;

@@ -6,12 +6,17 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:32:54 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/13 00:53:17 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:50:56 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Forks and executes a command with given path and arguments
+ * Handles file accessibility check and process creation
+ * Returns exit status of child process or error code (127)
+ */
 int	fork_it(char *path, char **args, char **envp)
 {
 	int	pid;
@@ -36,6 +41,11 @@ int	fork_it(char *path, char **args, char **envp)
 	return (-1);
 }
 
+/*
+ * Handles execution of commands with direct path (absolute or relative)
+ * Checks file accessibility, prepares arguments and executes command
+ * Returns exit code from command execution or 127 on failure
+ */
 static int	handle_direct_path(char *expanded_cmd, t_ast_node *ast, char **envp)
 {
 	char	**args;
@@ -51,6 +61,11 @@ static int	handle_direct_path(char *expanded_cmd, t_ast_node *ast, char **envp)
 	return (exit_code);
 }
 
+/*
+ * Finds PATH environment variable in the environment list
+ * Iterates through environment variables looking for "PATH"
+ * Returns pointer to PATH environment variable or NULL if not found
+ */
 static t_env	*find_path_env(t_env *env)
 {
 	while (env && ft_strncmp(env->key, "PATH", 5) != 0)
@@ -58,6 +73,11 @@ static t_env	*find_path_env(t_env *env)
 	return (env);
 }
 
+/*
+ * Searches for command in PATH directories and executes it
+ * Splits PATH variable, searches each directory for executable
+ * Returns exit code from execution or 127 if command not found
+ */
 static int	search_in_path(char *expanded_cmd, t_ast_node *ast, t_env *env,
 	char **envp)
 {
@@ -84,6 +104,11 @@ static int	search_in_path(char *expanded_cmd, t_ast_node *ast, t_env *env,
 	return (127);
 }
 
+/*
+ * Main command search function - handles both direct paths and PATH search
+ * If command contains '/', treats as direct path, otherwise searches in PATH
+ * Returns exit code from command execution
+ */
 int	search_command(char *expanded_cmd, t_ast_node *ast, t_env *env, char **envp)
 {
 	if (ft_strchr(expanded_cmd, '/'))

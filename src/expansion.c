@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/18 23:05:44 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:37:49 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 #include "expansion.h"
 #include "env.h"
 
+/*
+ * Handles memory cleanup on expansion error
+ * Frees all allocated resources and returns NULL for error indication
+ */
 static char	*handle_expansion_error(char *result, char *var_name,
 			char *var_value)
 {
@@ -23,6 +27,11 @@ static char	*handle_expansion_error(char *result, char *var_name,
 	return (NULL);
 }
 
+/*
+ * Joins string parts during variable expansion
+ * Concatenates result + var_value + rest with proper memory management
+ * Returns joined string or NULL on allocation failure
+ */
 static char	*join_parts(char *result, char *var_value, char *rest)
 {
 	char	*temp;
@@ -36,6 +45,11 @@ static char	*join_parts(char *result, char *var_value, char *rest)
 	return (final_result);
 }
 
+/*
+ * Processes single variable expansion in string
+ * Parses variable name, gets value, and replaces in result string
+ * Returns updated string or NULL on error
+ */
 static char	*process_variable(char *result, char *dollar_pos,
 			t_env *env, int exit_status)
 {
@@ -58,6 +72,12 @@ static char	*process_variable(char *result, char *dollar_pos,
 	return (final_result);
 }
 
+/*
+ * Main variable expansion function
+ * Expands all $VAR, ${VAR}, and $? in input string
+ * Handles both direct variable mode and string expansion mode
+ * Returns expanded string or NULL on error
+ */
 char	*expand_variables(char *input, t_env *env, int exit_status,
 		int is_env_var)
 {

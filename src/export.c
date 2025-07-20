@@ -6,12 +6,17 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 23:26:09 by lformank          #+#    #+#             */
-/*   Updated: 2025/07/18 23:26:33 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 11:35:19 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Validates split assignment parts and handles cleanup on error
+ * Checks for proper VAR=value format with both name and value present
+ * Returns 0 on success, -1 on invalid format with cleanup
+ */
 int	check_parts(char **parts, int *i)
 {
 	if (!parts || !parts[0] || !parts[1])
@@ -28,6 +33,11 @@ int	check_parts(char **parts, int *i)
 	return (0);
 }
 
+/*
+ * Processes export assignment (VAR=value) and adds to environment
+ * Handles quoted values by removing surrounding quotes
+ * Splits assignment string and sets environment variable
+ */
 static void	handle_export_assignment(char *assignment, t_env **env)
 {
 	char	**parts;
@@ -53,6 +63,11 @@ static void	handle_export_assignment(char *assignment, t_env **env)
 	free(parts);
 }
 
+/*
+ * Implements export builtin command with assignment and display modes
+ * Handles VAR=value assignments, -p flag for display, and error cases
+ * Sets appropriate exit codes based on operation success
+ */
 void	builtin_export(t_ast_node *root, t_shell *shell)
 {
 	if (root->u_content.cmd.arg_count == 1
