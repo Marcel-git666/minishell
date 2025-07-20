@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 20:17:10 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 00:31:13 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 10:49:31 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,8 @@ static void	handle_recursive_redirections(t_ast_node *node, t_parser *parser)
 		if (next_redir && next_redir->type == NODE_REDIR)
 		{
 			if (node->u_content.s_redir.child)
-				next_redir->u_content.s_redir.child = node->u_content.s_redir.child;
+				next_redir->u_content.s_redir.child
+					= node->u_content.s_redir.child;
 			node->u_content.s_redir.child = next_redir;
 		}
 	}
