@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 11:22:58 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 13:41:13 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,5 @@ int	main(int argc, char **argv, char **envp)
 	save_history();
 	env_free(shell->env);
 	free(shell);
-	printf("Exiting minishell...\n");
 	return (0);
 }

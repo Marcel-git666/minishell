@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 22:47:54 by lformank          #+#    #+#             */
-/*   Updated: 2025/07/20 11:34:10 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 13:55:39 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ int	fd(t_ast_node *ast, t_fds *fd, enum e_redir_type type)
 		else
 			fd->out_new = open(ast->u_content.s_redir.redir->file_or_delimiter,
 					O_WRONLY | O_CREAT | O_APPEND, 0666);
+		if (fd->out_new == -1)
+			return (perror("minishell"), -1);
 	}
 	else if (type == REDIR_IN)
 	{
@@ -74,6 +76,8 @@ int	fd(t_ast_node *ast, t_fds *fd, enum e_redir_type type)
 			close(fd->in_new);
 		fd->in_new = open(ast->u_content.s_redir.redir->file_or_delimiter,
 				O_RDONLY, 0666);
+		if (fd->in_new == -1)
+			return (perror("minishell"), -1);
 	}
 	return (0);
 }

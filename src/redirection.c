@@ -143,7 +143,6 @@ int	redirection(t_ast_node *ast_node, t_fds *fd_)
 		return (-1);
 	while (ast_node && ast_node->type == NODE_REDIR)
 	{
-		printf("in: %d, out: %d\n", fd_->in_new, fd_->out_new);
 		if (fd(ast_node, fd_, ast_node->u_content.s_redir.redir->type) == -1)
 			return (-1);
 		ast_node = ast_node->u_content.s_redir.child;

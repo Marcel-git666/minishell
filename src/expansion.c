@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 11:37:49 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 12:33:42 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,28 +82,22 @@ char	*expand_variables(char *input, t_env *env, int exit_status,
 		int is_env_var)
 {
 	char	*result;
-	char	*current;
 	char	*dollar_pos;
-	size_t	dollar_offset;
-	char	*temp_value;
 
 	if (!input)
 		return (NULL);
 	if (is_env_var)
 		return (get_variable_value(input, env, exit_status));
 	result = ft_strdup(input);
-	current = result;
-	dollar_pos = find_next_dollar(current);
+	if (!result)
+		return (NULL);
+	dollar_pos = find_next_dollar(result);
 	while (dollar_pos != NULL)
 	{
-		dollar_offset = dollar_pos - result;
 		result = process_variable(result, dollar_pos, env, exit_status);
 		if (!result)
 			return (NULL);
-		temp_value = get_variable_value(dollar_pos + 1, env, exit_status);
-		current = result + dollar_offset + ft_strlen(temp_value);
-		free(temp_value);
-		dollar_pos = find_next_dollar(current);
+		dollar_pos = find_next_dollar(result);
 	}
 	return (result);
 }

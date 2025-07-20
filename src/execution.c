@@ -25,7 +25,6 @@ static void	handle_redirection(t_ast_node **ast_node, t_fds *fd_red,
 {
 	if (redirection(*ast_node, fd_red) == -1)
 	{
-		reset_fd(fd_red);
 		shell->last_exit_code = 1;
 		return ;
 	}

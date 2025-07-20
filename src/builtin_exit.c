@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 12:19:07 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/20 13:43:21 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 	if (fd->temp)
 		free(fd->temp);
 	free(fd);
-	printf("Exiting minishell...\n");
 	shell->last_exit_code = 0;
 	exit(0);
 }
