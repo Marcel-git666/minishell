@@ -50,7 +50,10 @@ static void	process_tokens_and_execute(t_token *tokens, t_shell *shell,
 	t_ast_node	*ast;
 
 	if (!tokens)
+	{
+		shell->last_exit_code = 1;
 		return ;
+	}
 	ast = parse_tokens(tokens);
 	if (ast)
 	{

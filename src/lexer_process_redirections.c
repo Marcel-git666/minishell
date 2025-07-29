@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 10:21:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/02/17 19:14:01 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/29 22:05:12 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,7 @@ static int	handle_append_out(t_lexer *lexer)
 
 static int	handle_heredoc(t_lexer *lexer)
 {
-	if (!ft_isspace(lexer->input[lexer->i + 2])
-		&& lexer->input[lexer->i + 2] != '\0')
+	if (lexer->input[lexer->i + 2] == '<')
 		return (error_message("syntax error: invalid redirection operator"),
 			-1);
 	add_redirection_token(lexer, "<<", TOKEN_HEREDOC, 0);

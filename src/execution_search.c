@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_search.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:32:54 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 17:42:25 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/29 21:42:18 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,20 @@ int	fork_it(char *path, char **args, char **envp)
 	pid = fork();
 	if (pid == 0)
 	{
+		signal(SIGINT, signal_handler_heredoc);
 		if (execve(path, args, envp) == -1)
 			perror("error: execve failed");
 		exit(127);
 	}
 	else if (pid > 0)
 	{
-		wait(&status);
+		signal(SIGINT, SIG_IGN);
+		waitpid(pid, &status, 0);
+		setup_signals();
 		if (WIFEXITED(status))
 			return (WEXITSTATUS(status));
-		return (-1);
+		else if (WIFSIGNALED(status))
+			return (128 + WTERMSIG(status));
 	}
 	return (-1);
 }
@@ -71,7 +75,7 @@ static int	handle_direct_path(char *expanded_cmd, t_ast_node *ast, char **envp)
  */
 static t_env	*find_path_env(t_env *env)
 {
-	while (env && ft_strncmp(env->key, "PATH", 5) != 0)
+	while (env && ft_strcmp(env->key, "PATH") != 0)
 		env = env->next;
 	return (env);
 }

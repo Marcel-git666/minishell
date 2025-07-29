@@ -3,14 +3,33 @@
 /*                                                        :::      ::::::::   */
 /*   history.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 19:41:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 11:26:08 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/29 22:01:03 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+/*
+ * Gets history file path in user's home directory
+ * Returns $HOME/.history or falls back to .history if HOME not set
+ * Caller must free returned string
+ */
+static char	*get_history_path(void)
+{
+	char	*home;
+	char	*history_path;
+
+	home = getenv("HOME");
+	if (!home)
+		return (ft_strdup(HISTORY_FILE));
+	history_path = ft_strjoin(home, "/");
+	if (!history_path)
+		return (ft_strdup(HISTORY_FILE));
+	return (ft_strjoin(history_path, HISTORY_FILE));
+}
 
 /*
  * Loads command history from .history file on shell startup
@@ -21,10 +40,15 @@ void	load_history(void)
 {
 	char	*history;
 	char	*line;
+	char	*history_path;
 
 	history = NULL;
-	if (open_file(HISTORY_FILE, &history, O_RDONLY) == -1)
+	history_path = get_history_path();
+	if (open_file(history_path, &history, O_RDONLY) == -1)
+	{
+		free(history_path);
 		return ;
+	}
 	if (history)
 	{
 		line = ft_strtok(history, "\n");
@@ -44,27 +68,27 @@ void	load_history(void)
  */
 void	save_history(void)
 {
-	HIST_ENTRY	**history_array;
+	HIST_ENTRY	**h_array;
 	int			i;
 	int			fd;
-	int			history_count;
+	char		*history_path;
 
-	history_count = history_length;
-	if (history_count <= 0)
+	if (history_length <= 0)
 		return ;
-	history_array = history_list();
-	if (!history_array)
+	h_array = history_list();
+	if (!h_array)
 		return ;
-	fd = open_file(HISTORY_FILE, NULL, O_WRONLY | O_CREAT | O_TRUNC);
+	history_path = get_history_path();
+	fd = open_file(history_path, NULL, O_WRONLY | O_CREAT | O_TRUNC);
+	free(history_path);
 	if (fd == -1)
 		return ;
 	i = -1;
-	while (++i < history_count)
+	while (++i < history_length)
 	{
-		if (history_array[i] && history_array[i]->line)
+		if (h_array[i] && h_array[i]->line)
 		{
-			write(fd, history_array[i]->line,
-				ft_strlen(history_array[i]->line));
+			write(fd, h_array[i]->line, ft_strlen(h_array[i]->line));
 			write(fd, "\n", 1);
 		}
 	}
