@@ -47,10 +47,19 @@ static void	free_env_list(t_shell *shell)
 void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 {
 	free_env_list(shell);
+	if (ast->u_content.cmd.arg_count > 1)
+	{
+		error_message("exit: too many arguments");
+		shell->last_exit_code = 1;
+		return ;
+	}
+	if (ast->u_content.cmd.arg_count)
+		shell->last_exit_code = ft_atoi(ast->u_content.cmd.args[0]);
+	else
+		shell->last_exit_code = 0;
 	free_ast(ast);
 	if (fd->temp)
 		free(fd->temp);
 	free(fd);
-	shell->last_exit_code = 0;
-	exit(0);
+	exit(shell->last_exit_code);
 }

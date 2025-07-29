@@ -75,7 +75,7 @@ void	read_loop(char *delimiter, t_fds *fd)
 	fd->here_new = open(fd->temp, O_CREAT | O_RDWR | O_TRUNC, 0666);
 	if (fd->here_new == -1)
 	{
-		perror("minishell: heredoc");
+		perror("minishell: heredoc\n");
 		free(delimiter);
 		exit(EXIT_FAILURE);
 	}
