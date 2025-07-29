@@ -54,7 +54,15 @@ void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 		return ;
 	}
 	if (ast->u_content.cmd.arg_count)
+	{
+		if (!is_valid_number(ast->u_content.cmd.args[0]))
+		{
+			error_message("exit: numeric argument required");
+			shell->last_exit_code = 2;
+			return ;
+		}
 		shell->last_exit_code = ft_atoi(ast->u_content.cmd.args[0]);
+	}
 	else
 		shell->last_exit_code = 0;
 	free_ast(ast);
