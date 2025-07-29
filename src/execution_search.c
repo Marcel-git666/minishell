@@ -27,16 +27,20 @@ int	fork_it(char *path, char **args, char **envp)
 	pid = fork();
 	if (pid == 0)
 	{
+		signal(SIGINT, signal_handler_heredoc);
 		if (execve(path, args, envp) == -1)
 			perror("error: execve failed");
 		exit(127);
 	}
 	else if (pid > 0)
 	{
-		wait(&status);
+		signal(SIGINT, SIG_IGN);
+		waitpid(pid, &status, 0);
+		setup_signals();
 		if (WIFEXITED(status))
 			return (WEXITSTATUS(status));
-		return (-1);
+		else if (WIFSIGNALED(status))
+			return (128 + WTERMSIG(status));
 	}
 	return (-1);
 }

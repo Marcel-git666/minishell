@@ -54,5 +54,8 @@ void	setup_signals(void)
 void	signal_handler_heredoc(int signum)
 {
 	if (signum == SIGINT)
-		exit(1);
+	{
+		write(1, "\n", 1);
+		exit(130);
+	}
 }
