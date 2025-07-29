@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_search.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:32:54 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 17:42:25 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/29 21:42:18 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ static int	handle_direct_path(char *expanded_cmd, t_ast_node *ast, char **envp)
  */
 static t_env	*find_path_env(t_env *env)
 {
-	while (env && ft_strncmp(env->key, "PATH", 5) != 0)
+	while (env && ft_strcmp(env->key, "PATH") != 0)
 		env = env->next;
 	return (env);
 }

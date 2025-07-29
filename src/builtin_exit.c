@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 13:43:21 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/29 21:30:07 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,32 @@ static void	free_env_list(t_shell *shell)
 		}
 		shell->env = NULL;
 	}
+}
+
+/*
+ * Checks if a string represents a valid number for exit code
+ * Handles optional leading sign (+ or -)
+ * Returns 1 if valid number, 0 if invalid
+ * Empty string or non-numeric characters make it invalid
+ */
+int	is_valid_number(const char *str)
+{
+	int	i;
+
+	if (!str || !*str)
+		return (0);
+	i = 0;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (!str[i])
+		return (0);
+	while (str[i])
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
 }
 
 /*
