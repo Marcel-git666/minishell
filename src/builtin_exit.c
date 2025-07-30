@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/29 21:30:07 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/30 12:18:02 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,10 @@ int	is_valid_number(const char *str)
  * Frees all allocated memory including environment, AST, and file descriptors
  * Prints exit message and terminates shell with exit code 0
  */
-void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
+void	builtin_exit(t_shell *shell, t_ast_node *ast)
 {
+	int	exit_code;
+
 	free_env_list(shell);
 	if (ast->u_content.cmd.arg_count > 1)
 	{
@@ -92,8 +94,7 @@ void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 	else
 		shell->last_exit_code = 0;
 	free_ast(ast);
-	if (fd->temp)
-		free(fd->temp);
-	free(fd);
-	exit(shell->last_exit_code);
+	exit_code = shell->last_exit_code;
+	free(shell);
+	exit(exit_code);
 }
