@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 12:35:07 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 15:15:03 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/30 15:33:53 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,6 @@ static int	should_continue_compound(t_lexer *lexer)
  * IMPORTANT: Keep quotes in the token so expansion can handle them properly
  * Returns NULL on syntax error (unclosed quotes)
  */
-/*
- * Processes single element of compound token (quote, variable, or text)
- * IMPORTANT: Keep quotes in the token so expansion can handle them properly
- * Returns NULL on syntax error (unclosed quotes)
- */
 static char *process_compound_element(t_lexer *lexer)
 {
 	size_t start;
@@ -57,7 +52,7 @@ static char *process_compound_element(t_lexer *lexer)
 	{
 		// ✅ KEEP single quotes in the token - but check if closed
 		start = lexer->i;
-		lexer->i++; // přeskoč opening '
+		lexer->i++; // skip opening '
 		while (lexer->input[lexer->i] && lexer->input[lexer->i] != '\'')
 			lexer->i++;
 		
@@ -68,7 +63,7 @@ static char *process_compound_element(t_lexer *lexer)
 			return (NULL);
 		}
 		
-		lexer->i++; // přeskoč closing '
+		lexer->i++; // skip closing '
 		
 		// Return the WHOLE thing including quotes
 		result = ft_strndup(lexer->input + start, lexer->i - start);
@@ -78,7 +73,7 @@ static char *process_compound_element(t_lexer *lexer)
 	{
 		// ✅ KEEP double quotes in the token - but check if closed  
 		start = lexer->i;
-		lexer->i++; // přeskoč opening "
+		lexer->i++; // skip opening "
 		while (lexer->input[lexer->i] && lexer->input[lexer->i] != '"')
 			lexer->i++;
 		
@@ -89,16 +84,29 @@ static char *process_compound_element(t_lexer *lexer)
 			return (NULL);
 		}
 		
-		lexer->i++; // přeskoč closing "
+		lexer->i++; // skip closing "
 		
 		// Return the WHOLE thing including quotes
 		result = ft_strndup(lexer->input + start, lexer->i - start);
 		return (result);
 	}
-	else if (lexer->input[lexer->i] == '\'')
+	else if (lexer->input[lexer->i] == '$')
 	{
-		// ✅ Variables - keep as is
+		// Variables - extract properly
 		char *env_name = extract_env_var(lexer->input, &lexer->i);
+		if (!env_name)
+		{
+			// Error in extraction - treat $ as literal
+			return (ft_strdup("$"));
+		}
+		
+		// Check if it's a literal $ (when extract_env_var returns "$")
+		if (ft_strcmp(env_name, "$") == 0)
+		{
+			free(env_name);
+			return (ft_strdup("$"));
+		}
+	
 		result = ft_strjoin("$", env_name);
 		free(env_name);
 		return (result);
@@ -114,7 +122,6 @@ static char *process_compound_element(t_lexer *lexer)
 		return (ft_strndup(lexer->input + start, lexer->i - start));
 	}
 }
-
 
 /*
  * Joins multiple elements into single compound token
@@ -140,11 +147,6 @@ static char	*join_compound_elements(char **elements, int count)
 	return (result);
 }
 
-/*
- * Creates compound token from adjacent quoted/unquoted parts
- * Handles cases like hello'world' -> helloworld
- * Returns compound token value or NULL on error
- */
 /*
  * Creates compound token from adjacent quoted/unquoted parts
  * Handles cases like hello'world' -> helloworld

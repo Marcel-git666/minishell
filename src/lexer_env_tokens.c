@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_env_tokens.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 23:53:51 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/19 00:04:04 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 15:37:43 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,20 @@ static int	create_compound_env_token(t_lexer *lexer, size_t start_pos)
  */
 static int	create_env_token(t_lexer *lexer, char *env)
 {
+	if (!env)
+	{
+		// Error in extraction - create literal $ token
+		add_token(&(lexer->tokens), create_token(TOKEN_ARG, "$"));
+		return (0);
+	}
+	
+	if (ft_strcmp(env, "$") == 0)
+	{
+		// Literal $ character
+		add_token(&(lexer->tokens), create_token(TOKEN_ARG, "$"));
+		return (0);
+	}
+	
 	if (ft_strncmp(env, "?", 2) == 0)
 		add_token(&(lexer->tokens), create_token(TOKEN_EXIT_CODE, "?"));
 	else
@@ -57,22 +71,35 @@ static int	create_env_token(t_lexer *lexer, char *env)
  * Handles environment variable tokens ($VAR, $?, etc.)
  * Supports both simple and compound tokens
  */
-static int	handle_env_token(t_lexer *lexer, int *is_first_word)
+static int handle_env_token(t_lexer *lexer, int *is_first_word)
 {
-	char	*env;
-	size_t	start_pos;
+	char *env;
+	size_t start_pos;
 
 	start_pos = lexer->i;
 	env = extract_env_var(lexer->input, &(lexer->i));
-	if (!env)
-		return (-1);
+	
+	// Check if it's a literal $ (invalid variable)
+	if (env && ft_strcmp(env, "$") == 0)
+	{
+		// Just create a literal $ token, don't try compound
+		add_token(&(lexer->tokens), create_token(TOKEN_ARG, "$"));
+		if (*is_first_word)
+			*is_first_word = 0;
+		free(env);
+		return (0);
+	}
+	
+	// Valid variable - check if should be compound
 	if (should_create_compound(lexer))
 		create_compound_env_token(lexer, start_pos);
 	else
 		create_env_token(lexer, env);
+		
 	if (*is_first_word)
 		*is_first_word = 0;
-	free(env);
+	if (env)
+		free(env);
 	return (0);
 }
 
