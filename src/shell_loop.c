@@ -74,7 +74,7 @@ static void	process_input_line(char *input, t_shell *shell, char **envp)
 	if (!*input)
 		return ;
 	handle_input(input);
-	tokens = lexer(input);
+	tokens = lexer(input, shell);
 	process_tokens_and_execute(tokens, shell, envp);
 }
 

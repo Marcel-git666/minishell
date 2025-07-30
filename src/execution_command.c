@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 00:26:50 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 18:34:16 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 19:20:24 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,54 +19,6 @@
  */
 char	*expand_compound_token(char *compound, t_env *env, int exit_status);
 
-/*
- * Expands environment variables in command arguments
- * Processes each argument based on its token type, skipping single-quoted
- * strings
- * Updates the AST node's arguments with expanded values
- */
-static void expand_command_args(t_ast_node *ast_node, t_shell *shell)
-{
-	char			*expanded_arg;
-	int				i;
-	t_token_type	token_type;
-
-	printf("DEBUG: expand_command_args called, arg_count = %d\n", ast_node->u_content.cmd.arg_count);
-
-	i = -1;
-	while (++i < ast_node->u_content.cmd.arg_count)
-	{
-		token_type = ast_node->u_content.cmd.arg_token_types[i];
-		printf("DEBUG: arg[%d] = '%s', token_type = %d\n", i, ast_node->u_content.cmd.args[i], token_type);
-		
-		if (token_type == TOKEN_SINGLE_QUOTED)
-		{
-			printf("DEBUG: single quoted - no expansion\n");
-			continue;
-		}
-		else if (token_type == TOKEN_DOUBLE_QUOTED)
-		{
-			printf("DEBUG: double quoted - expanding\n");
-			expanded_arg = expand_variables(ast_node->u_content.cmd.args[i],
-					shell->env, shell->last_exit_code, 0);
-			printf("DEBUG: expanded to = '%s'\n", expanded_arg);
-		}
-		else if (token_type == TOKEN_ENV_VAR || token_type == TOKEN_EXIT_CODE)
-		{
-			// Environment variable - expand
-			expanded_arg = expand_variables(ast_node->u_content.cmd.args[i],
-					shell->env, shell->last_exit_code, 1);
-		}
-		else
-		{
-			// Regular argument - no expansion needed
-			continue;
-		}
-		
-		free(ast_node->u_content.cmd.args[i]);
-		ast_node->u_content.cmd.args[i] = expanded_arg;
-	}
-}
 
 /*
  * Checks if a command is a shell builtin
@@ -123,7 +75,6 @@ void	handle_command(t_ast_node *ast_node, t_shell *shell,
 {
 	int		exit_code;
 
-	expand_command_args(ast_node, shell);
 	if (is_builtin_command(expanded_cmd))
 		execute_builtin_cmd(expanded_cmd, ast_node, shell);
 	else

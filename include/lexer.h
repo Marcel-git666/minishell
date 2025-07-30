@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 14:14:51 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 18:04:25 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 19:48:20 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,16 +28,17 @@ typedef struct s_lexer
 }		t_lexer;
 
 // lexer.c
-void		add_token_from_input(t_lexer *lexer, int *is_first_word);
+void    	add_token_from_input(t_lexer *lexer, int *is_first_word, t_shell *shell);
+t_token		*lexer(const char *input, t_shell *shell);
 
 // lexer_core.c
 void		skip_whitespace(const char *input, size_t *i);
 void		init_lexer(t_lexer *lexer, const char *input);
-int			process_current_char(t_lexer *lexer, int *is_first_word);
-t_token		*lexer(const char *input);
+// int			process_current_char(t_lexer *lexer, int *is_first_word);
+// t_token		*lexer(const char *input);
 
 // lexer_compound.c
-char		*create_compound_token(t_lexer *lexer);
+// char		*create_compound_token(t_lexer *lexer);
 
 // lexer_utils.c
 int			is_valid_var_name(const char *word, int len);
@@ -49,11 +50,12 @@ int			handle_assignment_error(t_lexer *lexer);
 int			process_redirections(t_lexer *lexer);
 
 // lexer_special_tokens.c
-int			handle_pipe_token(t_lexer *lexer, int *is_first_word);
-int			handle_quote_token(t_lexer *lexer, int *is_first_word);
-char		*extract_compound_token(t_lexer *lexer, size_t start_pos);
+// int	handle_special_tokens(t_lexer *lexer, int *is_first_word);
+int	handle_pipe_token(t_lexer *lexer, int *is_first_word);
+// int	handle_quote_token(t_lexer *lexer, int *is_first_word);
+// char	*extract_compound_token(t_lexer *lexer, size_t start_pos);
 
 // lexer_env_tokens.c
-int			handle_special_tokens(t_lexer *lexer, int *is_first_word);
+// int			handle_special_tokens(t_lexer *lexer, int *is_first_word);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/30 18:36:20 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 22:51:48 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,6 @@ int	handle_quote_token(t_lexer *lexer, int *is_first_word)
 {
 	int	result;
 
-	printf("DEBUG: handle_quote_token called for char '%c'\n", lexer->input[lexer->i]);
 	if (lexer->input[lexer->i] == '\'')
 		result = handle_single_quote(lexer);
 	else
