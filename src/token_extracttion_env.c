@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_extracttion_env.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 12:57:22 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 11:13:28 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 15:35:43 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,33 +38,61 @@ static char	*extract_braced_var(const char *input, size_t *index)
  * Handles special case $? and validates variable naming rules
  * Returns variable name or NULL on invalid syntax
  */
-static char	*extract_simple_var(const char *input, size_t *index, size_t start)
-{
-	if (input[*index] == '?')
-	{
-		(*index)++;
-		return (ft_strdup("?"));
-	}
-	if (!ft_isalpha(input[*index]) && input[*index] != '_')
-		return (error_message(
-				"syntax error: invalid environment variable name"), NULL);
-	(*index)++;
-	while (ft_isalnum(input[*index]) || input[*index] == '_')
-		(*index)++;
-	return (ft_strndup(input + start, *index - start));
-}
+// static char	*extract_simple_var(const char *input, size_t *index, size_t start)
+// {
+// 	if (input[*index] == '?')
+// 	{
+// 		(*index)++;
+// 		return (ft_strdup("?"));
+// 	}
+// 	if (!ft_isalpha(input[*index]) && input[*index] != '_')
+// 		return (error_message(
+// 				"syntax error: invalid environment variable name"), NULL);
+// 	(*index)++;
+// 	while (ft_isalnum(input[*index]) || input[*index] == '_')
+// 		(*index)++;
+// 	return (ft_strndup(input + start, *index - start));
+// }
 
 /*
  * Main environment variable extraction function
  * Handles both ${VAR} and $VAR syntax, delegates to appropriate helper
  * Returns variable name string or NULL on error
  */
-char	*extract_env_var(const char *input, size_t *index)
+char *extract_env_var(const char *input, size_t *index)
 {
-	size_t	start;
-
-	start = ++(*index);
+	size_t start;
+	
+	start = ++(*index);  // Skip the $
+	
+	// Check if this is end of input
+	if (!input[*index])
+	{
+		// $ at end of input - treat as literal $
+		return (ft_strdup("$"));
+	}
+		
 	if (input[*index] == '{')
 		return (extract_braced_var(input, index));
-	return (extract_simple_var(input, index, start));
+		
+	// Handle $? special case
+	if (input[*index] == '?')
+	{
+		(*index)++;
+		return (ft_strdup("?"));
+	}
+	
+	// For $VAR syntax, must start with letter or underscore
+	if (!ft_isalpha(input[*index]) && input[*index] != '_')
+	{
+		// Invalid variable name - treat $ as literal
+		return (ft_strdup("$"));
+	}
+	
+	// Valid variable name - extract it
+	while (ft_isalnum(input[*index]) || input[*index] == '_')
+		(*index)++;
+	
+	return (ft_strndup(input + start, *index - start));
 }
+

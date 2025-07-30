@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 12:33:42 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 16:11:25 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,7 @@ static char	*process_variable(char *result, char *dollar_pos,
  * Handles both direct variable mode and string expansion mode
  * Returns expanded string or NULL on error
  */
-char	*expand_variables(char *input, t_env *env, int exit_status,
-		int is_env_var)
+char	*expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
 {
 	char	*result;
 	char	*dollar_pos;
@@ -88,9 +87,15 @@ char	*expand_variables(char *input, t_env *env, int exit_status,
 		return (NULL);
 	if (is_env_var)
 		return (get_variable_value(input, env, exit_status));
+	
+	// Quick fix: if input is just "$", return it as literal
+	if (ft_strcmp(input, "$") == 0)
+		return (ft_strdup("$"));
+		
 	result = ft_strdup(input);
 	if (!result)
 		return (NULL);
+		
 	dollar_pos = find_next_dollar(result);
 	while (dollar_pos != NULL)
 	{
@@ -101,3 +106,5 @@ char	*expand_variables(char *input, t_env *env, int exit_status,
 	}
 	return (result);
 }
+
+

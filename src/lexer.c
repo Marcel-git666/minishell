@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 13:21:23 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 16:28:07 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,22 +20,33 @@
 static int	should_start_compound(t_lexer *lexer)
 {
 	size_t	lookahead;
+	int		found_compound_parts;
 
+	found_compound_parts = 0;
 	lookahead = lexer->i;
 	while (lexer->input[lookahead] && !ft_isspace(lexer->input[lookahead]))
-	{
+	{	
 		if (is_special_char(lexer->input[lookahead])
 			&& lexer->input[lookahead] != '$'
 			&& lexer->input[lookahead] != '\''
 			&& lexer->input[lookahead] != '"')
+		{
 			break ;
+		}
 		if ((lexer->input[lookahead] == '\'' || lexer->input[lookahead] == '"'
-				|| lexer->input[lookahead] == '$') && lookahead > lexer->i)
-			return (1);
+				|| lexer->input[lookahead] == '$'))
+		{
+			found_compound_parts++;
+			if (found_compound_parts > 1)
+			{
+				return (1);
+			}
+		}
 		lookahead++;
 	}
 	return (0);
 }
+
 
 /*
  * Extracts word based on compound or regular extraction
@@ -83,13 +94,26 @@ static void	add_typed_token(t_lexer *lexer, char *word, int *is_first_word)
  * Handles delimiter, file, command, assignment, and argument tokens
  * Now supports compound tokens for adjacent quotes/variables
  */
-void	add_token_from_input(t_lexer *lexer, int *is_first_word)
+void add_token_from_input(t_lexer *lexer, int *is_first_word)
 {
-	char	*word;
+	char *word;
+	int is_compound;
 
+	is_compound = should_start_compound(lexer);
+	
 	word = extract_word_token(lexer);
 	if (!word)
 		return ;
-	add_typed_token(lexer, word, is_first_word);
+
+	if (is_compound)
+	{
+		add_token(&lexer->tokens, create_token(TOKEN_COMPOUND, word));
+		if (*is_first_word)
+			*is_first_word = 0;
+	}
+	else
+	{
+		add_typed_token(lexer, word, is_first_word);
+	}
 	free(word);
 }

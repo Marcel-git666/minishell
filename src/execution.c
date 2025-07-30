@@ -57,6 +57,12 @@ static char	*expand_command(t_ast_node *ast_node, t_shell *shell)
 	int		cmd_is_env_var;
 	char	*expanded_cmd;
 
+	if (ft_strcmp(ast_node->u_content.cmd.cmd, "$") == 0)
+	{
+		printf("minishell: $: command not found\n");
+		shell->last_exit_code = 127;
+		return (NULL);
+	}
 	cmd_is_env_var = (ast_node->u_content.cmd.cmd_token_type == TOKEN_ENV_VAR
 			|| ast_node->u_content.cmd.cmd_token_type == TOKEN_EXIT_CODE);
 	expanded_cmd = expand_variables(ast_node->u_content.cmd.cmd,
@@ -88,12 +94,21 @@ static void	handle_command_execution(t_ast_node *ast_node, t_shell *shell,
 
 	expanded_cmd = expand_command(ast_node, shell);
 	if (!expanded_cmd)
+	{
 		return ;
+	}
 	if (ft_strcmp(expanded_cmd, "exit") == 0)
+	{
+		free(expanded_cmd);
+		expanded_cmd = NULL;
 		builtin_exit(shell, fd_red, ast_node);
+	}
 	else
+	{
 		handle_command(ast_node, shell, envp, expanded_cmd);
-	free(expanded_cmd);
+	}
+	if (expanded_cmd)
+		free(expanded_cmd);
 }
 
 /*
@@ -112,7 +127,9 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		return ;
 	}
 	if (ast_node->type == NODE_REDIR)
+	{
 		handle_redirection(&ast_node, fd_red, shell);
+	}
 	if (ast_node && ast_node->type == NODE_PIPE)
 	{
 		reset_fd(fd_red);
@@ -120,8 +137,12 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 		return ;
 	}
 	if (ast_node->type == NODE_ASSIGNMENT)
+	{
 		handle_assignment(ast_node, shell);
+	}
 	else if (ast_node->type == NODE_COMMAND)
+	{
 		handle_command_execution(ast_node, shell, envp, fd_red);
+	}
 	reset_fd(fd_red);
 }

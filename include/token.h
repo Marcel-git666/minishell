@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 14:26:56 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 18:08:05 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 14:13:12 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef enum e_token_type
 	TOKEN_FILE,			// File name for redirection
 	TOKEN_DELIMITER,	// Assign a unique token type
 	TOKEN_ASSIGNMENT,	// Variable assignment (VAR=value)
+	TOKEN_COMPOUND,		// Compound token (multiple parts)
 	TOKEN_EOF,			// End of input (NULL)
 }	t_token_type;
 
