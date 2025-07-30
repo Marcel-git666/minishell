@@ -77,7 +77,7 @@ void	read_loop(char *delimiter, t_fds *fd)
 	{
 		perror("minishell: heredoc");
 		free(delimiter);
-		exit(EXIT_FAILURE);
+		exit(1);
 	}
 	while (1)
 	{

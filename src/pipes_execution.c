@@ -6,12 +6,35 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:42:33 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 16:56:34 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 00:16:19 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "pipes.h"
+
+/*
+ * Checks if AST node contains heredoc redirection
+ * Recursively traverses redirection nodes to find REDIR_HEREDOC type
+ * Returns 1 if heredoc found, 0 otherwise
+ */
+static int	contains_heredoc(t_ast_node *node)
+{
+	if (!node)
+		return (0);
+	if (node->type == NODE_REDIR)
+	{
+		if (node->u_content.s_redir.redir->type == REDIR_HEREDOC)
+			return (1);
+		return (contains_heredoc(node->u_content.s_redir.child));
+	}
+	else if (node->type == NODE_PIPE)
+	{
+		return (contains_heredoc(node->u_content.s_pipe.left)
+			|| contains_heredoc(node->u_content.s_pipe.right));
+	}
+	return (0);
+}
 
 /*
  * Executes left side of pipe (writes to pipe output)
@@ -20,6 +43,13 @@
 void	execute_left_child(int *pipe_fd, t_ast_node *left_node,
 			t_shell *shell, char **envp)
 {
+	if (contains_heredoc(left_node))
+	{
+		write(2, "minishell: heredoc not supported in pipe context\n", 49);
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		exit(2);
+	}
 	close(pipe_fd[0]);
 	dup2(pipe_fd[1], STDOUT_FILENO);
 	close(pipe_fd[1]);

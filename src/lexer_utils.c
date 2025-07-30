@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 23:48:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/18 23:51:33 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 08:41:50 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int	is_word_char(char c, int is_delimiter_expected)
 {
 	if (ft_isalnum(c) || c == '-' || c == '/' || c == '.')
 		return (1);
-	if (c == '~' || c == '?' || c == '*')
+	if (c == '~' || c == '?' || c == '*' || c == '+')
 		return (1);
 	if (is_delimiter_expected)
 		return (1);
