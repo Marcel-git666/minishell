@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_search.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:32:54 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/29 21:42:18 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/30 13:06:42 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ int	fork_it(char *path, char **args, char **envp)
 	pid = fork();
 	if (pid == 0)
 	{
+		signal(SIGQUIT, signal_handler_heredoc);
 		signal(SIGINT, signal_handler_heredoc);
 		if (execve(path, args, envp) == -1)
 			perror("error: execve failed");

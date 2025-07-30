@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 12:18:02 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/30 12:55:47 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,16 +65,22 @@ int	is_valid_number(const char *str)
 	return (1);
 }
 
+void	free_fd(t_fds *fd)
+{
+	if (fd->temp)
+		free(fd->temp);
+	free(fd);
+}
+
 /*
  * Implements exit builtin command with complete cleanup
  * Frees all allocated memory including environment, AST, and file descriptors
  * Prints exit message and terminates shell with exit code 0
  */
-void	builtin_exit(t_shell *shell, t_ast_node *ast)
+void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 {
 	int	exit_code;
 
-	free_env_list(shell);
 	if (ast->u_content.cmd.arg_count > 1)
 	{
 		error_message("exit: too many arguments");
@@ -89,12 +95,13 @@ void	builtin_exit(t_shell *shell, t_ast_node *ast)
 			shell->last_exit_code = 2;
 			return ;
 		}
-		shell->last_exit_code = ft_atoi(ast->u_content.cmd.args[0]);
+		exit_code = ft_atoi(ast->u_content.cmd.args[0]);
 	}
 	else
-		shell->last_exit_code = 0;
+		exit_code = 0;
+	free_env_list(shell);
 	free_ast(ast);
-	exit_code = shell->last_exit_code;
 	free(shell);
+	free_fd(fd);
 	exit(exit_code);
 }
