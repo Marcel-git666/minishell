@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 13:21:23 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 12:09:54 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,9 @@
 static int	should_start_compound(t_lexer *lexer)
 {
 	size_t	lookahead;
+	int		found_compound_parts;
 
+	found_compound_parts = 0;
 	lookahead = lexer->i;
 	while (lexer->input[lookahead] && !ft_isspace(lexer->input[lookahead]))
 	{
@@ -30,8 +32,12 @@ static int	should_start_compound(t_lexer *lexer)
 			&& lexer->input[lookahead] != '"')
 			break ;
 		if ((lexer->input[lookahead] == '\'' || lexer->input[lookahead] == '"'
-				|| lexer->input[lookahead] == '$') && lookahead > lexer->i)
-			return (1);
+				|| lexer->input[lookahead] == '$'))
+		{
+			found_compound_parts++;
+			if (found_compound_parts > 1)
+				return (1);
+		}
 		lookahead++;
 	}
 	return (0);
