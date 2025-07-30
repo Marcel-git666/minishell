@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd_utils.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:52:54 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 17:53:25 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 09:45:45 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,55 +32,103 @@ static void	print_cd_error(char *path, t_shell *shell)
 }
 
 /*
- * Handles absolute path changes for cd command
- * Validates path length and attempts directory change
- * Returns 1 on success, 0 on failure with error message
+ * Splits current directory into components and stores in array
+ * Returns number of components added
  */
-int	absolute_path(t_ast_node *root, int i, t_shell *shell)
+static int	split_current_dir(char *current_dir, char **components)
 {
-	char	*expanded_path;
+	char	*dir_copy;
+	char	*token;
+	int		count;
 
-	if (i == 0 && ft_strlen(root->u_content.cmd.args[0]) > 1)
+	count = 0;
+	dir_copy = ft_strdup(current_dir);
+	if (!dir_copy)
+		return (0);
+	token = ft_strtok(dir_copy, "/");
+	while (token && count < 1023)
 	{
-		expanded_path = expand_tilde(root->u_content.cmd.args[0], shell->env);
-		if (!expanded_path)
-		{
-			shell->last_exit_code = 1;
-			return (0);
-		}
-		if (chdir(expanded_path) == -1)
-		{
-			print_cd_error(expanded_path, shell);
-			free(expanded_path);
-			return (0);
-		}
-		free(expanded_path);
+		if (ft_strlen(token) > 0)
+			components[count++] = ft_strdup(token);
+		token = ft_strtok(NULL, "/");
 	}
-	return (1);
+	free(dir_copy);
+	return (count);
 }
 
 /*
- * Changes directory to root (/)
- * Simple helper function for root directory navigation
- * Used when path resolves to root directory
+ * Builds absolute path from component array
+ * Returns allocated path string starting with /
  */
-static void	handle_root_path(void)
+static char	*build_path_from_components(char **components, int count)
 {
-	chdir("/");
+	char	*result;
+	int		total_len;
+	int		i;
+
+	if (count == 0)
+		return (ft_strdup("/"));
+	total_len = 1;
+	i = -1;
+	while (++i < count)
+		total_len += ft_strlen(components[i]) + 1;
+	result = malloc(total_len + 1);
+	if (!result)
+		return (NULL);
+	result[0] = '/';
+	result[1] = '\0';
+	i = -1;
+	while (++i < count)
+	{
+		ft_strlcat(result, components[i], total_len + 1);
+		if (i < count - 1)
+			ft_strlcat(result, "/", total_len + 1);
+		free(components[i]);
+	}
+	return (result);
+}
+
+/*
+ * Normalizes relative path by resolving .. and . components
+ * Returns normalized absolute path or NULL on error
+ */
+static char	*normalize_relative_path(char *current_dir, char *path)
+{
+	char	**components;
+	char	*path_copy;
+	char	*token;
+	char	*result;
+	int		count;
+
+	components = malloc(1024 * sizeof(char *));
+	if (!components)
+		return (NULL);
+	count = 0;
+	if (path[0] != '/')
+		count = split_current_dir(current_dir, components);
+	path_copy = ft_strdup(path);
+	token = ft_strtok(path_copy, "/");
+	while (token && count < 1023)
+	{
+		if (ft_strcmp(token, "..") == 0 && count > 0)
+			free(components[--count]);
+		else if (ft_strcmp(token, ".") != 0 && ft_strlen(token) > 0)
+			components[count++] = ft_strdup(token);
+		token = ft_strtok(NULL, "/");
+	}
+	result = build_path_from_components(components, count);
+	return (free(path_copy), free(components), result);
 }
 
 /*
  * Main path handling function for cd command
- * Handles various path types including relative, absolute, and special cases
- * Processes path arguments and delegates to appropriate handlers
+ * Handles path normalization and directory change
  */
 void	path(t_ast_node *root, char *cwd, t_shell *shell)
 {
-	int		i;
-	char	*address;
+	char	*normalized_path;
 	char	*expanded_path;
 
-	i = 0;
 	if (only_cd(root, shell, cwd) == 0)
 		return ;
 	expanded_path = expand_tilde(root->u_content.cmd.args[0], shell->env);
@@ -89,16 +137,14 @@ void	path(t_ast_node *root, char *cwd, t_shell *shell)
 		shell->last_exit_code = 1;
 		return ;
 	}
-	address = ft_strrchr(expanded_path, '/');
-	while (expanded_path[i] && &expanded_path[i] != address)
-		i++;
-	if (i == 0 && ft_strlen(expanded_path) == 1)
-		handle_root_path();
-	else if (chdir(expanded_path) == -1)
+	normalized_path = normalize_relative_path(cwd, expanded_path);
+	if (!normalized_path || chdir(normalized_path) == -1)
 	{
 		print_cd_error(expanded_path, shell);
 		free(expanded_path);
+		free(normalized_path);
 		return ;
 	}
 	free(expanded_path);
+	free(normalized_path);
 }

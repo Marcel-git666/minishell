@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_cd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:51:13 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 12:14:36 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 09:41:12 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,17 +74,8 @@ static void	update_pwd(t_shell *shell)
  */
 static void	handle_cd_logic(t_ast_node *root, t_shell *shell, char *cwd)
 {
-	if (root->u_content.cmd.arg_count
-		&& ft_strncmp(root->u_content.cmd.args[0], "..", 2) == 0)
-	{
-		env_set(&shell->env, "OLDPWD", cwd);
-		previous_rep(shell, cwd);
-	}
-	else
-	{
-		env_set(&shell->env, "OLDPWD", cwd);
-		path(root, cwd, shell);
-	}
+	env_set(&shell->env, "OLDPWD", cwd);
+	path(root, cwd, shell);
 }
 
 /*
