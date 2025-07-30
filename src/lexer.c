@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/30 12:09:54 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/30 14:18:36 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,13 +89,26 @@ static void	add_typed_token(t_lexer *lexer, char *word, int *is_first_word)
  * Handles delimiter, file, command, assignment, and argument tokens
  * Now supports compound tokens for adjacent quotes/variables
  */
-void	add_token_from_input(t_lexer *lexer, int *is_first_word)
+void add_token_from_input(t_lexer *lexer, int *is_first_word)
 {
-	char	*word;
+	char *word;
+	int is_compound;
 
+	is_compound = should_start_compound(lexer);
 	word = extract_word_token(lexer);
 	if (!word)
 		return ;
-	add_typed_token(lexer, word, is_first_word);
+
+	if (is_compound)
+	{
+		printf("DEBUG: creating TOKEN_COMPOUND\n");
+		add_token(&lexer->tokens, create_token(TOKEN_COMPOUND, word));
+		if (*is_first_word)
+			*is_first_word = 0;
+	}
+	else
+	{
+		add_typed_token(lexer, word, is_first_word);
+	}
 	free(word);
 }

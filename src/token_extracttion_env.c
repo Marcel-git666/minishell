@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_extracttion_env.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 12:57:22 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 11:13:28 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 15:13:42 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,25 @@ static char	*extract_simple_var(const char *input, size_t *index, size_t start)
  * Handles both ${VAR} and $VAR syntax, delegates to appropriate helper
  * Returns variable name string or NULL on error
  */
-char	*extract_env_var(const char *input, size_t *index)
+char *extract_env_var(const char *input, size_t *index)
 {
-	size_t	start;
-
-	start = ++(*index);
+	size_t start;
+	
+	start = ++(*index);  // Skip the $
+	
+	// Check if this is a valid variable start
+	if (!input[*index])
+		return (NULL);  // $ at end of input
+		
 	if (input[*index] == '{')
 		return (extract_braced_var(input, index));
+		
+	// For $VAR syntax, must start with letter, underscore, or ?
+	if (!ft_isalpha(input[*index]) && input[*index] != '_' && input[*index] != '?')
+	{
+		// Invalid variable name - return empty string to indicate error
+		return (ft_strdup(""));  // This will be handled as invalid variable
+	}
+	
 	return (extract_simple_var(input, index, start));
 }

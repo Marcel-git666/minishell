@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 12:35:07 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 12:04:01 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/30 15:15:03 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,20 +40,72 @@ static int	should_continue_compound(t_lexer *lexer)
 
 /*
  * Processes single element of compound token (quote, variable, or text)
- * Updates lexer position and returns processed content
+ * IMPORTANT: Keep quotes in the token so expansion can handle them properly
+ * Returns NULL on syntax error (unclosed quotes)
  */
-static char	*process_compound_element(t_lexer *lexer)
+/*
+ * Processes single element of compound token (quote, variable, or text)
+ * IMPORTANT: Keep quotes in the token so expansion can handle them properly
+ * Returns NULL on syntax error (unclosed quotes)
+ */
+static char *process_compound_element(t_lexer *lexer)
 {
-	size_t	start;
+	size_t start;
+	char *result;
 
 	if (lexer->input[lexer->i] == '\'')
-		return (extract_single_quoted_string(lexer));
+	{
+		// ✅ KEEP single quotes in the token - but check if closed
+		start = lexer->i;
+		lexer->i++; // přeskoč opening '
+		while (lexer->input[lexer->i] && lexer->input[lexer->i] != '\'')
+			lexer->i++;
+		
+		if (lexer->input[lexer->i] != '\'')
+		{
+			// SYNTAX ERROR: unclosed single quote
+			printf("minishell: syntax error: unterminated quoted string\n");
+			return (NULL);
+		}
+		
+		lexer->i++; // přeskoč closing '
+		
+		// Return the WHOLE thing including quotes
+		result = ft_strndup(lexer->input + start, lexer->i - start);
+		return (result);
+	}
 	else if (lexer->input[lexer->i] == '"')
-		return (extract_double_quoted_string(lexer));
-	else if (lexer->input[lexer->i] == '$')
-		return (extract_env_var(lexer->input, &lexer->i));
+	{
+		// ✅ KEEP double quotes in the token - but check if closed  
+		start = lexer->i;
+		lexer->i++; // přeskoč opening "
+		while (lexer->input[lexer->i] && lexer->input[lexer->i] != '"')
+			lexer->i++;
+		
+		if (lexer->input[lexer->i] != '"')
+		{
+			// SYNTAX ERROR: unclosed double quote
+			printf("minishell: syntax error: unterminated quoted string\n");
+			return (NULL);
+		}
+		
+		lexer->i++; // přeskoč closing "
+		
+		// Return the WHOLE thing including quotes
+		result = ft_strndup(lexer->input + start, lexer->i - start);
+		return (result);
+	}
+	else if (lexer->input[lexer->i] == '\'')
+	{
+		// ✅ Variables - keep as is
+		char *env_name = extract_env_var(lexer->input, &lexer->i);
+		result = ft_strjoin("$", env_name);
+		free(env_name);
+		return (result);
+	}
 	else
 	{
+		// Regular text
 		start = lexer->i;
 		while (lexer->input[lexer->i] && !ft_isspace(lexer->input[lexer->i])
 			&& !is_compound_start(lexer->input[lexer->i])
@@ -62,6 +114,7 @@ static char	*process_compound_element(t_lexer *lexer)
 		return (ft_strndup(lexer->input + start, lexer->i - start));
 	}
 }
+
 
 /*
  * Joins multiple elements into single compound token
@@ -92,6 +145,11 @@ static char	*join_compound_elements(char **elements, int count)
  * Handles cases like hello'world' -> helloworld
  * Returns compound token value or NULL on error
  */
+/*
+ * Creates compound token from adjacent quoted/unquoted parts
+ * Handles cases like hello'world' -> helloworld
+ * Returns compound token value or NULL on syntax error
+ */
 char	*create_compound_token(t_lexer *lexer)
 {
 	char	*elements[32];
@@ -103,8 +161,17 @@ char	*create_compound_token(t_lexer *lexer)
 	while (should_continue_compound(lexer) && count < 32)
 	{
 		elements[count] = process_compound_element(lexer);
-		if (!elements[count])
-			break ;
+		if (!elements[count]) // Syntax error in process_compound_element
+		{
+			// Free already allocated elements
+			i = 0;
+			while (i < count)
+			{
+				free(elements[i]);
+				i++;
+			}
+			return (NULL); // Signal error to caller
+		}
 		count++;
 	}
 	result = join_compound_elements(elements, count);

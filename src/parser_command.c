@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_command.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 23:41:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 00:01:49 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 14:32:02 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ static int	count_arguments(t_token *cmd_token)
 			|| current->type == TOKEN_DOUBLE_QUOTED
 			|| current->type == TOKEN_SINGLE_QUOTED
 			|| current->type == TOKEN_ENV_VAR
-			|| current->type == TOKEN_EXIT_CODE))
+			|| current->type == TOKEN_EXIT_CODE
+			|| current->type == TOKEN_COMPOUND))
 	{
 		count++;
 		current = current->next;
