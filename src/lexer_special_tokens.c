@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/19 00:01:38 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 18:36:20 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,7 @@ static int	handle_single_quote(t_lexer *lexer)
 	quoted = extract_single_quoted_string(lexer);
 	if (!quoted)
 		return (-1);
-	if (ft_strlen(quoted) > 0)
-		add_token(&(lexer->tokens), create_token(TOKEN_SINGLE_QUOTED, quoted));
+	add_token(&(lexer->tokens), create_token(TOKEN_SINGLE_QUOTED, quoted));
 	free(quoted);
 	return (0);
 }
@@ -70,8 +69,7 @@ static int	handle_double_quote(t_lexer *lexer)
 	quoted = extract_double_quoted_string(lexer);
 	if (!quoted)
 		return (-1);
-	if (ft_strlen(quoted) > 0)
-		add_token(&(lexer->tokens), create_token(TOKEN_DOUBLE_QUOTED, quoted));
+	add_token(&(lexer->tokens), create_token(TOKEN_DOUBLE_QUOTED, quoted));
 	free(quoted);
 	return (0);
 }
@@ -84,6 +82,7 @@ int	handle_quote_token(t_lexer *lexer, int *is_first_word)
 {
 	int	result;
 
+	printf("DEBUG: handle_quote_token called for char '%c'\n", lexer->input[lexer->i]);
 	if (lexer->input[lexer->i] == '\'')
 		result = handle_single_quote(lexer);
 	else

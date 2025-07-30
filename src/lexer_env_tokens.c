@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_env_tokens.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 23:53:51 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 16:05:24 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/30 18:36:47 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ static int	handle_env_token(t_lexer *lexer, int *is_first_word)
  */
 int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 {
+	printf("DEBUG: handle_special_tokens called for char '%c'\n", lexer->input[lexer->i]);
 	if (lexer->input[lexer->i] == '\'' || lexer->input[lexer->i] == '\"')
 		return (handle_quote_token(lexer, is_first_word));
 	else if (lexer->input[lexer->i] == '>' || lexer->input[lexer->i] == '<')
