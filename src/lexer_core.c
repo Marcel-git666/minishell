@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 13:08:44 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/31 23:23:04 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 00:03:30 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,10 @@ int process_current_char(t_lexer *lexer, int *is_first_word)
     // Pokud to není operátor ani mezera, je to ZAČÁTEK SLOVA.
     // Zavoláme naši novou chytrou funkci, která "sežere" celé slovo
     // až do další mezery nebo operátoru.
-    add_token_from_input(lexer, is_first_word);
+	if (add_token_from_input(lexer, is_first_word) == -1)
+    {
+        return (-1); // Pošli chybu o úroveň výš
+    }
 
     // add_token_from_input sama posune lexer->i, takže tady už nic neděláme.
     return (0); // Pokračuj ve smyčce

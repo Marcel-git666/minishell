@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/31 23:29:39 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 00:02:06 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
  * Handles delimiter, file, command, assignment, and argument tokens
  * Now supports compound tokens for adjacent quotes/variables
  */
-void add_token_from_input(t_lexer *lexer, int *is_first_word)
+int add_token_from_input(t_lexer *lexer, int *is_first_word)
 {
     char *word;
 
@@ -27,11 +27,7 @@ void add_token_from_input(t_lexer *lexer, int *is_first_word)
 
     if (!word)
     {
-        // Pokud extract_greedy_word vrátila NULL, znamená to chybu (neuzavřená uvozovka).
-        // Musíme vyčistit paměť a signalizovat chybu dál.
-        free_tokens(lexer->tokens);
-        lexer->tokens = NULL; // Důležité, aby se nadřazená funkce dozvěděla o chybě.
-        return;
+        return (-1);
     }
 
     // Zbytek funkce zůstává podobný. Určí typ tokenu a přidá ho do seznamu.
@@ -57,5 +53,6 @@ void add_token_from_input(t_lexer *lexer, int *is_first_word)
     else
         add_token(&(lexer->tokens), create_token(TOKEN_ARG, word));
 
-    free(word); // Uvolníme paměť, protože create_token si dělá vlastní kopii.
+    free(word);
+	return (0);
 }
