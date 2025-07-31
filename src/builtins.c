@@ -65,26 +65,25 @@ void	builtin_echo(t_ast_node *root, t_shell *shell)
 {
 	int		i;
 	int		newline;
+	int		start_index;
 
 	newline = 1;
+	start_index = 0;
 	if (root->u_content.cmd.arg_count > 0
-		&& ft_strncmp(root->u_content.cmd.args[0], "-n", 2) == 0)
+		&& ft_strcmp(root->u_content.cmd.args[0], "-n") == 0)
 	{
 		newline = 0;
-		i = 0;
+		start_index = 1;
 	}
-	else
-		i = -1;
+	i = start_index - 1;
 	while (++i < root->u_content.cmd.arg_count && root->u_content.cmd.args[i])
 	{
-		if (root->u_content.cmd.args[i])
-		{
-			printf("%s", root->u_content.cmd.args[i]);
-			if (i < root->u_content.cmd.arg_count - 1)
-				printf(" ");
-		}
+		printf("%s", root->u_content.cmd.args[i]);
+		if (i < root->u_content.cmd.arg_count - 1)
+			printf(" ");
 	}
 	if (newline)
 		printf("\n");
 	shell->last_exit_code = 0;
 }
+

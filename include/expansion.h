@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:45:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 18:02:32 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 14:44:37 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 /* Main expansion function */
 char	*expand_variables(char *input, t_env *env, int exit_status,
 			int is_env_var);
+char	*expand_compound_token(char *compound, t_env *env, int exit_status);
+
 
 /* Helper functions from expansion_utils.c */
 char	*find_next_dollar(char *str);

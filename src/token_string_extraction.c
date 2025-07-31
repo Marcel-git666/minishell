@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 17:40:18 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 11:12:08 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/30 18:23:22 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,14 @@ char	*extract_single_quoted_string(t_lexer *lexer)
 	char	*str;
 	size_t	start;
 
-	quote = lexer->input[(lexer->i)++];
-	start = lexer->i;
+	quote = lexer->input[(lexer->i)++];  // Skip opening quote
+	start = lexer->i;                    // Start after quote
 	while (lexer->input[lexer->i] && lexer->input[lexer->i] != quote)
 		(lexer->i)++;
 	if (lexer->input[lexer->i] == '\0')
-		return (error_message("syntax error: missing closing quote"), NULL);
-	str = ft_strndup(lexer->input + start, lexer->i - start);
-	(lexer->i)++;
+		return (error_message("syntax error: missing closing quote"), NULL);	
+	str = ft_strndup(lexer->input + start, lexer->i - start);  // Content WITHOUT quotes
+	(lexer->i)++;  // Skip closing quote
 	return (str);
 }
 

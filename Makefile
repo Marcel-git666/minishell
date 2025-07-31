@@ -29,9 +29,9 @@ SRCS = main.c utils.c token.c token_extraction.c lexer.c history.c \
 	expansion.c fd.c export.c token_extracttion_env.c builtin_exit.c \
 	cd_utils.c builtin_cd.c env_print.c env_utils.c env_operations.c \
 	env_path.c execution_utils.c execution_search.c \
-	execution_command.c expansion_utils.c lexer_utils.c lexer_env_tokens.c \
+	execution_command.c expansion_utils.c lexer_utils.c \
 	parser_assignment.c parser_pipe.c parser_command.c pipes_execution.c\
-	lexer_compound.c lexer_core.c
+	lexer_core.c expansion_compound.c
 
 # Add src/ prefix to source files
 SRCS := $(addprefix $(SRC_DIR)/,$(SRCS))
