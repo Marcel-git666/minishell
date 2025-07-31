@@ -23,7 +23,7 @@
 static void	handle_redirection(t_ast_node **ast_node, t_fds *fd_red,
 	t_shell *shell)
 {
-	if (redirection(*ast_node, fd_red) == -1)
+	if (redirection(*ast_node, fd_red, shell) == -1)
 	{
 		shell->last_exit_code = 1;
 		return ;
@@ -57,6 +57,11 @@ static char	*expand_command(t_ast_node *ast_node, t_shell *shell)
 	int		cmd_is_env_var;
 	char	*expanded_cmd;
 
+	if (ft_strcmp(ast_node->u_content.cmd.cmd, "$") == 0)
+	{
+		printf("minishell: $: command not found\n");
+		return (shell->last_exit_code = 127, NULL);
+	}
 	cmd_is_env_var = (ast_node->u_content.cmd.cmd_token_type == TOKEN_ENV_VAR
 			|| ast_node->u_content.cmd.cmd_token_type == TOKEN_EXIT_CODE);
 	expanded_cmd = expand_variables(ast_node->u_content.cmd.cmd,

@@ -6,11 +6,12 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 22:47:54 by lformank          #+#    #+#             */
-/*   Updated: 2025/07/20 13:55:39 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 00:27:04 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "expansion.h"
 
 /*
  * Generates unique temporary filename using static counter
@@ -55,17 +56,26 @@ void	close_fd(t_fds *fd, enum e_redir_type type)
  * Handles input (<), output (>), and append (>>) redirections
  * Closes previous descriptors if already open
  */
-int	fd(t_ast_node *ast, t_fds *fd, enum e_redir_type type)
+int	fd(t_ast_node *ast, t_fds *fd, enum e_redir_type type, t_shell *shell)
 {
+	char	*expanded_filename;
+
+	if (type == REDIR_OUT || type == REDIR_APPEND || type == REDIR_IN)
+    {
+        expanded_filename = expand_variables(ast->u_content.s_redir.redir->file_or_delimiter,
+			shell->env, shell->last_exit_code, 0);
+        if (!expanded_filename)
+            return (-1);
+    }
 	if (type == REDIR_OUT || type == REDIR_APPEND)
 	{
 		if (fd->out_new != -1)
 			close(fd->out_new);
 		if (type == REDIR_OUT)
-			fd->out_new = open(ast->u_content.s_redir.redir->file_or_delimiter,
+			fd->out_new = open(expanded_filename,
 					O_WRONLY | O_CREAT | O_TRUNC, 0666);
 		else
-			fd->out_new = open(ast->u_content.s_redir.redir->file_or_delimiter,
+			fd->out_new = open(expanded_filename,
 					O_WRONLY | O_CREAT | O_APPEND, 0666);
 		if (fd->out_new == -1)
 			return (perror("minishell"), -1);
@@ -74,11 +84,13 @@ int	fd(t_ast_node *ast, t_fds *fd, enum e_redir_type type)
 	{
 		if (fd->in_new != -1)
 			close(fd->in_new);
-		fd->in_new = open(ast->u_content.s_redir.redir->file_or_delimiter,
+		fd->in_new = open(expanded_filename,
 				O_RDONLY, 0666);
 		if (fd->in_new == -1)
 			return (perror("minishell"), -1);
 	}
+	if (type == REDIR_OUT || type == REDIR_APPEND || type == REDIR_IN)
+        free(expanded_filename);
 	return (0);
 }
 

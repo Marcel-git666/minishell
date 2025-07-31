@@ -135,7 +135,7 @@ int	heredoc(t_ast_node *ast_node, t_fds *fd)
  * Saves original stdin/stdout, handles heredocs, applies redirections
  * Returns 0 on success, -1 on failure
  */
-int	redirection(t_ast_node *ast_node, t_fds *fd_)
+int	redirection(t_ast_node *ast_node, t_fds *fd_, t_shell *shell)
 {
 	fd_->out_old = dup(STDOUT_FILENO);
 	fd_->in_old = dup(STDIN_FILENO);
@@ -143,7 +143,7 @@ int	redirection(t_ast_node *ast_node, t_fds *fd_)
 		return (-1);
 	while (ast_node && ast_node->type == NODE_REDIR)
 	{
-		if (fd(ast_node, fd_, ast_node->u_content.s_redir.redir->type) == -1)
+		if (fd(ast_node, fd_, ast_node->u_content.s_redir.redir->type, shell) == -1)
 			return (-1);
 		ast_node = ast_node->u_content.s_redir.child;
 	}

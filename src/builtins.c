@@ -68,7 +68,7 @@ void	builtin_echo(t_ast_node *root, t_shell *shell)
 
 	newline = 1;
 	if (root->u_content.cmd.arg_count > 0
-		&& ft_strncmp(root->u_content.cmd.args[0], "-n", 2) == 0)
+		&& ft_strcmp(root->u_content.cmd.args[0], "-n") == 0)
 	{
 		newline = 0;
 		i = 0;

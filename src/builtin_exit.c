@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/29 21:30:07 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 00:44:48 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ int	is_valid_number(const char *str)
  */
 void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 {
+	int	exit_code;
+
 	free_env_list(shell);
 	if (ast->u_content.cmd.arg_count > 1)
 	{
@@ -84,16 +86,15 @@ void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 		if (!is_valid_number(ast->u_content.cmd.args[0]))
 		{
 			error_message("exit: numeric argument required");
-			shell->last_exit_code = 2;
-			return ;
+			exit_code = 2;
 		}
-		shell->last_exit_code = ft_atoi(ast->u_content.cmd.args[0]);
+		exit_code = ft_atoi(ast->u_content.cmd.args[0]);
 	}
 	else
-		shell->last_exit_code = 0;
+		exit_code = shell->last_exit_code;
+	free_env_list(shell);
 	free_ast(ast);
-	if (fd->temp)
-		free(fd->temp);
 	free(fd);
-	exit(shell->last_exit_code);
+	free(shell);
+	exit(exit_code);
 }

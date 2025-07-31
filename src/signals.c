@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:59:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/30 00:14:36 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 00:50:24 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,5 +57,10 @@ void	signal_handler_heredoc(int signum)
 	{
 		write(1, "\n", 1);
 		exit(130);
+	}
+	else if (signum == SIGQUIT)
+	{
+		error_message("Quit: 3");
+		exit(131);
 	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_cd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:51:13 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 09:41:12 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 00:48:11 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ static int	handle_oldpwd(t_ast_node *root, t_shell *shell, char *cwd)
 			free(cwd);
 			return (1);
 		}
+		printf("%s\n", oldpwd);
 		return (1);
 	}
 	return (0);

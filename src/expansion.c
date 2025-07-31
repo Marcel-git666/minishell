@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/31 23:53:34 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 00:33:34 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,36 +90,55 @@ char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
     if (!state.result)
         return (NULL); // Chyba alokace
 
-    while (state.input[state.i])
-    {
-        char c = state.input[state.i];
 
-        if (c == '\'')
-        {
-            if (!state.in_double_quotes)
-                state.in_single_quotes = !state.in_single_quotes;
-            else
-                state.result[state.j++] = c; // Uvozovka uvnitř jiných uvozovek je brána doslovně
-            state.i++;
-        }
-        else if (c == '"')
-        {
-            if (!state.in_single_quotes)
-                state.in_double_quotes = !state.in_double_quotes;
-            else
-                state.result[state.j++] = c;
-            state.i++;
-        }
-        else if (c == '$' && !state.in_single_quotes)
-        {
-            handle_variable_expansion(&state);
-        }
-        else
-        {
-            state.result[state.j++] = c;
-            state.i++;
-        }
-    }
+	while (state.input[state.i])
+	{
+    	char c = state.input[state.i];
+
+    	if (c == '\'')
+    	{
+        	state.i++; // Vždy se posuneme za uvozovku
+        	if (state.in_double_quotes)
+        	{
+            	// Toto je doslovná uvozovka uvnitř dvojitých, takže ji zkopírujeme.
+            	state.result[state.j++] = '\'';
+        	}
+        	else
+        	{
+            	// Toto je řídicí uvozovka, pouze změníme stav a nic nekopírujeme.
+            	state.in_single_quotes = !state.in_single_quotes;
+        	}
+        	continue; // Pokračujeme na další znak
+   		}
+    
+    	if (c == '"')
+    	{
+        	state.i++; // Vždy se posuneme za uvozovku
+        	if (state.in_single_quotes)
+       		{
+            	// Toto je doslovná uvozovka uvnitř jednoduchých, takže ji zkopírujeme.
+            	state.result[state.j++] = '"';
+        	}
+        	else
+        	{
+            	// Toto je řídicí uvozovka, pouze změníme stav a nic nekopírujeme.
+            	state.in_double_quotes = !state.in_double_quotes;
+        	}
+        	continue; // Pokračujeme na další znak
+    	}	
+
+    	if (c == '$' && !state.in_single_quotes)
+    	{
+        	// Tato funkce si sama posune index 'i'
+        	handle_variable_expansion(&state);
+    	}
+    	else
+    	{
+        	// Běžný znak, jen ho zkopírujeme
+        	state.result[state.j++] = c;
+        	state.i++;
+    	}
+	}
     state.result[state.j] = '\0'; // Ukončení výsledného řetězce
     return (state.result);
 }
