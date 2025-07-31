@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 13:08:44 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 13:21:19 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/31 23:23:04 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,24 +41,30 @@ void	init_lexer(t_lexer *lexer, const char *input)
  * Handles special characters, assignments, and word extraction
  * Returns -1 on error, 0 to continue, 1 to break
  */
-int	process_current_char(t_lexer *lexer, int *is_first_word)
+int process_current_char(t_lexer *lexer, int *is_first_word)
 {
-	if (lexer->input[lexer->i] == '\0')
-		return (1);
-	if (is_special_char(lexer->input[lexer->i])
-		&& !lexer->is_delimiter_expected)
-	{
-		if (handle_special_tokens(lexer, is_first_word) == -1)
-			return (-1);
-		return (0);
-	}
-	if (handle_assignment_error(lexer) == -1)
-		return (-1);
-	if (is_word_char(lexer->input[lexer->i], lexer->is_delimiter_expected))
-		add_token_from_input(lexer, is_first_word);
-	else
-		lexer->i++;
-	return (0);
+    char c = lexer->input[lexer->i];
+
+    if (c == '\0')
+        return (1); // Konec vstupu, ukonči smyčku.
+
+    // Pokud je to operátor, zpracuj ho jako samostatný token.
+    if (c == '|' || c == '<' || c == '>')
+    {
+        // Tuto funkci budeme muset také upravit, ale zatím to nechme tak.
+        // Důležité je, že operátory řešíme odděleně.
+        if (handle_special_tokens(lexer, is_first_word) == -1)
+            return (-1); // Chyba
+        return (0);    // Pokračuj ve smyčce
+    }
+
+    // Pokud to není operátor ani mezera, je to ZAČÁTEK SLOVA.
+    // Zavoláme naši novou chytrou funkci, která "sežere" celé slovo
+    // až do další mezery nebo operátoru.
+    add_token_from_input(lexer, is_first_word);
+
+    // add_token_from_input sama posune lexer->i, takže tady už nic neděláme.
+    return (0); // Pokračuj ve smyčce
 }
 
 /*
@@ -66,22 +72,31 @@ int	process_current_char(t_lexer *lexer, int *is_first_word)
  * Processes input character by character and builds token list
  * Returns linked list of tokens or NULL on error
  */
-t_token	*lexer(const char *input)
+t_token *lexer(const char *input)
 {
-	t_lexer	lexer;
-	int		is_first_word;
-	int		result;
+    t_lexer lexer;
+    int is_first_word;
+    int result;
 
-	init_lexer(&lexer, input);
-	is_first_word = 1;
-	while (lexer.input[lexer.i])
-	{
-		skip_whitespace(lexer.input, &(lexer.i));
-		result = process_current_char(&lexer, &is_first_word);
-		if (result == -1)
-			return (NULL);
-		if (result == 1)
-			break ;
-	}
-	return ((lexer.tokens));
+    init_lexer(&lexer, input);
+    is_first_word = 1;
+    while (lexer.input[lexer.i])
+    {
+        skip_whitespace(lexer.input, &(lexer.i));
+        result = process_current_char(&lexer, &is_first_word);
+        
+        // ZACHYCENÍ CHYBY
+        if (result == -1 || lexer.tokens == NULL)
+        {
+            // Pokud process_current_char nebo add_token_from_input selhaly,
+            // lexer.tokens budou buď NULL, nebo je uvolníme.
+            if (lexer.tokens)
+                free_tokens(lexer.tokens);
+            return (NULL); // Vracíme NULL, shell se nespustí.
+        }
+
+        if (result == 1) // Konec vstupu
+            break;
+    }
+    return (lexer.tokens);
 }
