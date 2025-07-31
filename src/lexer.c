@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 13:21:23 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/31 23:20:14 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,25 +17,25 @@
  * Checks if current position should start compound token processing
  * Returns 1 if adjacent quotes/variables/text should be concatenated
  */
-static int	should_start_compound(t_lexer *lexer)
-{
-	size_t	lookahead;
+// static int	should_start_compound(t_lexer *lexer)
+// {
+// 	size_t	lookahead;
 
-	lookahead = lexer->i;
-	while (lexer->input[lookahead] && !ft_isspace(lexer->input[lookahead]))
-	{
-		if (is_special_char(lexer->input[lookahead])
-			&& lexer->input[lookahead] != '$'
-			&& lexer->input[lookahead] != '\''
-			&& lexer->input[lookahead] != '"')
-			break ;
-		if ((lexer->input[lookahead] == '\'' || lexer->input[lookahead] == '"'
-				|| lexer->input[lookahead] == '$') && lookahead > lexer->i)
-			return (1);
-		lookahead++;
-	}
-	return (0);
-}
+// 	lookahead = lexer->i;
+// 	while (lexer->input[lookahead] && !ft_isspace(lexer->input[lookahead]))
+// 	{
+// 		if (is_special_char(lexer->input[lookahead])
+// 			&& lexer->input[lookahead] != '$'
+// 			&& lexer->input[lookahead] != '\''
+// 			&& lexer->input[lookahead] != '"')
+// 			break ;
+// 		if ((lexer->input[lookahead] == '\'' || lexer->input[lookahead] == '"'
+// 				|| lexer->input[lookahead] == '$') && lookahead > lexer->i)
+// 			return (1);
+// 		lookahead++;
+// 	}
+// 	return (0);
+// }
 
 /*
  * Extracts word based on compound or regular extraction
@@ -43,11 +43,12 @@ static int	should_start_compound(t_lexer *lexer)
  */
 static char	*extract_word_token(t_lexer *lexer)
 {
-	if (should_start_compound(lexer))
-		return (create_compound_token(lexer));
-	else
-		return (extract_word(lexer->input, &(lexer->i),
-				lexer->is_delimiter_expected));
+	// if (should_start_compound(lexer))
+	// 	return (create_compound_token(lexer));
+	// else
+	// 	return (extract_word(lexer->input, &(lexer->i),
+	// 			lexer->is_delimiter_expected));
+	return (create_compound_token(lexer));
 }
 
 /*
