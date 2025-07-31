@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/31 08:51:06 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/31 21:02:21 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,13 @@
  */
 static int	handle_special_tokens(t_lexer *lexer, int *is_first_word)
 {
-    if (lexer->input[lexer->i] == '>' || lexer->input[lexer->i] == '<')
-        return (process_redirections(lexer));
-    else if (lexer->input[lexer->i] == '|')
-        return (handle_pipe_token(lexer, is_first_word));
-    else
-        (lexer->i)++;
-    return (0);
+	if (lexer->input[lexer->i] == '>' || lexer->input[lexer->i] == '<')
+		return (process_redirections(lexer));
+	else if (lexer->input[lexer->i] == '|')
+		return (handle_pipe_token(lexer, is_first_word));
+	else
+		(lexer->i)++;
+	return (0);
 }
 
 // Helper to append character to string using ft_strjoin
@@ -46,6 +46,8 @@ static char *append_char_to_string(char *str, char c)
     }
     return (result);
 }
+
+
 
 // Helper to append string to string
 static char *append_string_to_string(char *str, char *to_append)
@@ -112,9 +114,9 @@ static char	*process_single_quotes(t_lexer *lexer, char *token)
 		lexer->i++;
 	if (lexer->input[lexer->i] == '\0')
 	{
-    	error_message("syntax error: unterminated quoted string\n");
+    	error_message("syntax error: unterminated quoted string");
     	free(token);
-    	return (ft_strdup(""));  // ✅ Vrať prázdný string místo NULL
+    	return (NULL);
 	}
 	char *content = ft_strndup(start, &lexer->input[lexer->i] - start);
 	token = append_string_to_string(token, content);
@@ -125,11 +127,22 @@ static char	*process_single_quotes(t_lexer *lexer, char *token)
 
 static char *process_double_quotes(t_lexer *lexer, char *token, t_shell *shell)
 {
-    // size_t start_pos = lexer->i + 1; // Pozice po "
-    
+    //size_t quote_start = lexer->i;  // ZAPAMATOVAT začátek uvozovek
     lexer->i++; // Skip opening "
     
-    // ✅ Stejná logika jako single quotes
+    // NEJDŘÍV najít koncovou uvozovku
+    size_t temp_i = lexer->i;
+    while (lexer->input[temp_i] && lexer->input[temp_i] != '"')
+        temp_i++;
+        
+    if (lexer->input[temp_i] == '\0')  // Pokud není koncová uvozovka
+    {
+        error_message("syntax error: unterminated quoted string");
+        free(token);
+        return (NULL);
+    }
+    
+    // TEPRV TEĎ zpracovávat obsah mezi uvozovkami
     while (lexer->input[lexer->i] && lexer->input[lexer->i] != '"')
     {
         if (lexer->input[lexer->i] == '$')
@@ -143,14 +156,6 @@ static char *process_double_quotes(t_lexer *lexer, char *token, t_shell *shell)
             token = append_char_to_string(token, lexer->input[lexer->i]);
             lexer->i++;
         }
-    }
-    
-    // ✅ Kontrola PO while loopu - stejně jako single quotes
-    if (lexer->input[lexer->i] == '\0')
-    {
-        error_message("syntax error: unterminated quoted string");
-        free(token);
-        return (ft_strdup(""));
     }
     
     lexer->i++; // Skip closing "
@@ -190,7 +195,10 @@ void	add_token_from_input(t_lexer *lexer, int *is_first_word, t_shell *shell)
 
 	word = extract_complete_word(lexer, shell);
 	if (!word)
+	{
+		lexer->tokens = NULL; 
 		return ;
+	}
 	if (ft_strlen(word) == 0)
 	{
     	free(word);
@@ -251,6 +259,10 @@ t_token *lexer(const char *input, t_shell *shell)
         else
         {
             add_token_from_input(&lexer, &is_first_word, shell);
+			if (lexer.tokens == NULL)  // Chyba při parsování
+			{
+    			return (NULL);
+			}
             if (token_count_before == token_lstsize(lexer.tokens) && lexer.input[lexer.i] != '\0')
             {
                  free_tokens(lexer.tokens);
