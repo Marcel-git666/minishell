@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/31 21:02:21 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/31 21:04:43 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,6 @@ static char	*process_variable_expansion(t_lexer *lexer, char *token,
 	char	*var_value;
 	char	*exit_status_str;
 	int		j;
-
-	printf("DEBUG: expansion start at pos %zu, char='%c'\n", lexer->i, lexer->input[lexer->i]);
     
 	j = 0;
 	lexer->i++; // Přeskočení '$'
@@ -100,7 +98,6 @@ static char	*process_variable_expansion(t_lexer *lexer, char *token,
 	var_value = env_get(shell->env, var_name);
 	if (var_value)
 		token = append_string_to_string(token, var_value);
-	printf("DEBUG: expansion end at pos %zu, char='%c'\n", lexer->i, lexer->input[lexer->i]);
 	return (token);
 }
 
