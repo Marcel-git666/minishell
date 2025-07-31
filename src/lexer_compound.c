@@ -3,16 +3,43 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_compound.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 12:35:07 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 13:06:49 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/31 23:27:46 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "lexer.h"
 
+#include <string.h> // Přidejte na začátek souboru, pokud tam není
+
+/*
+ * Helper function to wrap a string with start/end markers.
+ * For example, "content" with marker 1 becomes "\x01content\x01".
+ */
+static char	*add_markers(char *str, char marker)
+{
+	char	*result;
+	size_t	len;
+
+	if (!str)
+		return (NULL);
+	len = ft_strlen(str);
+	result = malloc(len + 3);
+	if (!result)
+	{
+		free(str);
+		return (NULL);
+	}
+	result[0] = marker;
+	memcpy(result + 1, str, len);
+	result[len + 1] = marker;
+	result[len + 2] = '\0';
+	free(str);
+	return (result);
+}
 /*
  * Checks if character starts a quote or variable expansion
  * Returns 1 if character begins a compound token element
@@ -44,12 +71,29 @@ static int	should_continue_compound(t_lexer *lexer)
  */
 static char	*process_compound_element(t_lexer *lexer)
 {
+	// size_t	start;
+
+	// if (lexer->input[lexer->i] == '\'')
+	// 	return (extract_single_quoted_string(lexer));
+	// else if (lexer->input[lexer->i] == '"')
+	// 	return (extract_double_quoted_string(lexer));
+	// else if (lexer->input[lexer->i] == '$')
+	// 	return (extract_env_var(lexer->input, &lexer->i));
+	// else
+	// {
+	// 	start = lexer->i;
+	// 	while (lexer->input[lexer->i] && !ft_isspace(lexer->input[lexer->i])
+	// 		&& !is_compound_start(lexer->input[lexer->i])
+	// 		&& !is_special_char(lexer->input[lexer->i]))
+	// 		lexer->i++;
+	// 	return (ft_strndup(lexer->input + start, lexer->i - start));
+	// }
 	size_t	start;
 
 	if (lexer->input[lexer->i] == '\'')
-		return (extract_single_quoted_string(lexer));
+		return (add_markers(extract_single_quoted_string(lexer), 1));
 	else if (lexer->input[lexer->i] == '"')
-		return (extract_double_quoted_string(lexer));
+		return (add_markers(extract_double_quoted_string(lexer), 2));
 	else if (lexer->input[lexer->i] == '$')
 		return (extract_env_var(lexer->input, &lexer->i));
 	else

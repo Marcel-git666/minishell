@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_special_tokens.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 19:59:03 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/19 00:01:38 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/31 23:20:17 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,17 +80,52 @@ static int	handle_double_quote(t_lexer *lexer)
  * Handles both single and double quoted strings
  * Delegates to appropriate quote handler based on quote type
  */
+int	is_word_continuation(char c)
+{
+	if (c == '\0' || ft_isspace(c) || c == '|' || c == '<' || c == '>')
+		return (0);
+	return (1);
+}
+
 int	handle_quote_token(t_lexer *lexer, int *is_first_word)
 {
-	int	result;
+	// int	result;
 
-	if (lexer->input[lexer->i] == '\'')
-		result = handle_single_quote(lexer);
+	// if (lexer->input[lexer->i] == '\'')
+	// 	result = handle_single_quote(lexer);
+	// else
+	// 	result = handle_double_quote(lexer);
+	// if (*is_first_word)
+	// 	*is_first_word = 0;
+	// return (result);
+	size_t	end_of_quote;
+	char	quote_char;
+
+	// Najdeme konec uvozovkového segmentu bez změny stavu lexeru
+	quote_char = lexer->input[lexer->i];
+	end_of_quote = lexer->i + 1;
+	while (lexer->input[end_of_quote] && lexer->input[end_of_quote] != quote_char)
+		end_of_quote++;
+	if (lexer->input[end_of_quote] == quote_char)
+		end_of_quote++;
+	// Zkontrolujeme, co následuje po uvozovce
+	if (is_word_continuation(lexer->input[end_of_quote]))
+	{
+		// Následuje text -> je to složené slovo.
+		// Použijeme vaši výkonnou funkci, která sestaví celé slovo.
+		add_token_from_input(lexer, is_first_word);
+	}
 	else
-		result = handle_double_quote(lexer);
+	{
+		// Je to samostatný token v uvozovkách, použijeme původní logiku.
+		if (lexer->input[lexer->i] == '\'')
+			handle_single_quote(lexer);
+		else
+			handle_double_quote(lexer);
+	}
 	if (*is_first_word)
 		*is_first_word = 0;
-	return (result);
+	return (0);
 }
 
 /*
