@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:45:44 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/30 22:54:20 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/31 08:51:06 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ static char	*process_variable_expansion(t_lexer *lexer, char *token,
 	char	*exit_status_str;
 	int		j;
 
+	printf("DEBUG: expansion start at pos %zu, char='%c'\n", lexer->i, lexer->input[lexer->i]);
+    
 	j = 0;
 	lexer->i++; // Přeskočení '$'
 	if (lexer->input[lexer->i] == '?')
@@ -96,6 +98,7 @@ static char	*process_variable_expansion(t_lexer *lexer, char *token,
 	var_value = env_get(shell->env, var_name);
 	if (var_value)
 		token = append_string_to_string(token, var_value);
+	printf("DEBUG: expansion end at pos %zu, char='%c'\n", lexer->i, lexer->input[lexer->i]);
 	return (token);
 }
 
@@ -109,8 +112,9 @@ static char	*process_single_quotes(t_lexer *lexer, char *token)
 		lexer->i++;
 	if (lexer->input[lexer->i] == '\0')
 	{
-		free(token);
-		return (NULL);
+    	error_message("syntax error: unterminated quoted string\n");
+    	free(token);
+    	return (ft_strdup(""));  // ✅ Vrať prázdný string místo NULL
 	}
 	char *content = ft_strndup(start, &lexer->input[lexer->i] - start);
 	token = append_string_to_string(token, content);
@@ -119,32 +123,39 @@ static char	*process_single_quotes(t_lexer *lexer, char *token)
 	return (token);
 }
 
-static char	*process_double_quotes(t_lexer *lexer, char *token, t_shell *shell)
+static char *process_double_quotes(t_lexer *lexer, char *token, t_shell *shell)
 {
-	lexer->i++; // Přeskoč úvodní "
-	while (lexer->input[lexer->i] && lexer->input[lexer->i] != '"')
-	{
-		if (lexer->input[lexer->i] == '$')
-		{
-			token = process_variable_expansion(lexer, token, shell);
-		}
-		else
-		{
-			token = append_char_to_string(token, lexer->input[lexer->i]);
-			lexer->i++;
-		}
-		if (!token)
-			return (NULL);
-	}
-	if (lexer->input[lexer->i] == '\0')
-	{
-		free(token);
-		return (NULL);
-	}
-	lexer->i++; // Přeskoč závěrečnou "
-	return (token);
+    // size_t start_pos = lexer->i + 1; // Pozice po "
+    
+    lexer->i++; // Skip opening "
+    
+    // ✅ Stejná logika jako single quotes
+    while (lexer->input[lexer->i] && lexer->input[lexer->i] != '"')
+    {
+        if (lexer->input[lexer->i] == '$')
+        {
+            token = process_variable_expansion(lexer, token, shell);
+            if (!token)
+                return (NULL);
+        }
+        else
+        {
+            token = append_char_to_string(token, lexer->input[lexer->i]);
+            lexer->i++;
+        }
+    }
+    
+    // ✅ Kontrola PO while loopu - stejně jako single quotes
+    if (lexer->input[lexer->i] == '\0')
+    {
+        error_message("syntax error: unterminated quoted string");
+        free(token);
+        return (ft_strdup(""));
+    }
+    
+    lexer->i++; // Skip closing "
+    return (token);
 }
-
 
 static char	*extract_complete_word(t_lexer *lexer, t_shell *shell)
 {
@@ -180,6 +191,11 @@ void	add_token_from_input(t_lexer *lexer, int *is_first_word, t_shell *shell)
 	word = extract_complete_word(lexer, shell);
 	if (!word)
 		return ;
+	if (ft_strlen(word) == 0)
+	{
+    	free(word);
+    	return ;  // Ignoruj prázdné tokeny
+	}
 	if (lexer->is_delimiter_expected)
 		type = TOKEN_DELIMITER;
 	else if (lexer->is_file_expected)
@@ -196,28 +212,51 @@ void	add_token_from_input(t_lexer *lexer, int *is_first_word, t_shell *shell)
 	free(word);
 }
 
-t_token	*lexer(const char *input, t_shell *shell)
+static int	token_lstsize(t_token *tokens)
 {
-	t_lexer	lexer;
-	int		is_first_word;
+	int	count;
 
-	is_first_word = 1;
-	init_lexer(&lexer, input);
-	while (lexer.input[lexer.i])
+	count = 0;
+	while (tokens)
 	{
-		skip_whitespace(lexer.input, &(lexer.i));
-		if (lexer.input[lexer.i] == '\0')
-			break ;
-		if (is_special_char(lexer.input[lexer.i])
-			&& lexer.input[lexer.i] != '$')
-		{
-			if (handle_special_tokens(&lexer, &is_first_word) == -1)
-				return (NULL); // TODO: free tokens
-		}
-		else
-		{
-			add_token_from_input(&lexer, &is_first_word, shell);
-		}
+		count++;
+		tokens = tokens->next;
 	}
-	return (lexer.tokens);
+	return (count);
+}
+
+// V souboru lexer.c nahraďte funkci lexer touto verzí
+
+t_token *lexer(const char *input, t_shell *shell)
+{
+    t_lexer lexer;
+    int     is_first_word;
+
+    is_first_word = 1;
+    init_lexer(&lexer, input);
+    while (lexer.input[lexer.i])
+    {
+        skip_whitespace(lexer.input, &(lexer.i));
+        if (lexer.input[lexer.i] == '\0')
+            break;
+        int token_count_before = token_lstsize(lexer.tokens);
+        if (is_special_char(lexer.input[lexer.i]))
+        {
+            if (handle_special_tokens(&lexer, &is_first_word) == -1)
+            {
+                free_tokens(lexer.tokens);
+                return (NULL);
+            }
+        }
+        else
+        {
+            add_token_from_input(&lexer, &is_first_word, shell);
+            if (token_count_before == token_lstsize(lexer.tokens) && lexer.input[lexer.i] != '\0')
+            {
+                 free_tokens(lexer.tokens);
+                 return (NULL);
+            }
+        }
+    }
+    return (lexer.tokens);
 }

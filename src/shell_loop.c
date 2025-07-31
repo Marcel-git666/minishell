@@ -49,11 +49,6 @@ static void	process_tokens_and_execute(t_token *tokens, t_shell *shell,
 {
 	t_ast_node	*ast;
 
-	if (!tokens)
-	{
-		shell->last_exit_code = 1;
-		return ;
-	}
 	ast = parse_tokens(tokens);
 	free_tokens(tokens);
 	if (ast)
@@ -75,6 +70,11 @@ static void	process_input_line(char *input, t_shell *shell, char **envp)
 		return ;
 	handle_input(input);
 	tokens = lexer(input, shell);
+	if (!tokens)
+	{
+		shell->last_exit_code = 2;
+		return ;
+	}
 	process_tokens_and_execute(tokens, shell, envp);
 }
 
