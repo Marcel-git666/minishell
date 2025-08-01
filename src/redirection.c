@@ -143,7 +143,8 @@ int	redirection(t_ast_node *ast_node, t_fds *fd_, t_shell *shell)
 		return (-1);
 	while (ast_node && ast_node->type == NODE_REDIR)
 	{
-		if (fd(ast_node, fd_, ast_node->u_content.s_redir.redir->type, shell) == -1)
+		if (fd(ast_node, fd_, ast_node->u_content.s_redir.redir->type,
+				shell) == -1)
 			return (-1);
 		ast_node = ast_node->u_content.s_redir.child;
 	}

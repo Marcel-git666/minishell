@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:42:33 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 10:18:43 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 14:33:21 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,8 @@ void	handle_parent_process(int *pipe_fd, pid_t left_pid,
 		shell->last_exit_code = WEXITSTATUS(right_status);
 	else
 		shell->last_exit_code = 1;
-	if (shell->last_exit_code == 0 && WIFEXITED(left_status) && WEXITSTATUS(left_status) != 0)
+	if (shell->last_exit_code == 0 && WIFEXITED(left_status)
+		&& WEXITSTATUS(left_status) != 0)
 	{
 		shell->last_exit_code = WEXITSTATUS(left_status);
 	}

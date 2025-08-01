@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 11:46:37 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/31 23:21:10 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 14:43:16 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,55 +118,4 @@ int	check_next_token(t_lexer *lexer, size_t next_pos)
 		return (error_message("syntax error: redirection requires a filename"),
 			-1);
 	return (0);
-}
-
-/*
- * Tato funkce je "chamtivá". Čte vstupní řetězec a zastaví se až na konci slova.
- * Konec slova je definován jako mezera nebo operátor, který není uvnitř uvozovek.
- * Správně handleuje neuzavřené uvozovky.
-*/
-char *extract_greedy_word(const char *input, size_t *index)
-{
-    size_t start;
-    int in_quotes;
-    char quote_type;
-
-    start = *index;
-    in_quotes = 0;
-    quote_type = 0;
-
-    while (input[*index] != '\0')
-    {
-        char c = input[*index];
-
-        // Zpracování uvozovek
-        if (c == '\'' || c == '"')
-        {
-            if (in_quotes == 0) // Vcházíme do uvozovek
-            {
-                in_quotes = 1;
-                quote_type = c;
-            }
-            else if (c == quote_type) // Vycházíme z uvozovek
-            {
-                in_quotes = 0;
-            }
-        }
-        // Konec slova, pokud nejsme v uvozovkách
-        else if (in_quotes == 0 && (ft_isspace(c) || c == '|' || c == '<' || c == '>'))
-        {
-            break;
-        }
-        (*index)++;
-    }
-
-    // KONTROLA CHYBY: Pokud jsme na konci vstupu a uvozovka je stále otevřená...
-    if (in_quotes != 0)
-    {
-        error_message("syntax error: missing closing quote");
-        return (NULL); // Toto je klíčové! Signalizujeme chybu.
-    }
-
-    // Vytvoříme a vrátíme podřetězec, který jsme našli.
-    return (ft_strndup(input + start, *index - start));
 }
