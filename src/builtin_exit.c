@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 00:44:48 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 09:18:50 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 		{
 			error_message("exit: numeric argument required");
 			exit_code = 2;
+			return ;
 		}
 		exit_code = ft_atoi(ast->u_content.cmd.args[0]);
 	}
@@ -94,7 +95,12 @@ void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 		exit_code = shell->last_exit_code;
 	free_env_list(shell);
 	free_ast(ast);
-	free(fd);
+	if (fd)
+    {
+        if (fd->temp)
+            free(fd->temp);
+        free(fd);
+    }
 	free(shell);
 	exit(exit_code);
 }
