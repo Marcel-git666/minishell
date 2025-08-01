@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:59:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/30 13:10:41 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/01 00:50:24 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	signal_handler_heredoc(int signum)
 	}
 	else if (signum == SIGQUIT)
 	{
-		error_message("Quit: Core dump");
+		error_message("Quit: 3");
 		exit(131);
 	}
 }

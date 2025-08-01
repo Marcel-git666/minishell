@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   history.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 19:41:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/30 11:26:09 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 14:01:55 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,18 @@
 static char	*get_history_path(void)
 {
 	char	*home;
-	char	*full_home_path;
+	char	*path_with_slash;
+	char	*full_path;
 
 	home = getenv("HOME");
 	if (!home)
 		return (ft_strdup(HISTORY_FILE));
-	full_home_path = ft_strjoin(home, "/" HISTORY_FILE);
-	if (!full_home_path)
+	path_with_slash = ft_strjoin(home, "/");
+	if (!path_with_slash)
 		return (ft_strdup(HISTORY_FILE));
-	return (full_home_path);
+	full_path = ft_strjoin(path_with_slash, HISTORY_FILE);
+	free(path_with_slash);
+	return (full_path);
 }
 
 /*
@@ -57,9 +60,9 @@ void	load_history(void)
 			add_history(line);
 			line = ft_strtok(NULL, "\n");
 		}
-		free(history_path);
 		free(history);
 	}
+	free(history_path);
 }
 
 /*

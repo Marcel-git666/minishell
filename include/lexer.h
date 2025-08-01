@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 14:14:51 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 18:04:25 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 00:07:31 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,16 +28,13 @@ typedef struct s_lexer
 }		t_lexer;
 
 // lexer.c
-void		add_token_from_input(t_lexer *lexer, int *is_first_word);
+int			add_token_from_input(t_lexer *lexer, int *is_first_word);
 
 // lexer_core.c
 void		skip_whitespace(const char *input, size_t *i);
 void		init_lexer(t_lexer *lexer, const char *input);
 int			process_current_char(t_lexer *lexer, int *is_first_word);
 t_token		*lexer(const char *input);
-
-// lexer_compound.c
-char		*create_compound_token(t_lexer *lexer);
 
 // lexer_utils.c
 int			is_valid_var_name(const char *word, int len);

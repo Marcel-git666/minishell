@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 12:55:47 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/01 13:06:59 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,43 +65,60 @@ int	is_valid_number(const char *str)
 	return (1);
 }
 
-void	free_fd(t_fds *fd)
+/*
+ * Cleans up all allocated resources before exit
+ * Frees AST, file descriptors and shell structure
+ */
+static void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
 {
-	if (fd->temp)
-		free(fd->temp);
-	free(fd);
+	if (ast)
+		free_ast(ast);
+	if (fd)
+	{
+		if (fd->temp)
+			free(fd->temp);
+		free(fd);
+	}
+	if (shell)
+		free(shell);
+}
+
+/*
+ * Gets exit code from command arguments
+ * Returns exit code or sets error message for invalid arguments
+ */
+static int	get_exit_code(t_ast_node *ast, t_shell *shell)
+{
+	if (ast->u_content.cmd.arg_count > 1)
+	{
+		error_message("exit: too many arguments");
+		shell->last_exit_code = 1;
+		return (-1);
+	}
+	if (ast->u_content.cmd.arg_count == 1)
+	{
+		if (!is_valid_number(ast->u_content.cmd.args[0]))
+		{
+			error_message("exit: numeric argument required");
+			return (2);
+		}
+		return (ft_atoi(ast->u_content.cmd.args[0]));
+	}
+	return (shell->last_exit_code);
 }
 
 /*
  * Implements exit builtin command with complete cleanup
- * Frees all allocated memory including environment, AST, and file descriptors
- * Prints exit message and terminates shell with exit code 0
+ * Validates arguments and terminates shell with appropriate exit code
  */
 void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 {
 	int	exit_code;
 
-	if (ast->u_content.cmd.arg_count > 1)
-	{
-		error_message("exit: too many arguments");
-		shell->last_exit_code = 1;
+	exit_code = get_exit_code(ast, shell);
+	if (exit_code == -1)
 		return ;
-	}
-	if (ast->u_content.cmd.arg_count)
-	{
-		if (!is_valid_number(ast->u_content.cmd.args[0]))
-		{
-			error_message("exit: numeric argument required");
-			shell->last_exit_code = 2;
-			return ;
-		}
-		exit_code = ft_atoi(ast->u_content.cmd.args[0]);
-	}
-	else
-		exit_code = 0;
 	free_env_list(shell);
-	free_ast(ast);
-	free(shell);
-	free_fd(fd);
+	cleanup_resources(shell, fd, ast);
 	exit(exit_code);
 }

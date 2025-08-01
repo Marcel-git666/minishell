@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 14:26:56 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/30 14:13:12 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/31 23:25:05 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ typedef enum e_token_type
 	TOKEN_FILE,			// File name for redirection
 	TOKEN_DELIMITER,	// Assign a unique token type
 	TOKEN_ASSIGNMENT,	// Variable assignment (VAR=value)
-	TOKEN_COMPOUND,		// Compound token (multiple parts)
 	TOKEN_EOF,			// End of input (NULL)
 }	t_token_type;
 
@@ -59,6 +58,7 @@ char		*extract_word(const char *input, size_t *index,
 t_token		*extract_operator(const char *input, size_t *index);
 char		*extract_env_var(const char *input, size_t *index);
 int			check_next_token(t_lexer *lexer, size_t next_pos);
+char		*extract_greedy_word(const char *input, size_t *index);
 
 // token_string_extraction.c
 char		*extract_single_quoted_string(t_lexer *lexer);

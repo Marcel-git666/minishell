@@ -26,7 +26,7 @@ typedef struct s_fds
 }	t_fds;
 
 /*redirections*/
-int		redirection(t_ast_node *ast_node, t_fds *fd_);
+int		redirection(t_ast_node *ast_node, t_fds *fd_, t_shell *shell);
 
 /*heredoc*/
 char	*find_heredocs(t_ast_node *ast);

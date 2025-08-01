@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_cd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:51:13 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 10:54:56 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 10:01:28 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static int	handle_oldpwd(t_ast_node *root, t_shell *shell, char *cwd)
 			free(cwd);
 			return (1);
 		}
-		printf("%s\n", oldpwd);
+		env_set(&shell->env, "OLDPWD", cwd);
 		if (chdir(oldpwd) == -1)
 		{
 			perror("cd");
@@ -42,8 +42,8 @@ static int	handle_oldpwd(t_ast_node *root, t_shell *shell, char *cwd)
 			free(cwd);
 			return (1);
 		}
-		env_set(&shell->env, "OLDPWD", cwd);
-		return (shell->last_exit_code = 0, free(cwd), 1);
+		printf("%s\n", oldpwd);
+		return (1);
 	}
 	return (0);
 }
@@ -73,10 +73,10 @@ static void	update_pwd(t_shell *shell)
  * Distinguishes between parent directory (..) and other paths
  * Updates OLDPWD and calls appropriate path handling function
  */
-static void	handle_cd_logic(t_ast_node *root, t_shell *shell, char *cwd)
+static int	handle_cd_logic(t_ast_node *root, t_shell *shell, char *cwd)
 {
 	env_set(&shell->env, "OLDPWD", cwd);
-	path(root, cwd, shell);
+	return (path(root, cwd, shell));
 }
 
 /*
@@ -123,8 +123,11 @@ void	builtin_cd(t_ast_node *root, t_shell *shell)
 		return ;
 	}
 	if (handle_oldpwd(root, shell, cwd))
+	{
+		update_pwd(shell);
 		return ;
-	handle_cd_logic(root, shell, cwd);
+	}
+	if (handle_cd_logic(root, shell, cwd) == 0)
+		update_pwd(shell);
 	free(cwd);
-	update_pwd(shell);
 }

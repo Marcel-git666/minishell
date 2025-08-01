@@ -55,12 +55,12 @@ static void	process_tokens_and_execute(t_token *tokens, t_shell *shell,
 		return ;
 	}
 	ast = parse_tokens(tokens);
-	free_tokens(tokens);
 	if (ast)
 	{
 		execute_command(ast, shell, envp);
 		free_ast(ast);
 	}
+	free_tokens(tokens);
 }
 
 /*

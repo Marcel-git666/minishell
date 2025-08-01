@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_command.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 00:26:50 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 14:44:11 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/20 12:04:14 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,56 +15,31 @@
 #include "expansion.h"
 
 /*
- * Forward declaration for compound token expansion
- */
-char	*expand_compound_token(char *compound, t_env *env, int exit_status);
-
-/*
  * Expands environment variables in command arguments
  * Processes each argument based on its token type, skipping single-quoted
  * strings
  * Updates the AST node's arguments with expanded values
  */
-static void expand_command_args(t_ast_node *ast_node, t_shell *shell)
+static void	expand_command_args(t_ast_node *ast_node, t_shell *shell)
 {
 	char			*expanded_arg;
 	int				i;
 	int				is_env_var;
 	t_token_type	token_type;
 
-	printf("DEBUG: expand_command_args called, arg_count = %d\n", ast_node->u_content.cmd.arg_count);
-
 	i = -1;
 	while (++i < ast_node->u_content.cmd.arg_count)
 	{
 		token_type = ast_node->u_content.cmd.arg_token_types[i];
-		printf("DEBUG: arg[%d] = '%s', token_type = %d\n", i, ast_node->u_content.cmd.args[i], token_type);
-		
 		if (token_type == TOKEN_SINGLE_QUOTED)
-		{
-			printf("DEBUG: skipping single quoted\n");
 			continue ;
-		}
-		else if (token_type == TOKEN_COMPOUND)  
-		{
-			printf("DEBUG: expanding compound token\n");
-			expanded_arg = expand_compound_token(ast_node->u_content.cmd.args[i],
-					shell->env, shell->last_exit_code);
-			printf("DEBUG: compound expanded to = '%s'\n", expanded_arg);
-		}
-		else
-		{
-			printf("DEBUG: expanding regular token\n");
-			is_env_var = (token_type == TOKEN_ENV_VAR || token_type == TOKEN_EXIT_CODE);
-			expanded_arg = expand_variables(ast_node->u_content.cmd.args[i],
-					shell->env, shell->last_exit_code, is_env_var);
-			printf("DEBUG: regular expanded to = '%s'\n", expanded_arg);
-		}
-		
+		is_env_var = (token_type == TOKEN_ENV_VAR
+				|| token_type == TOKEN_EXIT_CODE);
+		expanded_arg = expand_variables(ast_node->u_content.cmd.args[i],
+				shell->env, shell->last_exit_code, is_env_var);
 		free(ast_node->u_content.cmd.args[i]);
 		ast_node->u_content.cmd.args[i] = expanded_arg;
 	}
-	printf("DEBUG: expand_command_args finished\n");
 }
 
 /*

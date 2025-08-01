@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_core.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 13:08:44 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 12:13:11 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 14:49:26 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,32 +37,34 @@ void	init_lexer(t_lexer *lexer, const char *input)
 }
 
 /*
+ * Checks if character is an operator that needs special handling
+ * Returns 1 for operators, 0 for regular characters
+ */
+static int	is_operator_char(char c)
+{
+	return (c == '|' || c == '<' || c == '>');
+}
+
+/*
  * Processes current character in lexer loop
  * Handles special characters, assignments, and word extraction
  * Returns -1 on error, 0 to continue, 1 to break
  */
 int	process_current_char(t_lexer *lexer, int *is_first_word)
 {
-	if (lexer->input[lexer->i] == '\0')
+	char	c;
+
+	c = lexer->input[lexer->i];
+	if (c == '\0')
 		return (1);
-	if (is_word_char(lexer->input[lexer->i], lexer->is_delimiter_expected)
-		|| (is_special_char(lexer->input[lexer->i]) 
-			&& (lexer->input[lexer->i] == '$' || lexer->input[lexer->i] == '\''
-				|| lexer->input[lexer->i] == '"')))
-	{
-		add_token_from_input(lexer, is_first_word);
-		return (0);
-	}
-	if (is_special_char(lexer->input[lexer->i])
-		&& !lexer->is_delimiter_expected)
+	if (is_operator_char(c))
 	{
 		if (handle_special_tokens(lexer, is_first_word) == -1)
 			return (-1);
 		return (0);
 	}
-	if (handle_assignment_error(lexer) == -1)
+	if (add_token_from_input(lexer, is_first_word) == -1)
 		return (-1);
-	lexer->i++;
 	return (0);
 }
 
@@ -83,10 +85,14 @@ t_token	*lexer(const char *input)
 	{
 		skip_whitespace(lexer.input, &(lexer.i));
 		result = process_current_char(&lexer, &is_first_word);
-		if (result == -1)
+		if (result == -1 || lexer.tokens == NULL)
+		{
+			if (lexer.tokens)
+				free_tokens(lexer.tokens);
 			return (NULL);
+		}
 		if (result == 1)
 			break ;
 	}
-	return ((lexer.tokens));
+	return (lexer.tokens);
 }

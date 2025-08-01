@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 22:57:32 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 14:28:49 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/20 17:50:47 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,9 @@
  */
 char	*find_next_dollar(char *str)
 {
-	int	in_single_quotes;
-
-	in_single_quotes = 0;
 	while (*str)
 	{
-		if (*str == '\'' && !in_single_quotes)
-			in_single_quotes = 1;
-		else if (*str == '\'' && in_single_quotes)
-			in_single_quotes = 0;
-		else if (*str == '$' && !in_single_quotes)
+		if (*str == '$')
 			return (str);
 		str++;
 	}

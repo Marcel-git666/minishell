@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 15:07:52 by lformank          #+#    #+#             */
-/*   Updated: 2025/07/30 11:40:59 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/07/20 12:17:37 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,11 +73,11 @@ static int	change_to_home(t_shell *shell, char *cwd)
 	if (!env_ptr || !env_ptr->value)
 	{
 		shell->last_exit_code = 1;
-		free(cwd);
 		return (1);
 	}
 	chdir(env_ptr->value);
-	env_set(&shell->env, "OLDPWD", cwd);
+	if (env_set(&shell->env, "OLDPWD", cwd) == 0)
+		free(cwd);
 	return (0);
 }
 
