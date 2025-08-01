@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 10:25:35 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 13:45:35 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,131 +14,85 @@
 #include "expansion.h"
 #include "env.h"
 
-
-// Struktura pro uchování stavu při expanzi
-typedef struct s_expansion_state
-{
-    char    *input;         // Původní řetězec z tokenu
-    char    *result;        // Výsledný, expandovaný řetězec
-    int     i;              // Index pro čtení z input
-    int     j;              // Index pro zápis do result
-    bool    in_single_quotes;
-    bool    in_double_quotes;
-    t_env   *env;
-    int     exit_status;
-} t_expansion_state;
-
-
-// Pomocná funkce pro expanzi proměnné ($VAR)
+/*
+ * Handles variable expansion from $VAR syntax
+ * Parses variable name and substitutes with environment value
+ * Updates state indexes after processing variable
+ */
 static void	handle_variable_expansion(t_expansion_state *state)
 {
 	char	*var_name;
 	char	*var_value;
 	int		var_len;
 
-    // Posuneme se za znak '$'
 	state->i++;
 	var_len = parse_var_name(&state->input[state->i], &var_name);
 	if (var_len > 0)
 	{
-		var_value = get_variable_value(var_name, state->env, state->exit_status);
-		// Zkopírujeme hodnotu proměnné do výsledku
-        ft_strlcpy(&state->result[state->j], var_value, ft_strlen(var_value) + 1);
-        state->j += ft_strlen(var_value);
-        state->i += var_len; // Posuneme vstupní index za jméno proměnné
+		var_value = get_variable_value(var_name, state->env,
+				state->exit_status);
+		ft_strlcpy(&state->result[state->j], var_value,
+			ft_strlen(var_value) + 1);
+		state->j += ft_strlen(var_value);
+		state->i += var_len;
 		free(var_name);
 		free(var_value);
 	}
 	else
-	{
-        // Pokud za '$' není platné jméno, bereme '$' doslovně
 		state->result[state->j++] = '$';
-	}
-}
-
-// Inicializace stavové struktury
-static void init_expansion_state(t_expansion_state *state, char *input, t_env *env, int exit_status)
-{
-    state->input = input;
-    // Alokujeme paměť pro nejhorší možný případ (velmi dlouhá proměnná)
-    // V reálném projektu by se to dělalo dynamicky, ale pro teď to stačí.
-    state->result = ft_calloc(ft_strlen(input) * 2 + 1, sizeof(char)); // Bezpečný odhad velikosti
-    state->i = 0;
-    state->j = 0;
-    state->in_single_quotes = false;
-    state->in_double_quotes = false;
-    state->env = env;
-    state->exit_status = exit_status;
 }
 
 /*
- * NOVÁ hlavní funkce pro expanzi.
- * Zpracovává uvozovky a proměnné.
+ * Initializes expansion state structure with input parameters
+ * Allocates result buffer and sets initial values
+ * Returns 0 on success, -1 on allocation failure
  */
-char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
+static int	init_expansion_state(t_expansion_state *state, char *input,
+		t_env *env, int exit_status)
 {
-    t_expansion_state state;
-    
-    // Stará logika pro přímé proměnné může zůstat, pokud ji potřebuješ jinde.
-    if (is_env_var)
+	state->input = input;
+	state->result = ft_calloc(ft_strlen(input) * 2 + 1, sizeof(char));
+	if (!state->result)
+		return (-1);
+	state->i = 0;
+	state->j = 0;
+	state->in_single_quotes = 0;
+	state->in_double_quotes = 0;
+	state->env = env;
+	state->exit_status = exit_status;
+	return (0);
+}
+
+/*
+ * Main expansion function for variables and quotes processing
+ * Handles environment variable substitution and quote parsing
+ * Returns allocated expanded string or NULL on failure
+ */
+char	*expand_variables(char *input, t_env *env, int exit_status,
+	int is_env_var)
+{
+	t_expansion_state	state;
+	char				c;
+
+	if (is_env_var)
 		return (get_variable_value(input, env, exit_status));
-
-    if (!input)
-        return (NULL);
-
-    init_expansion_state(&state, input, env, exit_status);
-    if (!state.result)
-	{
+	if (!input || init_expansion_state(&state, input, env, exit_status) == -1)
 		return (NULL);
-	}
 	while (state.input[state.i])
 	{
-    	char c = state.input[state.i];
-
-    	if (c == '\'')
-    	{
-        	state.i++; // Vždy se posuneme za uvozovku
-        	if (state.in_double_quotes)
-        	{
-            	// Toto je doslovná uvozovka uvnitř dvojitých, takže ji zkopírujeme.
-            	state.result[state.j++] = '\'';
-        	}
-        	else
-        	{
-            	// Toto je řídicí uvozovka, pouze změníme stav a nic nekopírujeme.
-            	state.in_single_quotes = !state.in_single_quotes;
-        	}
-        	continue; // Pokračujeme na další znak
-   		}
-    
-    	if (c == '"')
-    	{
-        	state.i++; // Vždy se posuneme za uvozovku
-        	if (state.in_single_quotes)
-       		{
-            	// Toto je doslovná uvozovka uvnitř jednoduchých, takže ji zkopírujeme.
-            	state.result[state.j++] = '"';
-        	}
-        	else
-        	{
-            	// Toto je řídicí uvozovka, pouze změníme stav a nic nekopírujeme.
-            	state.in_double_quotes = !state.in_double_quotes;
-        	}
-        	continue; // Pokračujeme na další znak
-    	}	
-
-    	if (c == '$' && !state.in_single_quotes)
-    	{
-        	// Tato funkce si sama posune index 'i'
-        	handle_variable_expansion(&state);
-    	}
-    	else
-    	{
-        	// Běžný znak, jen ho zkopírujeme
-        	state.result[state.j++] = c;
-        	state.i++;
-    	}
+		c = state.input[state.i];
+		if (c == '\'')
+			process_single_quote(&state);
+		else if (c == '"')
+			process_double_quote(&state);
+		else if (c == '$' && !state.in_single_quotes)
+			handle_variable_expansion(&state);
+		else
+		{
+			state.result[state.j++] = c;
+			state.i++;
+		}
 	}
-    state.result[state.j] = '\0'; // Ukončení výsledného řetězce
-    return (state.result);
+	state.result[state.j] = '\0';
+	return (state.result);
 }

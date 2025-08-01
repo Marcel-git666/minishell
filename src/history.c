@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 19:41:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/01 10:34:39 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 14:01:55 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  */
 static char	*get_history_path(void)
 {
-	char    *home;
+	char	*home;
 	char	*path_with_slash;
 	char	*full_path;
 
