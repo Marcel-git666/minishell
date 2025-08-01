@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_search.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:32:54 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/29 21:42:18 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 09:35:23 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,32 +17,47 @@
  * Handles file accessibility check and process creation
  * Returns exit status of child process or error code (127)
  */
-int	fork_it(char *path, char **args, char **envp)
-{
-	int	pid;
-	int	status;
+// Soubor: src/execution_search.c
 
-	if (access(path, F_OK) != 0)
-		return (127);
-	pid = fork();
-	if (pid == 0)
-	{
-		signal(SIGINT, signal_handler_heredoc);
-		if (execve(path, args, envp) == -1)
-			perror("error: execve failed");
-		exit(127);
-	}
-	else if (pid > 0)
-	{
-		signal(SIGINT, SIG_IGN);
-		waitpid(pid, &status, 0);
-		setup_signals();
-		if (WIFEXITED(status))
-			return (WEXITSTATUS(status));
-		else if (WIFSIGNALED(status))
-			return (128 + WTERMSIG(status));
-	}
-	return (-1);
+int fork_it(char *path, char **args, char **envp)
+{
+    int pid;
+    int status;
+
+    if (access(path, F_OK) != 0)
+        return (127);
+    pid = fork();
+    if (pid == 0)
+    {
+        signal(SIGINT, SIG_DFL);
+        signal(SIGQUIT, SIG_DFL);
+        if (execve(path, args, envp) == -1)
+            perror("error: execve failed");
+        exit(127);
+    }
+    else if (pid > 0)
+    {
+        signal(SIGINT, SIG_IGN);
+        signal(SIGQUIT, SIG_IGN);
+        waitpid(pid, &status, 0);
+        setup_signals();
+        if (WIFSIGNALED(status))
+        {
+            if (WTERMSIG(status) == SIGINT)
+            {
+                write(1, "\n", 1);
+                return (130);
+            }
+            if (WTERMSIG(status) == SIGQUIT)
+            {
+                error_message("Quit: 3");
+                return (131);
+            }
+        }
+        if (WIFEXITED(status))
+            return (WEXITSTATUS(status));
+    }
+    return (-1);
 }
 
 /*
