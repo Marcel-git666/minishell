@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:51:13 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 16:20:19 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 16:45:23 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ static int	execute_cd_minus(char *oldpwd, char *cwd, t_shell *shell)
 	if (!oldpwd_copy)
 	{
 		shell->last_exit_code = 1;
-		free(cwd);
 		return (-1);
 	}
 	env_set(&shell->env, "OLDPWD", cwd);
@@ -34,7 +33,6 @@ static int	execute_cd_minus(char *oldpwd, char *cwd, t_shell *shell)
 	{
 		perror("cd");
 		shell->last_exit_code = 1;
-		free(cwd);
 		free(oldpwd_copy);
 		return (-1);
 	}
@@ -60,7 +58,6 @@ static int	handle_oldpwd(t_ast_node *root, t_shell *shell, char *cwd)
 		{
 			error_message("cd: OLDPWD not set");
 			shell->last_exit_code = 1;
-			free(cwd);
 			return (1);
 		}
 		return (execute_cd_minus(oldpwd, cwd, shell));
@@ -133,6 +130,7 @@ void	builtin_cd(t_ast_node *root, t_shell *shell)
 	}
 	if (handle_oldpwd(root, shell, cwd))
 	{
+		free(cwd);
 		update_pwd(shell);
 		return ;
 	}
