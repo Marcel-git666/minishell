@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_fork.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 13:20:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 13:22:31 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 18:59:58 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,13 @@ static int	wait_for_child(int pid)
 	return (-1);
 }
 
-/*
- * Forks and executes a command with given path and arguments
- * Handles file accessibility check and process creation
- * Returns exit status of child process or error code (127)
- */
+static void	cleanup_child_process(char **args)
+{
+	if (args)
+		free_args(args);
+
+}
+
 int	fork_it(char *path, char **args, char **envp)
 {
 	int	pid;
@@ -69,8 +71,11 @@ int	fork_it(char *path, char **args, char **envp)
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
 		if (execve(path, args, envp) == -1)
+		{
+			cleanup_child_process(args);
 			perror("error: execve failed");
-		exit(127);
+			exit(127);
+		}
 	}
 	else if (pid > 0)
 		return (wait_for_child(pid));

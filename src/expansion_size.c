@@ -6,7 +6,7 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 16:23:15 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/01 16:36:54 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 19:18:58 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ static size_t	get_var_expansion_size(t_size_calc *calc)
 	size_t	var_size;
 	int		var_len;
 
+	var_name = NULL;
 	var_len = parse_var_name(&calc->input[calc->i], &var_name);
 	if (var_len > 0)
 	{
@@ -36,6 +37,8 @@ static size_t	get_var_expansion_size(t_size_calc *calc)
 		free(var_value);
 		return (var_size);
 	}
+	if (var_name)
+		free(var_name);
 	return (1);
 }
 

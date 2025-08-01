@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 18:14:19 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 19:22:05 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ int	main(int argc, char **argv, char **envp)
 		return (1);
 	run_shell_loop(shell, envp);
 	save_history();
+	rl_clear_history();
 	env_free(shell->env);
 	free(shell);
 	return (0);
