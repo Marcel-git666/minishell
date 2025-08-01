@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 00:33:34 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 10:25:35 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,9 @@ char *expand_variables(char *input, t_env *env, int exit_status, int is_env_var)
 
     init_expansion_state(&state, input, env, exit_status);
     if (!state.result)
-        return (NULL); // Chyba alokace
-
-
+	{
+		return (NULL);
+	}
 	while (state.input[state.i])
 	{
     	char c = state.input[state.i];
