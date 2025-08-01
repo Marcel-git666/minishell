@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:51:13 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 00:48:11 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 10:01:28 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,10 @@ static void	update_pwd(t_shell *shell)
  * Distinguishes between parent directory (..) and other paths
  * Updates OLDPWD and calls appropriate path handling function
  */
-static void	handle_cd_logic(t_ast_node *root, t_shell *shell, char *cwd)
+static int	handle_cd_logic(t_ast_node *root, t_shell *shell, char *cwd)
 {
 	env_set(&shell->env, "OLDPWD", cwd);
-	path(root, cwd, shell);
+	return (path(root, cwd, shell));
 }
 
 /*
@@ -127,7 +127,7 @@ void	builtin_cd(t_ast_node *root, t_shell *shell)
 		update_pwd(shell);
 		return ;
 	}
-	handle_cd_logic(root, shell, cwd);
+	if (handle_cd_logic(root, shell, cwd) == 0)
+		update_pwd(shell);
 	free(cwd);
-	update_pwd(shell);
 }
