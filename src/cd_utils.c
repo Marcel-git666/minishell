@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd_utils.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:52:54 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 09:45:45 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 10:05:14 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,9 @@
  */
 static void	print_cd_error(char *path, t_shell *shell)
 {
-	int	j;
-
-	j = 0;
-	error_message("cd: no such file or directory: ");
-	while (path[j])
-		write(2, &path[j++], 1);
-	write(2, "\n", 1);
+	write(2, "minishell: cd: ", 15);
+	write(2, path, ft_strlen(path));
+	write(2, ": No such file or directory\n", 28);
 	shell->last_exit_code = 1;
 }
 
@@ -124,18 +120,18 @@ static char	*normalize_relative_path(char *current_dir, char *path)
  * Main path handling function for cd command
  * Handles path normalization and directory change
  */
-void	path(t_ast_node *root, char *cwd, t_shell *shell)
+int	path(t_ast_node *root, char *cwd, t_shell *shell)
 {
 	char	*normalized_path;
 	char	*expanded_path;
 
 	if (only_cd(root, shell, cwd) == 0)
-		return ;
+		return (0);
 	expanded_path = expand_tilde(root->u_content.cmd.args[0], shell->env);
 	if (!expanded_path)
 	{
 		shell->last_exit_code = 1;
-		return ;
+		return (-1);
 	}
 	normalized_path = normalize_relative_path(cwd, expanded_path);
 	if (!normalized_path || chdir(normalized_path) == -1)
@@ -143,8 +139,9 @@ void	path(t_ast_node *root, char *cwd, t_shell *shell)
 		print_cd_error(expanded_path, shell);
 		free(expanded_path);
 		free(normalized_path);
-		return ;
+		return (-1);
 	}
 	free(expanded_path);
 	free(normalized_path);
+	return (0);
 }

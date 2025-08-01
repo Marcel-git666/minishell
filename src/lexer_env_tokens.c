@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 23:53:51 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/19 00:04:04 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 14:14:03 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ static int	should_create_compound(t_lexer *lexer)
 {
 	if (!lexer->input[lexer->i] || ft_isspace(lexer->input[lexer->i]))
 		return (0);
-	if (lexer->input[lexer->i] == '$')
+	if (lexer->input[lexer->i] == '$' || lexer->input[lexer->i] == '\''
+		|| lexer->input[lexer->i] == '"')
 		return (1);
 	if (!is_special_char(lexer->input[lexer->i]))
 		return (1);

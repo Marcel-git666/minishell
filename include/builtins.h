@@ -35,7 +35,7 @@ void	builtin_pwd(t_shell *shell);
 void	builtin_cd(t_ast_node *root, t_shell *shell);
 char	*get_pwd(void);
 void	previous_rep(t_shell *shell, char *cwd);
-void	path(t_ast_node *root, char *cwd, t_shell *shell);
+int	path(t_ast_node *root, char *cwd, t_shell *shell);
 int		absolute_path(t_ast_node *root, int i, t_shell *shell);
 int		only_cd(t_ast_node *root, t_shell *shell, char *cwd);
 

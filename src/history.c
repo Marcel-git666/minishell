@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   history.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 19:41:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/29 22:01:03 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 14:01:55 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,18 @@
 static char	*get_history_path(void)
 {
 	char	*home;
-	char	*history_path;
+	char	*path_with_slash;
+	char	*full_path;
 
 	home = getenv("HOME");
 	if (!home)
 		return (ft_strdup(HISTORY_FILE));
-	history_path = ft_strjoin(home, "/");
-	if (!history_path)
+	path_with_slash = ft_strjoin(home, "/");
+	if (!path_with_slash)
 		return (ft_strdup(HISTORY_FILE));
-	return (ft_strjoin(history_path, HISTORY_FILE));
+	full_path = ft_strjoin(path_with_slash, HISTORY_FILE);
+	free(path_with_slash);
+	return (full_path);
 }
 
 /*
@@ -59,6 +62,7 @@ void	load_history(void)
 		}
 		free(history);
 	}
+	free(history_path);
 }
 
 /*

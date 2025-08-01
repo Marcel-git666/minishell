@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 12:57:22 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 11:13:28 by marcel           ###   ########.fr       */
+/*   Updated: 2025/07/31 23:12:27 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ char	*extract_env_var(const char *input, size_t *index)
 {
 	size_t	start;
 
-	start = ++(*index);
+	start = (*index)++;
 	if (input[*index] == '{')
 		return (extract_braced_var(input, index));
 	return (extract_simple_var(input, index, start));

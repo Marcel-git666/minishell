@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 21:44:07 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/18 23:37:41 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 14:01:18 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,4 +94,24 @@ int	open_file(char *name, char **file_content, int oflag)
 	if (oflag & O_WRONLY)
 		return (fd);
 	return (read_file_content(fd, file_content));
+}
+
+/*
+ * Generates unique temporary filename using static counter
+ * Creates filename in format "tempN.txt" where N increments
+ * Returns allocated filename string
+ */
+char	*new_tempfile(void)
+{
+	char		*name;
+	char		*name_temp;
+	char		*num;
+	static int	i;
+
+	num = ft_itoa(i++);
+	name = ft_strjoin("temp", num);
+	name_temp = ft_strjoin(name, ".txt");
+	free(num);
+	free(name);
+	return (name_temp);
 }

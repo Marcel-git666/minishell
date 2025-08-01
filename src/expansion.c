@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 12:33:42 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 13:45:35 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,89 +15,84 @@
 #include "env.h"
 
 /*
- * Handles memory cleanup on expansion error
- * Frees all allocated resources and returns NULL for error indication
+ * Handles variable expansion from $VAR syntax
+ * Parses variable name and substitutes with environment value
+ * Updates state indexes after processing variable
  */
-static char	*handle_expansion_error(char *result, char *var_name,
-			char *var_value)
-{
-	free(result);
-	free(var_name);
-	free(var_value);
-	return (NULL);
-}
-
-/*
- * Joins string parts during variable expansion
- * Concatenates result + var_value + rest with proper memory management
- * Returns joined string or NULL on allocation failure
- */
-static char	*join_parts(char *result, char *var_value, char *rest)
-{
-	char	*temp;
-	char	*final_result;
-
-	temp = ft_strjoin(result, var_value);
-	if (!temp)
-		return (NULL);
-	final_result = ft_strjoin(temp, rest);
-	free(temp);
-	return (final_result);
-}
-
-/*
- * Processes single variable expansion in string
- * Parses variable name, gets value, and replaces in result string
- * Returns updated string or NULL on error
- */
-static char	*process_variable(char *result, char *dollar_pos,
-			t_env *env, int exit_status)
+static void	handle_variable_expansion(t_expansion_state *state)
 {
 	char	*var_name;
 	char	*var_value;
-	char	*final_result;
 	int		var_len;
 
-	var_len = parse_var_name(dollar_pos + 1, &var_name);
-	if (var_len == 0)
-		return (result);
-	*dollar_pos = '\0';
-	var_value = get_variable_value(var_name, env, exit_status);
-	final_result = join_parts(result, var_value, dollar_pos + 1 + var_len);
-	if (!final_result)
-		return (handle_expansion_error(result, var_name, var_value));
-	free(result);
-	free(var_name);
-	free(var_value);
-	return (final_result);
+	state->i++;
+	var_len = parse_var_name(&state->input[state->i], &var_name);
+	if (var_len > 0)
+	{
+		var_value = get_variable_value(var_name, state->env,
+				state->exit_status);
+		ft_strlcpy(&state->result[state->j], var_value,
+			ft_strlen(var_value) + 1);
+		state->j += ft_strlen(var_value);
+		state->i += var_len;
+		free(var_name);
+		free(var_value);
+	}
+	else
+		state->result[state->j++] = '$';
 }
 
 /*
- * Main variable expansion function
- * Expands all $VAR, ${VAR}, and $? in input string
- * Handles both direct variable mode and string expansion mode
- * Returns expanded string or NULL on error
+ * Initializes expansion state structure with input parameters
+ * Allocates result buffer and sets initial values
+ * Returns 0 on success, -1 on allocation failure
+ */
+static int	init_expansion_state(t_expansion_state *state, char *input,
+		t_env *env, int exit_status)
+{
+	state->input = input;
+	state->result = ft_calloc(ft_strlen(input) * 2 + 1, sizeof(char));
+	if (!state->result)
+		return (-1);
+	state->i = 0;
+	state->j = 0;
+	state->in_single_quotes = 0;
+	state->in_double_quotes = 0;
+	state->env = env;
+	state->exit_status = exit_status;
+	return (0);
+}
+
+/*
+ * Main expansion function for variables and quotes processing
+ * Handles environment variable substitution and quote parsing
+ * Returns allocated expanded string or NULL on failure
  */
 char	*expand_variables(char *input, t_env *env, int exit_status,
-		int is_env_var)
+	int is_env_var)
 {
-	char	*result;
-	char	*dollar_pos;
+	t_expansion_state	state;
+	char				c;
 
-	if (!input)
-		return (NULL);
 	if (is_env_var)
 		return (get_variable_value(input, env, exit_status));
-	result = ft_strdup(input);
-	if (!result)
+	if (!input || init_expansion_state(&state, input, env, exit_status) == -1)
 		return (NULL);
-	dollar_pos = find_next_dollar(result);
-	while (dollar_pos != NULL)
+	while (state.input[state.i])
 	{
-		result = process_variable(result, dollar_pos, env, exit_status);
-		if (!result)
-			return (NULL);
-		dollar_pos = find_next_dollar(result);
+		c = state.input[state.i];
+		if (c == '\'')
+			process_single_quote(&state);
+		else if (c == '"')
+			process_double_quote(&state);
+		else if (c == '$' && !state.in_single_quotes)
+			handle_variable_expansion(&state);
+		else
+		{
+			state.result[state.j++] = c;
+			state.i++;
+		}
 	}
-	return (result);
+	state.result[state.j] = '\0';
+	return (state.result);
 }
