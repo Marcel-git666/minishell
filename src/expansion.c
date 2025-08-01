@@ -3,16 +3,40 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 13:45:35 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 16:28:05 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "expansion.h"
 #include "env.h"
+
+/*
+ * Initializes expansion state structure with input parameters
+ * Allocates result buffer with calculated size and sets initial values
+ * Returns 0 on success, -1 on allocation failure
+ */
+static int	init_expansion_state(t_expansion_state *state, char *input,
+		t_env *env, int exit_status)
+{
+	size_t	buffer_size;
+
+	state->input = input;
+	buffer_size = calculate_expansion_size(input, env, exit_status);
+	state->result = ft_calloc(buffer_size, sizeof(char));
+	if (!state->result)
+		return (-1);
+	state->i = 0;
+	state->j = 0;
+	state->in_single_quotes = 0;
+	state->in_double_quotes = 0;
+	state->env = env;
+	state->exit_status = exit_status;
+	return (0);
+}
 
 /*
  * Handles variable expansion from $VAR syntax
@@ -40,27 +64,6 @@ static void	handle_variable_expansion(t_expansion_state *state)
 	}
 	else
 		state->result[state->j++] = '$';
-}
-
-/*
- * Initializes expansion state structure with input parameters
- * Allocates result buffer and sets initial values
- * Returns 0 on success, -1 on allocation failure
- */
-static int	init_expansion_state(t_expansion_state *state, char *input,
-		t_env *env, int exit_status)
-{
-	state->input = input;
-	state->result = ft_calloc(ft_strlen(input) * 2 + 1, sizeof(char));
-	if (!state->result)
-		return (-1);
-	state->i = 0;
-	state->j = 0;
-	state->in_single_quotes = 0;
-	state->in_double_quotes = 0;
-	state->env = env;
-	state->exit_status = exit_status;
-	return (0);
 }
 
 /*

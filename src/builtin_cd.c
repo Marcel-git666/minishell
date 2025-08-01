@@ -3,16 +3,45 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_cd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:51:13 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 10:01:28 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 16:20:19 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "env.h"
 #include "builtins.h"
+
+/*
+ * Creates copy of oldpwd and handles cd - logic
+ * Returns 1 on success, -1 on failure  
+ */
+static int	execute_cd_minus(char *oldpwd, char *cwd, t_shell *shell)
+{
+	char	*oldpwd_copy;
+
+	oldpwd_copy = ft_strdup(oldpwd);
+	if (!oldpwd_copy)
+	{
+		shell->last_exit_code = 1;
+		free(cwd);
+		return (-1);
+	}
+	env_set(&shell->env, "OLDPWD", cwd);
+	if (chdir(oldpwd_copy) == -1)
+	{
+		perror("cd");
+		shell->last_exit_code = 1;
+		free(cwd);
+		free(oldpwd_copy);
+		return (-1);
+	}
+	printf("%s\n", oldpwd_copy);
+	free(oldpwd_copy);
+	return (1);
+}
 
 /*
  * Handles 'cd -' command to change to previous directory
@@ -34,16 +63,7 @@ static int	handle_oldpwd(t_ast_node *root, t_shell *shell, char *cwd)
 			free(cwd);
 			return (1);
 		}
-		env_set(&shell->env, "OLDPWD", cwd);
-		if (chdir(oldpwd) == -1)
-		{
-			perror("cd");
-			shell->last_exit_code = 1;
-			free(cwd);
-			return (1);
-		}
-		printf("%s\n", oldpwd);
-		return (1);
+		return (execute_cd_minus(oldpwd, cwd, shell));
 	}
 	return (0);
 }
@@ -66,17 +86,6 @@ static void	update_pwd(t_shell *shell)
 	else
 		shell->last_exit_code = 1;
 	free(cwd);
-}
-
-/*
- * Handles main cd logic for different path types
- * Distinguishes between parent directory (..) and other paths
- * Updates OLDPWD and calls appropriate path handling function
- */
-static int	handle_cd_logic(t_ast_node *root, t_shell *shell, char *cwd)
-{
-	env_set(&shell->env, "OLDPWD", cwd);
-	return (path(root, cwd, shell));
 }
 
 /*
@@ -127,7 +136,8 @@ void	builtin_cd(t_ast_node *root, t_shell *shell)
 		update_pwd(shell);
 		return ;
 	}
-	if (handle_cd_logic(root, shell, cwd) == 0)
+	env_set(&shell->env, "OLDPWD", cwd);
+	if (path(root, cwd, shell) == 0)
 		update_pwd(shell);
 	free(cwd);
 }
