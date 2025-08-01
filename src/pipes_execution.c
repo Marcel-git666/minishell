@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:42:33 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/30 00:16:19 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/01 10:18:43 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	execute_left_child(int *pipe_fd, t_ast_node *left_node,
 	dup2(pipe_fd[1], STDOUT_FILENO);
 	close(pipe_fd[1]);
 	execute_command(left_node, shell, envp);
-	exit(0);
+	exit(shell->last_exit_code);
 }
 
 /*
@@ -68,7 +68,7 @@ void	execute_right_child(int *pipe_fd, t_ast_node *right_node,
 	dup2(pipe_fd[0], STDIN_FILENO);
 	close(pipe_fd[0]);
 	execute_command(right_node, shell, envp);
-	exit(0);
+	exit(shell->last_exit_code);
 }
 
 /*
@@ -93,4 +93,8 @@ void	handle_parent_process(int *pipe_fd, pid_t left_pid,
 		shell->last_exit_code = WEXITSTATUS(right_status);
 	else
 		shell->last_exit_code = 1;
+	if (shell->last_exit_code == 0 && WIFEXITED(left_status) && WEXITSTATUS(left_status) != 0)
+	{
+		shell->last_exit_code = WEXITSTATUS(left_status);
+	}
 }
