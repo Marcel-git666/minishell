@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_cd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:51:13 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 16:45:23 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/01 18:52:56 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ static void	update_pwd(t_shell *shell)
  * Allocates buffer and gets current directory path
  * Returns allocated cwd string or NULL on failure
  */
+
 static char	*init_cwd(t_shell *shell)
 {
 	char	*cwd;
