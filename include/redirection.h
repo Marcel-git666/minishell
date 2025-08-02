@@ -32,7 +32,7 @@ int		redirection(t_ast_node *ast_node, t_fds *fd_, t_shell *shell);
 char	*find_heredocs(t_ast_node *ast);
 int		parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd);
 void	read_loop(char *delimiter, t_fds *fd);
-int		heredoc(t_ast_node *ast_node, t_fds *fd);
+int		heredoc(t_shell *shell, t_ast_node *ast_node, t_fds *fd);
 
 /*signals*/
 void	signal_handler_heredoc(int signum);

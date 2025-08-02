@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_search.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:32:54 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 14:49:48 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/02 08:41:38 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ static int	handle_direct_path(char *expanded_cmd, t_ast_node *ast, char **envp)
 	args = prepare_args(expanded_cmd, ast);
 	if (!args)
 		return (127);
-	exit_code = fork_it(expanded_cmd, args, envp);
+	exit_code = fork_it(ast, expanded_cmd, args, envp);
+	free_ast(ast);
 	free_args(args);
 	return (exit_code);
 }
@@ -73,7 +74,7 @@ static int	search_in_path(char *expanded_cmd, t_ast_node *ast, t_env *env,
 	path = full_path(paths, NULL, expanded_cmd);
 	if (path)
 	{
-		exit_code = fork_it(path, args, envp);
+		exit_code = fork_it(ast, path, args, envp);
 		free_source(paths, NULL, path, args);
 		return (exit_code);
 	}

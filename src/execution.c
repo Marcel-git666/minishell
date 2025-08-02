@@ -95,7 +95,10 @@ static void	handle_command_execution(t_ast_node *ast_node, t_shell *shell,
 	if (!expanded_cmd)
 		return ;
 	if (ft_strcmp(expanded_cmd, "exit") == 0)
+	{
+		free(expanded_cmd);
 		builtin_exit(shell, fd_red, ast_node);
+	}
 	else
 		handle_command(ast_node, shell, envp, expanded_cmd);
 	free(expanded_cmd);
