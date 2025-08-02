@@ -85,6 +85,8 @@ void	read_loop(char *delimiter, t_fds *fd)
 	}
 	while (1)
 	{
+		if (g_signal_heredoc)
+			return ;
 		newline = readline("> ");
 		if (!newline || ft_strcmp(newline, delimiter) == 0)
 		{
@@ -100,7 +102,7 @@ delimited by end-of-file (wanted `EOF')\n", 79);
 		free(newline);
 	}
 }
-
+int	g_signal_heredoc = 0;
 /*
  * Implements heredoc functionality (<<) by forking child process
  * Child process reads input, parent waits and processes result
@@ -125,13 +127,16 @@ int	heredoc(t_shell *shell, t_ast_node *ast_node, t_fds *fd)
 		else
 			return (-1);
 	}
+	g_signal_heredoc = 0;
+	signal(SIGINT, signal_handler_heredoc); // Použijeme hlavní, bezpečný handler
 	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, signal_handler_heredoc);
 	read_loop(delimiter, fd);
 	close(fd->here_new);
 	free(delimiter);
 	cleanup_resources(shell, fd, ast_node);
-	exit(EXIT_SUCCESS);
+	if (g_signal_heredoc) // Pokud byl proces přerušen signálem
+		exit(130);
+	exit(EXIT_SUCCESS); // Pokud skončil normálně
 }
 
 /*

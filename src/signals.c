@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:59:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/02 10:44:35 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/02 11:35:48 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <termios.h>
 
 int	g_signal_received = 0;
-
+extern int	g_signal_heredoc;
 /*
  * Handles SIGINT (Ctrl+C) in interactive mode
  * Sets global signal flag, prints newline, and resets readline
@@ -55,8 +55,7 @@ void	signal_handler_heredoc(int signum)
 {
 	if (signum == SIGINT)
 	{
-		write(1, "\n", 1);
-		exit(130);
+		g_signal_heredoc = signum;
 	}
 	else if (signum == SIGQUIT)
 	{
