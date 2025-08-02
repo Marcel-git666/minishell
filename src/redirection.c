@@ -54,6 +54,8 @@ int	parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd)
 		ast->u_content.s_redir.redir->type = REDIR_IN;
 		free(ast->u_content.s_redir.redir->file_or_delimiter);
 		ast->u_content.s_redir.redir->file_or_delimiter = ft_strdup(fd->temp);
+		free(fd->temp);
+		fd->temp = NULL;
 		return (0);
 	}
 	else
@@ -61,6 +63,8 @@ int	parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd)
 		unlink(fd->temp);
 		return (-1);
 	}
+		free(fd->temp);
+		fd->temp = NULL;
 }
 
 /*
@@ -87,7 +91,7 @@ void	read_loop(char *delimiter, t_fds *fd)
 			if (newline)
 				free(newline);
 			else
-				write(fd->here_new, "bash: warning: here-document at line 1\
+				write(fd->out_old, "bash: warning: here-document at line 1\
 delimited by end-of-file (wanted `EOF')\n", 79);
 			break ;
 		}
@@ -102,13 +106,12 @@ delimited by end-of-file (wanted `EOF')\n", 79);
  * Child process reads input, parent waits and processes result
  * Returns 0 on success, -1 on failure
  */
-int	heredoc(t_ast_node *ast_node, t_fds *fd)
+int	heredoc(t_shell *shell, t_ast_node *ast_node, t_fds *fd)
 {
 	char	*delimiter;
 	int		pid;
 
 	delimiter = find_heredocs(ast_node);
-	fd->temp = ft_strdup("temp.txt");
 	if (delimiter)
 		pid = fork();
 	else
@@ -122,11 +125,12 @@ int	heredoc(t_ast_node *ast_node, t_fds *fd)
 		else
 			return (-1);
 	}
-	signal(SIGINT, signal_handler_heredoc);
 	signal(SIGQUIT, SIG_IGN);
+	signal(SIGINT, signal_handler_heredoc);
 	read_loop(delimiter, fd);
 	close(fd->here_new);
 	free(delimiter);
+	cleanup_resources(shell, fd, ast_node);
 	exit(EXIT_SUCCESS);
 }
 
@@ -139,7 +143,8 @@ int	redirection(t_ast_node *ast_node, t_fds *fd_, t_shell *shell)
 {
 	fd_->out_old = dup(STDOUT_FILENO);
 	fd_->in_old = dup(STDIN_FILENO);
-	if (heredoc(ast_node, fd_) == -1)
+	fd_->temp = ft_strdup("temp.txt");
+	if (heredoc(shell, ast_node, fd_) == -1)
 		return (-1);
 	while (ast_node && ast_node->type == NODE_REDIR)
 	{

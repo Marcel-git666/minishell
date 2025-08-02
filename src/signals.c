@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:59:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/01 00:50:24 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/02 10:44:35 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	g_signal_received = 0;
  * Handles SIGINT (Ctrl+C) in interactive mode
  * Sets global signal flag, prints newline, and resets readline
  */
-static void	signal_handler(int signum)
+void	signal_handler(int signum)
 {
 	if (signum == SIGINT)
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_fork.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 13:20:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 13:22:31 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/02 09:11:04 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static int	wait_for_child(int pid)
  * Handles file accessibility check and process creation
  * Returns exit status of child process or error code (127)
  */
-int	fork_it(char *path, char **args, char **envp)
+int	fork_it(t_ast_node *ast, char *path, char **args, char **envp)
 {
 	int	pid;
 
@@ -67,7 +67,8 @@ int	fork_it(char *path, char **args, char **envp)
 	if (pid == 0)
 	{
 		signal(SIGINT, SIG_DFL);
-		signal(SIGQUIT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);	
+		free_ast(ast);
 		if (execve(path, args, envp) == -1)
 			perror("error: execve failed");
 		exit(127);

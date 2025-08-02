@@ -1,3 +1,0 @@
-První řádek do souboru.
-Druhý řádek.
-EOF
