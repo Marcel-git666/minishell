@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 18:50:12 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/02 08:41:27 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/02 22:10:46 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	handle_command(t_ast_node *ast_node, t_shell *shell,
 // execution_search.c  
 int		search_command(char *expanded_cmd, t_ast_node *ast, t_env *env,
 			char **envp);
-int		fork_it(t_ast_node *ast, char *path, char **args, char **envp);
+int		fork_it(char *path, char **args, char **envp);
 
 // execution_utils.c
 char	*full_path(char **paths, char *path, char *cmd);
