@@ -741,3 +741,299 @@
    fun:rl_set_prompt
    fun:readline
 }
+{
+   tinfo_tsearch_leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:tsearch
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:_nc_tiparm
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_rl_insert_definite_leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:xmalloc
+   fun:rl_add_undo
+   fun:rl_insert_text
+   fun:_rl_insert_char
+   fun:rl_insert
+}
+{
+   tinfo_realloc_doalloc_leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   fun:_nc_doalloc
+   fun:_nc_tiparm
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   tinfo_calloc_tiparm_leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:???
+   fun:_nc_tiparm
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   tinfo_tsearch_leak_1
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:tsearch
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:_nc_tiparm
+   obj:/usr/lib/x86_64-linux-gnu/libreadline.so.8.1
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   tinfo_tsearch_leak_2
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:tsearch
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:_nc_tiparm
+   obj:/usr/lib/x86_64-linux-gnu/libreadline.so.8.1
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_rl_maybe_save_line_leak_1
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:xmalloc
+   fun:rl_maybe_save_line
+   fun:rl_get_previous_history
+   fun:_rl_dispatch_subseq
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_rl_maybe_save_line_leak_2
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:xmalloc
+   fun:rl_maybe_save_line
+   fun:rl_get_previous_history
+   fun:_rl_dispatch_subseq
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   tinfo_tsearch_leak_3
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:tsearch
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:_nc_tiparm
+   obj:/usr/lib/x86_64-linux-gnu/libreadline.so.8.1
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   tinfo_tsearch_leak_4
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:tsearch
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:_nc_tiparm
+   obj:/usr/lib/x86_64-linux-gnu/libreadline.so.8.1
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   tinfo_tsearch_leak_3
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:tsearch
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:_nc_tiparm
+   obj:/usr/lib/x86_64-linux-gnu/libreadline.so.8.1
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   tinfo_tsearch_leak_4
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:tsearch
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:_nc_tiparm
+   obj:/usr/lib/x86_64-linux-gnu/libreadline.so.8.1
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_rl_maybe_save_line_1
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:xmalloc
+   fun:rl_maybe_save_line
+   fun:rl_get_previous_history
+   fun:_rl_dispatch_subseq
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_rl_maybe_save_line_2
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:xmalloc
+   fun:rl_maybe_save_line
+   fun:rl_get_previous_history
+   fun:_rl_dispatch_subseq
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_rl_maybe_save_line_3
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:xmalloc
+   fun:rl_maybe_save_line
+   fun:rl_get_previous_history
+   fun:_rl_dispatch_subseq
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_realloc_expand_prompt
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:xrealloc
+   obj:/usr/lib/x86_64-linux-gnu/libreadline.so.8.1
+   fun:rl_expand_prompt
+   fun:rl_set_prompt
+   fun:readline
+}
+{
+   readline_rl_copy_text_indirect_leak
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   fun:xmalloc
+   fun:rl_copy_text
+   fun:rl_delete_text
+   fun:_rl_rubout_char
+   fun:_rl_dispatch_subseq
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   tinfo_tsearch_leak_5
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:tsearch
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:_nc_tiparm
+   obj:/usr/lib/x86_64-linux-gnu/libreadline.so.8.1
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   tinfo_tsearch_leak_6
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:tsearch
+   obj:/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3
+   fun:_nc_tiparm
+   obj:/usr/lib/x86_64-linux-gnu/libreadline.so.8.1
+   fun:???
+   fun:rl_redisplay
+   fun:_rl_internal_char_cleanup
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_rl_insert_indirect_leak
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   fun:xmalloc
+   fun:rl_add_undo
+   fun:rl_insert_text
+   fun:_rl_insert_char
+   fun:rl_insert
+   fun:_rl_dispatch_subseq
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_rl_delete_text_indirect_leak
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   fun:xmalloc
+   fun:rl_add_undo
+   fun:rl_delete_text
+   fun:_rl_rubout_char
+   fun:_rl_dispatch_subseq
+   fun:readline_internal_char
+   fun:readline
+}
+{
+   readline_rl_delete_text_definite_leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:xmalloc
+   fun:rl_add_undo
+   fun:rl_delete_text
+   fun:_rl_rubout_char
+   fun:_rl_dispatch_subseq
+   fun:readline_internal_char
+   fun:readline
+}

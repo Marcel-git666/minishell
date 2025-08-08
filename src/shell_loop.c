@@ -22,6 +22,8 @@ t_shell	*initialize_shell(char **envp)
 	t_shell	*shell;
 
 	shell = malloc(sizeof(t_shell));
+	shell->last_executed = NULL;
+	shell->ast = NULL;
 	if (!shell)
 	{
 		error_message("Failed to allocate shell state");
@@ -55,6 +57,7 @@ static void	process_tokens_and_execute(t_token *tokens, t_shell *shell,
 		return ;
 	}
 	ast = parse_tokens(tokens);
+	shell->ast = ast;
 	free_tokens(tokens);
 	if (ast)
 	{
@@ -73,7 +76,7 @@ static void	process_input_line(char *input, t_shell *shell, char **envp)
 
 	if (!*input)
 		return ;
-	handle_input(input);
+	handle_input(input, shell);
 	tokens = lexer(input);
 	process_tokens_and_execute(tokens, shell, envp);
 }

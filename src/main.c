@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:36:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/01 19:22:05 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/08 11:42:32 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,6 @@ int	main(int argc, char **argv, char **envp)
 	save_history();
 	rl_clear_history();
 	env_free(shell->env);
-	free(shell);
+	cleanup_resources(shell, NULL, NULL);
 	return (0);
 }

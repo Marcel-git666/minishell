@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/02 11:35:31 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/08 13:27:03 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,10 @@
 // Shell state structure
 typedef struct s_shell
 {
-	t_env	*env;
-	int		last_exit_code;
+	t_env		*env;
+	int			last_exit_code;
+	char		*last_executed;
+	t_ast_node	*ast;
 }	t_shell;
 
 // global variable

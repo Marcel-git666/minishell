@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/02 09:45:57 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/08 11:46:13 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,8 @@ void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
 	if (shell)
 	{
 		free_env_list(shell);
+		if (shell->last_executed)
+			free(shell->last_executed);
 		free(shell);
 	}
 }

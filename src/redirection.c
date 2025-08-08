@@ -83,10 +83,10 @@ void	read_loop(char *delimiter, t_fds *fd)
 		free(delimiter);
 		exit(1);
 	}
-	while (1)
+	while (!g_signal_heredoc)
 	{
-		if (g_signal_heredoc)
-			return ;
+		// if (g_signal_heredoc)
+		// 	return ;
 		newline = readline("> ");
 		if (!newline || ft_strcmp(newline, delimiter) == 0)
 		{
@@ -102,6 +102,7 @@ delimited by end-of-file (wanted `EOF')\n", 79);
 		free(newline);
 	}
 }
+
 int	g_signal_heredoc = 0;
 /*
  * Implements heredoc functionality (<<) by forking child process

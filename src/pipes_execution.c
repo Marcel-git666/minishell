@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes_execution.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:42:33 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 14:33:21 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/08 13:34:29 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ static int	contains_heredoc(t_ast_node *node)
 void	execute_left_child(int *pipe_fd, t_ast_node *left_node,
 			t_shell *shell, char **envp)
 {
+	int	exit_code;
+
 	if (contains_heredoc(left_node))
 	{
 		write(2, "minishell: heredoc not supported in pipe context\n", 49);
@@ -54,7 +56,9 @@ void	execute_left_child(int *pipe_fd, t_ast_node *left_node,
 	dup2(pipe_fd[1], STDOUT_FILENO);
 	close(pipe_fd[1]);
 	execute_command(left_node, shell, envp);
-	exit(shell->last_exit_code);
+	exit_code = shell->last_exit_code;
+	cleanup_resources(shell, NULL, shell->ast);
+	exit(exit_code);
 }
 
 /*
@@ -64,11 +68,15 @@ void	execute_left_child(int *pipe_fd, t_ast_node *left_node,
 void	execute_right_child(int *pipe_fd, t_ast_node *right_node,
 			t_shell *shell, char **envp)
 {
+	int	exit_code;
+
 	close(pipe_fd[1]);
 	dup2(pipe_fd[0], STDIN_FILENO);
 	close(pipe_fd[0]);
 	execute_command(right_node, shell, envp);
-	exit(shell->last_exit_code);
+	exit_code = shell->last_exit_code;
+	cleanup_resources(shell, NULL, shell->ast);
+	exit(exit_code);
 }
 
 /*
