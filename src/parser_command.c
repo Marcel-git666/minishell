@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 23:41:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 00:01:49 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/10 14:35:43 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ static int	allocate_argument_arrays(t_ast_node *node, int arg_count)
 /*
  * Fills argument arrays with token values and types
  */
-static void	fill_argument_arrays(t_ast_node *node, t_parser *parser)
+static int	fill_argument_arrays(t_ast_node *node, t_parser *parser)
 {
 	int	i;
 
@@ -86,10 +86,13 @@ static void	fill_argument_arrays(t_ast_node *node, t_parser *parser)
 	while (i < node->u_content.cmd.arg_count)
 	{
 		node->u_content.cmd.args[i] = ft_strdup(parser->current_token->value);
+		if (!node->u_content.cmd.args[i])
+			return (-1);
 		node->u_content.cmd.arg_token_types[i] = parser->current_token->type;
 		parser->current_token = parser->current_token->next;
 		i++;
 	}
+	return (0);
 }
 
 /*
@@ -114,6 +117,10 @@ t_ast_node	*parse_command(t_parser *parser)
 		return (NULL);
 	}
 	parser->current_token = cmd_token->next;
-	fill_argument_arrays(node, parser);
+	if (fill_argument_arrays(node, parser) == -1)
+    {
+        free_ast(node);
+        return (NULL);
+    }
 	return (node);
 }

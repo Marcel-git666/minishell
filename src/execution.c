@@ -114,6 +114,12 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	t_fds	*fd_red;
 
 	fd_red = set_fd();
+	if (!fd_red)
+	{
+		error_message("Failed to allocate file descriptors");
+		shell->last_exit_code = 1;
+		return ;
+	}
 	if (!ast_node)
 	{
 		reset_fd(fd_red);

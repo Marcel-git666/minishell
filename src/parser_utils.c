@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 09:45:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/02 08:37:12 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/10 14:33:11 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ static void	free_command_node(t_ast_node *node)
 		i = 0;
 		while (i < node->u_content.cmd.arg_count)
 		{
-			free(node->u_content.cmd.args[i]);
+			if (node->u_content.cmd.args[i])
+                free(node->u_content.cmd.args[i]);
 			i++;
 		}
 		free(node->u_content.cmd.args);
