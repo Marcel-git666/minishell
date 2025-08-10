@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_fork.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 13:20:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/08 13:07:08 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/10 17:10:01 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,14 @@ static int	wait_for_child(int pid)
 	return (-1);
 }
 
-static void	cleanup_child_process(char **args)
+static void	cleanup_child_process(char *path, char **args, char **envp)
 {
+	if (path)
+		free(path);
 	if (args)
 		free_args(args);
-
+	if (envp)
+		free_args(envp);
 }
 
 int	fork_it(char *path, char **args, char **envp)
@@ -72,7 +75,7 @@ int	fork_it(char *path, char **args, char **envp)
 		signal(SIGQUIT, SIG_DFL);
 		if (execve(path, args, envp) == -1)
 		{
-			cleanup_child_process(args);
+			cleanup_child_process(path, args, envp);
 			perror("error: execve failed");
 			exit(127);
 		}
