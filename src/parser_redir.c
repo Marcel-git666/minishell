@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 20:17:10 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 10:49:31 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/10 15:00:05 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ static t_redirection	*create_redirection(t_parser *parser)
 		return (NULL);
 	}
 	redir->file_or_delimiter = ft_strdup(parser->current_token->value);
+	if (!redir->file_or_delimiter)
+		return (free(redir), NULL);
 	get_next_token(parser);
 	return (redir);
 }

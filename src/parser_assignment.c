@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 23:43:41 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 00:31:24 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/10 14:52:17 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,27 +50,21 @@ static t_ast_node	*create_assignment_node(void)
  * Splits assignment string into variable name and value
  * Stores them in the AST node structure
  */
-static void	split_assignment_parts(t_ast_node *node, char *assignment,
+static int	split_assignment_parts(t_ast_node *node, char *assignment,
 		char *equals_pos)
 {
 	node->u_content.s_assign.name = ft_strndup(assignment,
 			equals_pos - assignment);
+	if (!node->u_content.s_assign.name)
+		return (-1); 
 	node->u_content.s_assign.value = ft_strdup(equals_pos + 1);
-}
-
-/*
- * Handles cleanup on assignment parsing failure
- */
-static void	cleanup_assignment_error(t_ast_node *node)
-{
-	if (node)
+	if (!node->u_content.s_assign.value)
 	{
-		if (node->u_content.s_assign.name)
-			free(node->u_content.s_assign.name);
-		if (node->u_content.s_assign.value)
-			free(node->u_content.s_assign.value);
-		free(node);
+		free(node->u_content.s_assign.name);
+		node->u_content.s_assign.name = NULL;
+		return (-1);
 	}
+	return (0);
 }
 
 /*
@@ -90,10 +84,9 @@ t_ast_node	*parse_assignment(t_parser *parser)
 	node = create_assignment_node();
 	if (!node)
 		return (NULL);
-	split_assignment_parts(node, assignment, equals_pos);
-	if (!node->u_content.s_assign.name || !node->u_content.s_assign.value)
+	if (split_assignment_parts(node, assignment, equals_pos) == -1)
 	{
-		cleanup_assignment_error(node);
+		free_ast(node);
 		return (NULL);
 	}
 	get_next_token(parser);
