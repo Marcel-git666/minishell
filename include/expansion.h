@@ -30,19 +30,6 @@ typedef struct s_expansion_state
 	int		exit_status;
 }	t_expansion_state;
 
-/*
- * Structure for size calculation state
- */
-typedef struct s_size_calc
-{
-	char		*input;
-	t_env		*env;
-	int			exit_status;
-	int			i;
-	int			in_single_quotes;
-	size_t		total_size;
-}	t_size_calc;
-
 /* Main expansion function */
 char	*expand_variables(char *input, t_env *env, int exit_status,
 			int is_env_var);

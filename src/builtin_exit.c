@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/08 11:46:13 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/01 13:06:59 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	is_valid_number(const char *str)
  * Cleans up all allocated resources before exit
  * Frees AST, file descriptors and shell structure
  */
-void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
+static void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
 {
 	if (ast)
 		free_ast(ast);
@@ -80,12 +80,7 @@ void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
 		free(fd);
 	}
 	if (shell)
-	{
-		free_env_list(shell);
-		if (shell->last_executed)
-			free(shell->last_executed);
 		free(shell);
-	}
 }
 
 /*
