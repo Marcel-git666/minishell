@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 23:26:09 by lformank          #+#    #+#             */
-/*   Updated: 2025/08/11 19:48:49 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/12 20:13:11 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,13 @@ static void	handle_export_assignment(char *assignment, t_env **env)
 	free(parts);
 }
 
+int	valid_name(char *arg)
+{
+	if (arg[0] == '_' || (arg[0] >= 'A' && arg[0] <= 'Z') || (arg[0] >= 'a' && arg[0] <= 'z'))
+		return (1);
+	else
+		return (0);
+}
 
 /*
  * Implements export builtin command with assignment and display modes
@@ -71,26 +78,26 @@ static void	handle_export_assignment(char *assignment, t_env **env)
  */
 void	builtin_export(t_ast_node *root, t_shell *shell)
 {
-	// if (valid_name(root) == 1)	
-	if (root->u_content.cmd.arg_count == 1
-		&& ft_strchr(root->u_content.cmd.args[0], '='))
-	{
-		handle_export_assignment(root->u_content.cmd.args[0], &shell->env);
-		shell->last_exit_code = 0;
-		return ;
-	}
-	if (root->u_content.cmd.arg_count > 1 || (root->u_content.cmd.arg_count == 1
-			&& ft_strcmp(root->u_content.cmd.args[0], "-p") != 0))
-	{
-		error_message("error: export: -l: invalid option\n"
-			"export: usage: export or export -p");
-		shell->last_exit_code = 1;
-		return ;
-	}
-	if (root->u_content.cmd.arg_count == 0)
+	int	i;
+
+	i = -1;
+	if (!root->u_content.cmd.arg_count)
 	{
 		env_print_sorted(shell);
 		return ;
 	}
-	shell->last_exit_code = 0;
+	while (++i < root->u_content.cmd.arg_count)
+	{
+		if (!valid_name(root->u_content.cmd.args[i]))
+		{
+			error_message("export: not an identifier");
+			shell->last_exit_code = 1;
+			return ;
+		}
+		if (ft_strchr(root->u_content.cmd.args[i], '='))
+		{
+			handle_export_assignment(root->u_content.cmd.args[0], &shell->env);
+			shell->last_exit_code = 0;
+		}
+	}
 }
