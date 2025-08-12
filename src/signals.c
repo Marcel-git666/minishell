@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:59:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/08 15:47:02 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/09 10:18:06 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,10 @@ void	signal_handler_heredoc(int signum)
 	if (signum == SIGINT)
 	{
 		g_signal_heredoc = signum;
-		g_signal_received = signum;
+		rl_done = 1;
 		write(1, "\n", 1);
-		rl_on_new_line();
 		rl_replace_line("", 0);
+		rl_on_new_line();
 		rl_redisplay();
 	}
 	else if (signum == SIGQUIT)
