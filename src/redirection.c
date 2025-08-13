@@ -13,8 +13,7 @@
 #include "minishell.h"
 #include "redirection.h"
 #include <errno.h>
-
-int	g_signal_heredoc = 0;
+#include <termios.h>
 
 /*
  * Reads heredoc input from user until delimiter is encountered
@@ -28,7 +27,7 @@ void	read_loop(char *delimiter, int temp_fd)
 	while (1)
 	{
 		line = readline("> ");
-		if (g_signal_heredoc) // Reakce na Ctrl+C
+		if (g_signal_received)
 		{
 			if (line)
 				free(line);
@@ -60,6 +59,7 @@ static int	heredoc_parent(pid_t pid, t_shell *shell)
 	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
 	{
 		shell->last_exit_code = 130;
+		g_signal_received = SIGINT;
 		return (-1); // Přerušeno signálem
 	}
 	return (0); // Vše v pořádku
@@ -71,31 +71,51 @@ static int	heredoc_parent(pid_t pid, t_shell *shell)
  */
 int	heredoc(t_shell *shell, t_redirection *redir, t_fds *fds)
 {
-	int		temp_fd;
-	pid_t	pid;
+	int				temp_fd;
+	pid_t			pid;
+	struct termios	original_termios;
 
-	fds->temp = ft_strdup("/tmp/minishell_heredoc_XXXXXX"); // Šablona pro dočasný soubor
-	temp_fd = mkstemp(fds->temp); // Vytvoří unikátní dočasný soubor
+	// 1. Uložíme si původní nastavení terminálu.
+	tcgetattr(STDIN_FILENO, &original_termios);
+
+	// 2. Nahradíme mkstemp vlastní logikou.
+	fds->temp = new_tempfile(); // Použijeme vaši funkci pro generování názvu.
+	if (!fds->temp)
+		return (-1);
+	temp_fd = open(fds->temp, O_CREAT | O_RDWR | O_TRUNC, 0600);
 	if (temp_fd == -1)
-		return (perror("minishell"), -1);
-	g_signal_heredoc = 0;
+	{
+		perror("minishell");
+		free(fds->temp);
+		fds->temp = NULL;
+		return (-1);
+	}
+	
+	g_signal_received = 0;
 	pid = fork();
 	if (pid == -1)
-		return (-1);
-	if (pid == 0) // Dceřiný proces (child)
+		return (tcsetattr(STDIN_FILENO, TCSANOW, &original_termios), -1);
+	if (pid == 0) // Dceřiný proces
 	{
 		signal(SIGINT, signal_handler_heredoc);
 		read_loop(redir->file_or_delimiter, temp_fd);
 		close(temp_fd);
-		exit(g_signal_heredoc ? 130 : 0);
+		exit(g_signal_received ? 1 : 0);
 	}
+
+	// Rodičovský proces
 	close(temp_fd);
 	if (heredoc_parent(pid, shell) == -1)
+	{
+		tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
 		return (-1);
-	// Nahradíme delimiter názvem dočasného souboru a změníme typ na vstupní přesměrování
+	}
+	
+	tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
 	free(redir->file_or_delimiter);
 	redir->file_or_delimiter = ft_strdup(fds->temp);
+	if (!redir->file_or_delimiter)
+		return (-1);
 	redir->type = REDIR_IN;
 	return (0);
 }
-

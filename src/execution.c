@@ -143,6 +143,10 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 			else
 				shell->last_exit_code = 1;
 		}
+		else
+		{
+			shell->last_exit_code = 130; // Přerušeno signálem (Ctrl+C)
+		}
 	}
 	reset_fd(fd_red);
 }
