@@ -91,7 +91,8 @@ t_env	*env_init(char **envp)
 		new_node = parse_envp_line(envp[i]);
 		if (!new_node)
 		{
-			env_free(env_list);
+			if (env_list)
+				env_free(env_list);
 			return (NULL);
 		}
 		new_node->next = env_list;
@@ -118,4 +119,5 @@ void	env_free(t_env *env)
 		free(tmp->value);
 		free(tmp);
 	}
+	env = NULL;
 }

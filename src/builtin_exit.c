@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 13:06:59 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 23:15:26 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,16 @@ static void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
 		free(fd);
 	}
 	if (shell)
+	{
+		if (shell->env)
+		{
+			free_env_list(shell);
+			shell->env = NULL;
+		}
+		if (shell->last_executed)
+			free(shell->last_executed);
 		free(shell);
+	}
 }
 
 /*
@@ -118,7 +127,6 @@ void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 	exit_code = get_exit_code(ast, shell);
 	if (exit_code == -1)
 		return ;
-	free_env_list(shell);
 	cleanup_resources(shell, fd, ast);
 	exit(exit_code);
 }

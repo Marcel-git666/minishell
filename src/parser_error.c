@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_error.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 22:30:09 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 00:05:44 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 13:54:27 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,7 @@ int	set_parser_error(t_parser *parser, const char *msg)
 	if (parser->error_msg)
 		free(parser->error_msg);
 	parser->error_msg = ft_strdup(msg);
+	write(2, msg, ft_strlen(msg));
+	write(2, "\n", 1);
 	return (-1);
 }

@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 23:26:09 by lformank          #+#    #+#             */
-/*   Updated: 2025/08/12 20:13:11 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/13 14:27:30 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ static void	handle_export_assignment(char *assignment, t_env **env)
 
 int	valid_name(char *arg)
 {
-	if (arg[0] == '_' || (arg[0] >= 'A' && arg[0] <= 'Z') || (arg[0] >= 'a' && arg[0] <= 'z'))
+	if (arg[0] == '_' || (arg[0] >= 'A' && arg[0] <= 'Z')
+		|| (arg[0] >= 'a' && arg[0] <= 'z'))
 		return (1);
 	else
 		return (0);

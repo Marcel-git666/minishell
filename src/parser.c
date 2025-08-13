@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 00:02:40 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 14:07:04 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ t_ast_node	*parse_tokens(t_token *tokens)
 	{
 		if (ast_node)
 			free_ast(ast_node);
+		free(parser.error_msg);
 		return (NULL);
 	}
 	return (ast_node);
@@ -102,6 +103,8 @@ t_ast_node	*parse_expression(t_parser *parser)
 	{
 		get_next_token(parser);
 		node = create_pipe_node(node, parser);
+		if (!node)
+			return (NULL);
 	}
 	return (node);
 }

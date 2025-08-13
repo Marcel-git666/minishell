@@ -14,6 +14,8 @@
 #include "redirection.h"
 #include <errno.h>
 
+extern int	g_signal_heredoc;
+
 /*
  * Finds and returns the last heredoc delimiter in AST chain
  * Traverses redirection nodes to find REDIR_HEREDOC type
@@ -42,14 +44,16 @@ char	*find_heredocs(t_ast_node *ast)
  * Waits for child, converts heredoc to input redirection on success
  * Returns 0 on success, -1 on failure
  */
-int	parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd)
+int	parent(t_shell *shell, char *delimiter, int pid, t_fds *fd)
 {
-	int		status;
+	int			status;
+	t_ast_node	*ast;
 
 	signal(SIGINT, SIG_IGN);
 	waitpid(pid, &status, 0);
 	signal(SIGINT, SIG_DFL);
 	free(delimiter);
+	ast = shell->ast;
 	if (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS)
 	{
 		ast->u_content.s_redir.redir->type = REDIR_IN;
@@ -59,13 +63,16 @@ int	parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd)
 		fd->temp = NULL;
 		return (0);
 	}
+	else if (WEXITSTATUS(status) == (128 + SIGINT))
+	{
+		shell->last_exit_code = 130;
+		return (130);
+	}
 	else
 	{
 		unlink(fd->temp);
 		return (-1);
 	}
-		free(fd->temp);
-		fd->temp = NULL;
 }
 
 /*
@@ -87,24 +94,12 @@ void	read_loop(char *delimiter, t_fds *fd)
 	while (1)
 	{
 		newline = readline("> ");
-		if (!newline)
-		{
-			if (g_signal_heredoc)
-				break;
-			write(fd->out_old, "bash: warning: here-document at line 1\
-delimited by end-of-file (wanted `EOF')\n", 79);
-			break ;
-		}
-		// if (g_signal_heredoc)
-		// {
-		// 	if (newline)
-		// 		free(newline);
-		// 	break;
-		// }
+		if (!no_newline(newline, fd))
+			return ;
 		if (!ft_strcmp(newline, delimiter))
 		{
 			free(newline);
-			break;
+			return ;
 		}
 		write(fd->here_new, newline, ft_strlen(newline));
 		write(fd->here_new, "\n", 1);
@@ -112,7 +107,6 @@ delimited by end-of-file (wanted `EOF')\n", 79);
 	}
 }
 
-int	g_signal_heredoc = 0;
 /*
  * Implements heredoc functionality (<<) by forking child process
  * Child process reads input, parent waits and processes result
@@ -135,22 +129,17 @@ int	heredoc(t_shell *shell, t_ast_node *ast_node, t_fds *fd)
 		return (-1);
 	else if (pid > 0)
 	{
-		if (parent(ast_node, delimiter, pid, fd) == 0)
+		if (parent(shell, delimiter, pid, fd) == 0)
 			return (0);
 		else
 			return (-1);
 	}
 	else
 	{
-		signal(SIGINT, signal_handler_heredoc); // Použijeme hlavní, bezpečný handler
-		signal(SIGQUIT, SIG_IGN);
-		read_loop(delimiter, fd);
-		close(fd->here_new);
-		free(delimiter);
-		cleanup_resources(shell, fd, ast_node);
-		if (g_signal_heredoc) // Pokud byl proces přerušen signálem
+		child_heredoc(delimiter, fd, shell);
+		if (g_signal_heredoc)
 			exit(130);
-		exit(EXIT_SUCCESS); // Pokud skončil normálně
+		exit(EXIT_SUCCESS);
 	}
 }
 

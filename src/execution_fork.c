@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_fork.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 13:20:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 13:22:31 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 23:14:59 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,12 @@ static int	wait_for_child(int pid)
 	return (-1);
 }
 
-/*
- * Forks and executes a command with given path and arguments
- * Handles file accessibility check and process creation
- * Returns exit status of child process or error code (127)
- */
+static void	cleanup_child_process(char **args)
+{
+	if (args)
+		free_args(args);
+}
+
 int	fork_it(char *path, char **args, char **envp)
 {
 	int	pid;
