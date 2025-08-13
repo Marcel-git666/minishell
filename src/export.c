@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 23:26:09 by lformank          #+#    #+#             */
-/*   Updated: 2025/07/20 11:35:19 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/11 19:48:49 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ static void	handle_export_assignment(char *assignment, t_env **env)
 	free(parts);
 }
 
+
 /*
  * Implements export builtin command with assignment and display modes
  * Handles VAR=value assignments, -p flag for display, and error cases
@@ -70,6 +71,7 @@ static void	handle_export_assignment(char *assignment, t_env **env)
  */
 void	builtin_export(t_ast_node *root, t_shell *shell)
 {
+	// if (valid_name(root) == 1)	
 	if (root->u_content.cmd.arg_count == 1
 		&& ft_strchr(root->u_content.cmd.args[0], '='))
 	{
@@ -78,7 +80,7 @@ void	builtin_export(t_ast_node *root, t_shell *shell)
 		return ;
 	}
 	if (root->u_content.cmd.arg_count > 1 || (root->u_content.cmd.arg_count == 1
-			&& ft_strncmp(root->u_content.cmd.args[0], "-p", 2) != 0))
+			&& ft_strcmp(root->u_content.cmd.args[0], "-p") != 0))
 	{
 		error_message("error: export: -l: invalid option\n"
 			"export: usage: export or export -p");

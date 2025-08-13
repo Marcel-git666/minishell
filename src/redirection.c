@@ -48,6 +48,7 @@ int	parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd)
 
 	signal(SIGINT, SIG_IGN);
 	waitpid(pid, &status, 0);
+	signal(SIGINT, SIG_DFL);
 	free(delimiter);
 	if (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS)
 	{
@@ -83,19 +84,25 @@ void	read_loop(char *delimiter, t_fds *fd)
 		free(delimiter);
 		exit(1);
 	}
-	while (!g_signal_heredoc)
+	while (1)
 	{
-		// if (g_signal_heredoc)
-		// 	return ;
 		newline = readline("> ");
-		if (!newline || ft_strcmp(newline, delimiter) == 0)
+		if (g_signal_heredoc)
 		{
 			if (newline)
 				free(newline);
-			else
-				write(fd->out_old, "bash: warning: here-document at line 1\
+			break;
+		}
+		if (!newline)
+		{
+			write(fd->out_old, "bash: warning: here-document at line 1\
 delimited by end-of-file (wanted `EOF')\n", 79);
 			break ;
+		}
+		if (!ft_strcmp(newline, delimiter))
+		{
+			free(newline);
+			break;
 		}
 		write(fd->here_new, newline, ft_strlen(newline));
 		write(fd->here_new, "\n", 1);
@@ -128,16 +135,19 @@ int	heredoc(t_shell *shell, t_ast_node *ast_node, t_fds *fd)
 		else
 			return (-1);
 	}
-	g_signal_heredoc = 0;
-	signal(SIGINT, signal_handler_heredoc); // Použijeme hlavní, bezpečný handler
-	signal(SIGQUIT, SIG_IGN);
-	read_loop(delimiter, fd);
-	close(fd->here_new);
-	free(delimiter);
-	cleanup_resources(shell, fd, ast_node);
-	if (g_signal_heredoc) // Pokud byl proces přerušen signálem
-		exit(130);
-	exit(EXIT_SUCCESS); // Pokud skončil normálně
+	else
+	{
+		g_signal_heredoc = 0;
+		signal(SIGINT, signal_handler_heredoc); // Použijeme hlavní, bezpečný handler
+		signal(SIGQUIT, SIG_IGN);
+		read_loop(delimiter, fd);
+		close(fd->here_new);
+		free(delimiter);
+		cleanup_resources(shell, fd, ast_node);
+		if (g_signal_heredoc) // Pokud byl proces přerušen signálem
+			exit(130);
+		exit(EXIT_SUCCESS); // Pokud skončil normálně
+	}
 }
 
 /*
