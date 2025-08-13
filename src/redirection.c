@@ -54,6 +54,8 @@ int	parent(t_shell *shell, char *delimiter, int pid, t_fds *fd)
 	signal(SIGINT, SIG_DFL);
 	free(delimiter);
 	ast = shell->ast;
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
+		shell->last_exit_code = 130;
 	if (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS)
 	{
 		ast->u_content.s_redir.redir->type = REDIR_IN;
@@ -62,11 +64,6 @@ int	parent(t_shell *shell, char *delimiter, int pid, t_fds *fd)
 		free(fd->temp);
 		fd->temp = NULL;
 		return (0);
-	}
-	else if (WEXITSTATUS(status) == (128 + SIGINT))
-	{
-		shell->last_exit_code = 130;
-		return (130);
 	}
 	else
 	{
@@ -118,11 +115,9 @@ int	heredoc(t_shell *shell, t_ast_node *ast_node, t_fds *fd)
 	int		pid;
 
 	delimiter = find_heredocs(ast_node);
+	g_signal_heredoc = 0;
 	if (delimiter)
-	{
-		g_signal_heredoc = 0;
 		pid = fork();
-	}
 	else
 		return (0);
 	if (pid == -1)
