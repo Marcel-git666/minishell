@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/13 17:53:51 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 23:05:50 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,31 +45,41 @@ static void	add_redir_to_list(t_redirection **list, t_redirection *new_redir)
  */
 static t_ast_node	*parse_simple_command(t_parser *parser)
 {
-	t_ast_node		*cmd_node;
-	t_redirection	*redir;
+	t_ast_node	*cmd_node;
+	int			is_command_set; // Flag, který si pamatuje, zda už máme příkaz
 
 	cmd_node = NULL;
+	is_command_set = 0;
 	while (parser->current_token && parser->current_token->type != TOKEN_PIPE)
 	{
 		if (is_redirection_token(parser->current_token->type))
 		{
-			// Získáme přesměrování z `parser_redir.c`
-			redir = parse_redirection(parser); // Upravíme parse_redirection, aby vracela t_redirection*
-			if (!redir)
-				return (free_ast(cmd_node), NULL);
-			if (!cmd_node) // Pokud je přesměrování před příkazem
+			if (!cmd_node) // Pokud je přesměrování první, vytvoříme "prázdný" uzel
 			{
-				cmd_node = ft_calloc(1, sizeof(t_ast_node)); // Potřebujeme uzel, kam ho uložit
+				cmd_node = ft_calloc(1, sizeof(t_ast_node));
+				if (!cmd_node)
+					return (NULL);
 				cmd_node->type = NODE_COMMAND;
 			}
-			add_redir_to_list(&cmd_node->u_content.cmd.redirections, redir);
+			add_redir_to_list(&cmd_node->u_content.cmd.redirections,
+				parse_redirection(parser));
 		}
 		else // Je to příkaz nebo argument
 		{
-			if (!cmd_node)
-				cmd_node = parse_command(parser); // Vytvoří uzel příkazu
-			else
-				add_argument_to_command(cmd_node, parser->current_token); // Přidá další argument
+			if (!is_command_set) // Pokud jsme ještě nenašli příkaz
+			{
+				if (cmd_node) // A už existuje uzel (kvůli přesměrování)
+				{
+					// Jen do něj doplníme název příkazu
+					cmd_node->u_content.cmd.cmd = ft_strdup(parser->current_token->value);
+					cmd_node->u_content.cmd.cmd_token_type = parser->current_token->type;
+				}
+				else // Příkaz je první, vytvoříme pro něj uzel
+					cmd_node = parse_command(parser);
+				is_command_set = 1;
+			}
+			else // Příkaz už máme, toto je další argument
+				add_argument_to_command(cmd_node, parser->current_token);
 			get_next_token(parser);
 		}
 	}
