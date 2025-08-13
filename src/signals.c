@@ -6,7 +6,7 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:59:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/01 00:50:24 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 23:03:57 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	signal_handler_heredoc(int signum)
 		write(1, "\n", 1);
 		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_redisplay();
+		close(STDIN_FILENO);
 	}
 	else if (signum == SIGQUIT)
 	{

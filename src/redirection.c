@@ -87,18 +87,20 @@ void	read_loop(char *delimiter, t_fds *fd)
 	while (1)
 	{
 		newline = readline("> ");
-		if (g_signal_heredoc)
-		{
-			if (newline)
-				free(newline);
-			break;
-		}
 		if (!newline)
 		{
+			if (g_signal_heredoc)
+				break;
 			write(fd->out_old, "bash: warning: here-document at line 1\
 delimited by end-of-file (wanted `EOF')\n", 79);
 			break ;
 		}
+		// if (g_signal_heredoc)
+		// {
+		// 	if (newline)
+		// 		free(newline);
+		// 	break;
+		// }
 		if (!ft_strcmp(newline, delimiter))
 		{
 			free(newline);
@@ -123,7 +125,10 @@ int	heredoc(t_shell *shell, t_ast_node *ast_node, t_fds *fd)
 
 	delimiter = find_heredocs(ast_node);
 	if (delimiter)
+	{
+		g_signal_heredoc = 0;
 		pid = fork();
+	}
 	else
 		return (0);
 	if (pid == -1)
@@ -137,7 +142,6 @@ int	heredoc(t_shell *shell, t_ast_node *ast_node, t_fds *fd)
 	}
 	else
 	{
-		g_signal_heredoc = 0;
 		signal(SIGINT, signal_handler_heredoc); // Použijeme hlavní, bezpečný handler
 		signal(SIGQUIT, SIG_IGN);
 		read_loop(delimiter, fd);
