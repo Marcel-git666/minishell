@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:18:15 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 00:37:35 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 17:56:30 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,17 +82,18 @@ typedef struct s_parser
 	char	*error_msg;
 }	t_parser;
 
-void		init_parser(t_token *tokens, t_parser *parser);
-t_ast_node	*parse_tokens(t_token *tokens);
-t_ast_node	*parse_expression(t_parser *parser);
-t_ast_node	*parse_command(t_parser *parser);
-t_ast_node	*parse_assignment(t_parser *parser);
-t_ast_node	*create_pipe_node(t_ast_node *left_node, t_parser *parser);
-int			set_parser_error(t_parser *parser, const char *msg);
-t_ast_node	*parse_redirection(t_parser *parser);
-t_ast_node	*attach_redirection_to_command(t_ast_node *cmd_node,
+void			init_parser(t_token *tokens, t_parser *parser);
+t_ast_node		*parse_tokens(t_token *tokens);
+t_ast_node		*parse_expression(t_parser *parser);
+t_ast_node		*parse_command(t_parser *parser);
+t_ast_node		*parse_assignment(t_parser *parser);
+t_ast_node		*create_pipe_node(t_ast_node *left_node, t_ast_node *right_node);
+int				set_parser_error(t_parser *parser, const char *msg);
+t_redirection	*parse_redirection(t_parser *parser);
+t_ast_node		*attach_redirection_to_command(t_ast_node *cmd_node,
 				t_parser *parser);
-t_token		*get_next_token(t_parser *parser);
-void		free_ast(t_ast_node *node);
+t_token			*get_next_token(t_parser *parser);
+void			free_ast(t_ast_node *node);
+int				add_argument_to_command(t_ast_node *cmd_node, t_token *arg_token);
 
 #endif

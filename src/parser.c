@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/20 00:02:40 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 17:53:51 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,92 @@ void	init_parser(t_token *tokens, t_parser *parser)
 	parser->error_msg = NULL;
 }
 
+static void	add_redir_to_list(t_redirection **list, t_redirection *new_redir)
+{
+	t_redirection	*current;
+
+	if (!*list)
+	{
+		*list = new_redir;
+		return ;
+	}
+	current = *list;
+	while (current->next)
+		current = current->next;
+	current->next = new_redir;
+}
+
 /*
- * Main parsing entry point - converts token list to AST
- * Returns AST root node or NULL on error
+ * Nová hlavní funkce pro parsování jednoduchého příkazu.
+ * Iteruje přes tokeny a sbírá argumenty a přesměrování.
  */
+static t_ast_node	*parse_simple_command(t_parser *parser)
+{
+	t_ast_node		*cmd_node;
+	t_redirection	*redir;
+
+	cmd_node = NULL;
+	while (parser->current_token && parser->current_token->type != TOKEN_PIPE)
+	{
+		if (is_redirection_token(parser->current_token->type))
+		{
+			// Získáme přesměrování z `parser_redir.c`
+			redir = parse_redirection(parser); // Upravíme parse_redirection, aby vracela t_redirection*
+			if (!redir)
+				return (free_ast(cmd_node), NULL);
+			if (!cmd_node) // Pokud je přesměrování před příkazem
+			{
+				cmd_node = ft_calloc(1, sizeof(t_ast_node)); // Potřebujeme uzel, kam ho uložit
+				cmd_node->type = NODE_COMMAND;
+			}
+			add_redir_to_list(&cmd_node->u_content.cmd.redirections, redir);
+		}
+		else // Je to příkaz nebo argument
+		{
+			if (!cmd_node)
+				cmd_node = parse_command(parser); // Vytvoří uzel příkazu
+			else
+				add_argument_to_command(cmd_node, parser->current_token); // Přidá další argument
+			get_next_token(parser);
+		}
+	}
+	return (cmd_node);
+}
+
+
+/*
+ * Parses tokens into expression nodes (commands, redirections, assignments)
+ * Handles pipe connections between expressions
+ */
+t_ast_node	*parse_expression(t_parser *parser)
+{
+	t_ast_node	*node;
+	t_ast_node	*right_node;
+
+	if (!parser->current_token)
+		return (NULL);
+	if (parser->current_token->type == TOKEN_ASSIGNMENT &&
+		(!parser->current_token->next || parser->current_token->next->type == TOKEN_PIPE))
+		return (parse_assignment(parser));
+	node = parse_simple_command(parser);
+	if (!node)
+		return (NULL);
+	if (parser->current_token && parser->current_token->type == TOKEN_PIPE)
+	{
+		get_next_token(parser);
+		if (!parser->current_token)
+		{
+			set_parser_error(parser, "syntax error near unexpected token `|'");
+			return (free_ast(node), NULL);
+		}
+		right_node = parse_expression(parser);
+		if (!right_node)
+			return (free_ast(node), NULL);
+		node = create_pipe_node(node, right_node);
+	}
+	return (node);
+}
+
 t_ast_node	*parse_tokens(t_token *tokens)
 {
 	t_ast_node	*ast_node;
@@ -35,7 +117,6 @@ t_ast_node	*parse_tokens(t_token *tokens)
 
 	if (!tokens)
 		return (NULL);
-	ast_node = NULL;
 	init_parser(tokens, &parser);
 	ast_node = parse_expression(&parser);
 	if (parser.error)
@@ -47,61 +128,3 @@ t_ast_node	*parse_tokens(t_token *tokens)
 	return (ast_node);
 }
 
-/*
- * Handles command parsing and potential redirection attachment
- */
-static t_ast_node	*parse_command_with_redirections(t_parser *parser)
-{
-	t_ast_node	*node;
-
-	node = parse_command(parser);
-	if (parser->current_token
-		&& is_redirection_token(parser->current_token->type))
-		node = attach_redirection_to_command(node, parser);
-	return (node);
-}
-
-/*
- * Determines which type of node to parse based on current token
- * Returns appropriate AST node or NULL on error
- */
-static t_ast_node	*parse_node_by_type(t_parser *parser)
-{
-	if (is_redirection_token(parser->current_token->type))
-		return (parse_redirection(parser));
-	else if (parser->current_token->type == TOKEN_CMD
-		|| parser->current_token->type == TOKEN_ENV_VAR
-		|| parser->current_token->type == TOKEN_EXIT_CODE)
-	{
-		return (parse_command_with_redirections(parser));
-	}
-	else if (parser->current_token->type == TOKEN_ASSIGNMENT)
-		return (parse_assignment(parser));
-	else
-	{
-		set_parser_error(parser,
-			"syntax error: expected command or redirection");
-		return (NULL);
-	}
-}
-
-/*
- * Parses tokens into expression nodes (commands, redirections, assignments)
- * Handles pipe connections between expressions
- */
-t_ast_node	*parse_expression(t_parser *parser)
-{
-	t_ast_node	*node;
-
-	if (!parser->current_token)
-		return (NULL);
-	node = parse_node_by_type(parser);
-	if (!node)
-		return (NULL);
-	if (parser->current_token && parser->current_token->type == TOKEN_PIPE)
-	{
-		get_next_token(parser);
-		node = create_pipe_node(node, parser);
-	}
-	return (node);
-}

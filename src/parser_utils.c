@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 09:45:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/10 14:33:11 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 17:47:04 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,3 +96,34 @@ void	free_ast(t_ast_node *node)
 	}
 	free(node);
 }
+int	add_argument_to_command(t_ast_node *cmd_node, t_token *arg_token)
+{
+	t_command	*cmd;
+	char		**new_args;
+	int			*new_types;
+	int			i;
+
+	cmd = &cmd_node->u_content.cmd;
+	new_args = malloc(sizeof(char *) * (cmd->arg_count + 1));
+	new_types = malloc(sizeof(int) * (cmd->arg_count + 1));
+	if (!new_args || !new_types)
+		return (free(new_args), free(new_types), -1);
+	i = 0;
+	while (i < cmd->arg_count)
+	{
+		new_args[i] = cmd->args[i]; // Zkopírujeme ukazatele
+		new_types[i] = cmd->arg_token_types[i];
+		i++;
+	}
+	new_args[i] = ft_strdup(arg_token->value); // Přidáme nový argument
+	new_types[i] = arg_token->type;
+	if (!new_args[i])
+		return (free(new_args), free(new_types), -1);
+	free(cmd->args); // Uvolníme stará pole
+	free(cmd->arg_token_types);
+	cmd->args = new_args;
+	cmd->arg_token_types = new_types;
+	cmd->arg_count++;
+	return (0);
+}
+
