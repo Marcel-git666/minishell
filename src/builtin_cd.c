@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_cd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:51:13 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 10:01:28 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 17:27:15 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,61 +15,43 @@
 #include "builtins.h"
 
 /*
- * Creates copy of oldpwd and handles cd - logic
- * Returns 1 on success, -1 on failure  
- */
-static int	execute_cd_minus(char *oldpwd, char *cwd, t_shell *shell)
-{
-	char	*oldpwd_copy;
-
-	oldpwd_copy = ft_strdup(oldpwd);
-	if (!oldpwd_copy)
-	{
-		shell->last_exit_code = 1;
-		return (-1);
-	}
-	env_set(&shell->env, "OLDPWD", cwd);
-	if (chdir(oldpwd_copy) == -1)
-	{
-		perror("cd");
-		shell->last_exit_code = 1;
-		free(oldpwd_copy);
-		return (-1);
-	}
-	printf("%s\n", oldpwd_copy);
-	free(oldpwd_copy);
-	return (1);
-}
-
-/*
  * Handles 'cd -' command to change to previous directory
  * Uses OLDPWD environment variable to get previous directory
  * Returns 1 if handled (success or failure), 0 if not applicable
  */
 static int	handle_oldpwd(t_ast_node *root, t_shell *shell, char *cwd)
 {
-	char	*oldpwd;
+	char	*oldpwd_val;
+	char	*oldpwd_copy;
 
 	if (root->u_content.cmd.arg_count == 1
 		&& ft_strcmp(root->u_content.cmd.args[0], "-") == 0)
 	{
-		oldpwd = env_get(shell->env, "OLDPWD");
-		if (!oldpwd)
+		oldpwd_val = env_get(shell->env, "OLDPWD");
+		if (!oldpwd_val || ft_strlen(oldpwd_val) == 0)
 		{
 			error_message("cd: OLDPWD not set");
 			shell->last_exit_code = 1;
-			free(cwd);
+			return (1);
+		}
+		oldpwd_copy = ft_strdup(oldpwd_val);
+		if (!oldpwd_copy)
+		{
+			shell->last_exit_code = 1;
 			return (1);
 		}
 		env_set(&shell->env, "OLDPWD", cwd);
-		if (chdir(oldpwd) == -1)
+		if (chdir(oldpwd_copy) == -1)
 		{
 			perror("cd");
 			shell->last_exit_code = 1;
-			free(cwd);
-			return (1);
 		}
-		printf("%s\n", oldpwd);
+		else
+		{
+			printf("%s\n", oldpwd_copy);
+			shell->last_exit_code = 0;
+		}
+		free(oldpwd_copy);
 		return (1);
 	}
 	return (0);
@@ -88,10 +70,12 @@ static void	update_pwd(t_shell *shell)
 	if (getcwd(cwd, PATH_MAX))
 	{
 		env_set(&shell->env, "PWD", cwd);
-		shell->last_exit_code = 0;
 	}
 	else
+	{
+		perror("pwd");
 		shell->last_exit_code = 1;
+	}
 	free(cwd);
 }
 
@@ -146,17 +130,14 @@ void	builtin_cd(t_ast_node *root, t_shell *shell)
 	if (root->u_content.cmd.arg_count > 1)
 	{
 		error_message("cd: too many arguments");
-		free(cwd);
 		shell->last_exit_code = 1;
-		return ;
-	}
-	if (handle_oldpwd(root, shell, cwd))
-	{
 		free(cwd);
-		update_pwd(shell);
 		return ;
 	}
-	if (handle_cd_logic(root, shell, cwd) == 0)
-		update_pwd(shell);
+	else if (!handle_oldpwd(root, shell, cwd))
+	{
+		handle_cd_logic(root, shell, cwd);
+	}
+	update_pwd(shell);
 	free(cwd);
 }

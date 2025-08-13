@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes_execution.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:42:33 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 14:33:21 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 17:09:24 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,6 @@ void	execute_left_child(int *pipe_fd, t_ast_node *left_node,
 void	execute_right_child(int *pipe_fd, t_ast_node *right_node,
 			t_shell *shell, char **envp)
 {
-	int	exit_code;
-
 	close(pipe_fd[1]);
 	dup2(pipe_fd[0], STDIN_FILENO);
 	close(pipe_fd[0]);
