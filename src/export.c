@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 23:26:09 by lformank          #+#    #+#             */
-/*   Updated: 2025/08/13 14:27:30 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:08:43 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,35 +38,32 @@ int	check_parts(char **parts, int *i)
  * Handles quoted values by removing surrounding quotes
  * Splits assignment string and sets environment variable
  */
-static void	handle_export_assignment(char *assignment, t_env **env)
+static void	handle_export_assignment(char *assignment, t_shell *shell)
 {
-	char	**parts;
-	int		i;
-	char	*clean_value;
-	char	*temp;
+	char	*equals_pos;
+	char	*key;
+	char	*value;
 
-	parts = ft_split(assignment, '=');
-	if (check_parts(parts, &i) == -1)
+	equals_pos = ft_strchr(assignment, '=');
+	if (!equals_pos) // Případ `export VAR` bez hodnoty - nic se neděje
 		return ;
-	clean_value = parts[1];
-	if (clean_value[0] == '"' && clean_value[ft_strlen(clean_value) - 1] == '"')
+	key = ft_strndup(assignment, equals_pos - assignment);
+	if (!key)
+		return ;
+	value = ft_strdup(equals_pos + 1);
+	if (!value)
 	{
-		temp = ft_substr(clean_value, 1, ft_strlen(clean_value) - 2);
-		env_set(env, parts[0], temp);
-		free(temp);
+		free(key);
+		return ;
 	}
-	else
-		env_set(env, parts[0], clean_value);
-	i = -1;
-	while (parts[++i])
-		free(parts[i]);
-	free(parts);
+	env_set(&shell->env, key, value);
+	free(key);
+	free(value);
 }
 
 int	valid_name(char *arg)
 {
-	if (arg[0] == '_' || (arg[0] >= 'A' && arg[0] <= 'Z')
-		|| (arg[0] >= 'a' && arg[0] <= 'z'))
+	if (arg[0] == '_' || (arg[0] >= 'A' && arg[0] <= 'Z') || (arg[0] >= 'a' && arg[0] <= 'z'))
 		return (1);
 	else
 		return (0);
@@ -79,26 +76,31 @@ int	valid_name(char *arg)
  */
 void	builtin_export(t_ast_node *root, t_shell *shell)
 {
-	int	i;
+	int		i;
+	char	*arg;
+	char	*equals_pos;
+	int		name_len;
 
-	i = -1;
-	if (!root->u_content.cmd.arg_count)
+	if (root->u_content.cmd.arg_count == 0)
 	{
-		env_print_sorted(shell);
+		env_print_sorted(shell); // `export` bez argumentů vypíše seřazené proměnné
 		return ;
 	}
+	i = -1;
+	shell->last_exit_code = 0; // Výchozí stav je úspěch
 	while (++i < root->u_content.cmd.arg_count)
 	{
-		if (!valid_name(root->u_content.cmd.args[i]))
+		arg = root->u_content.cmd.args[i];
+		equals_pos = ft_strchr(arg, '=');
+		name_len = (equals_pos) ? (equals_pos - arg) : ft_strlen(arg);
+		if (!is_valid_var_name(arg, name_len))
 		{
-			error_message("export: not an identifier");
-			shell->last_exit_code = 1;
-			return ;
+			error_message("export: not a valid identifier");
+			shell->last_exit_code = 1; // Nastavíme chybu
+			continue ; // A pokračujeme na další argument
 		}
-		if (ft_strchr(root->u_content.cmd.args[i], '='))
-		{
-			handle_export_assignment(root->u_content.cmd.args[0], &shell->env);
-			shell->last_exit_code = 0;
-		}
+		if (equals_pos)
+			handle_export_assignment(arg, shell);
 	}
 }
+

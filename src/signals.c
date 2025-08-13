@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:59:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/13 23:15:25 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/13 22:48:21 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #include <termios.h>
 
 int	g_signal_received = 0;
-int	g_signal_heredoc = 0;
 
 /*
  * Handles SIGINT (Ctrl+C) in interactive mode
@@ -56,15 +55,9 @@ void	signal_handler_heredoc(int signum)
 {
 	if (signum == SIGINT)
 	{
-		g_signal_heredoc = 1;
+		g_signal_received = signum;
+		write(STDOUT_FILENO, "\n", 1);
 		close(STDIN_FILENO);
-		write(1, "\n", 1);
 		rl_on_new_line();
-		rl_replace_line("", 0);
-	}
-	else if (signum == SIGQUIT)
-	{
-		error_message("Quit: 3");
-		exit(131);
 	}
 }

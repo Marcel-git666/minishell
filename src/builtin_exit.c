@@ -6,7 +6,11 @@
 /*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/08/13 23:15:26 by lformank         ###   ########.fr       */
+=======
+/*   Updated: 2025/08/13 17:05:15 by marcel           ###   ########.fr       */
+>>>>>>> 27a0093ccc06f57b8ce7b8a34a5ac93f18838c21
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +73,7 @@ int	is_valid_number(const char *str)
  * Cleans up all allocated resources before exit
  * Frees AST, file descriptors and shell structure
  */
-static void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
+void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
 {
 	if (ast)
 		free_ast(ast);
