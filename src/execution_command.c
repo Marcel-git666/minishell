@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_command.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 00:26:50 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 12:04:14 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 11:59:29 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ static void	expand_command_args(t_ast_node *ast_node, t_shell *shell)
 	int				is_env_var;
 	t_token_type	token_type;
 
+	if (!ast_node || !shell)
+		return ;
 	i = -1;
 	while (++i < ast_node->u_content.cmd.arg_count)
 	{
@@ -37,8 +39,11 @@ static void	expand_command_args(t_ast_node *ast_node, t_shell *shell)
 				|| token_type == TOKEN_EXIT_CODE);
 		expanded_arg = expand_variables(ast_node->u_content.cmd.args[i],
 				shell->env, shell->last_exit_code, is_env_var);
-		free(ast_node->u_content.cmd.args[i]);
-		ast_node->u_content.cmd.args[i] = expanded_arg;
+		if (expanded_arg)
+		{
+			free(ast_node->u_content.cmd.args[i]);
+			ast_node->u_content.cmd.args[i] = expanded_arg;
+		}
 	}
 }
 
@@ -49,6 +54,8 @@ static void	expand_command_args(t_ast_node *ast_node, t_shell *shell)
  */
 static int	is_builtin_command(char *cmd)
 {
+	if (!cmd)
+		return (0);
 	if (ft_strcmp(cmd, "exit") == 0)
 		return (1);
 	if (ft_strcmp(cmd, "env") == 0)
@@ -73,6 +80,8 @@ static int	is_builtin_command(char *cmd)
  */
 static void	execute_builtin_cmd(char *cmd, t_ast_node *ast_node, t_shell *shell)
 {
+	if (!cmd || !ast_node || !shell)
+		return ;
 	if (ft_strcmp(cmd, "env") == 0)
 		env_print(shell);
 	else if (ft_strcmp(cmd, "pwd") == 0)
@@ -97,6 +106,12 @@ void	handle_command(t_ast_node *ast_node, t_shell *shell,
 {
 	int		exit_code;
 
+	if (!ast_node || !shell || !expanded_cmd)
+	{
+		if (shell)
+			shell->last_exit_code = 1;
+		return ;
+	}
 	expand_command_args(ast_node, shell);
 	if (is_builtin_command(expanded_cmd))
 		execute_builtin_cmd(expanded_cmd, ast_node, shell);

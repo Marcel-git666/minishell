@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes_execution.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:42:33 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/14 08:06:36 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 12:30:28 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 #include "pipes.h"
 
 /*
- * Zpracuje přesměrování pro daný uzel. Vrací 1, pokud byl stdout přesměrován, jinak 0.
- * Tato funkce je klíčová pro správné chování rour.
+ * Sets up redirections for child process in pipe execution
+ * Returns 1 if stdout was redirected to file, 0 otherwise
+ * Properly cleans up fd structure after setup to prevent memory leaks
  */
 static int	setup_child_redirections(t_ast_node *node, t_shell *shell)
 {
@@ -24,52 +25,70 @@ static int	setup_child_redirections(t_ast_node *node, t_shell *shell)
 
 	fd_red = set_fd();
 	if (!fd_red)
-		exit(1); // Nemůžeme pokračovat bez fds
+		exit(1);
 	stdout_redirected = 0;
 	if (process_heredocs(node, shell, fd_red) == -1)
-		exit(130); // Heredoc přerušen
+	{
+		reset_fd(fd_red);
+		exit(130);
+	}
 	if (handle_redirections(node, fd_red, shell) == -1)
-		exit(1); // Chyba přesměrování
+	{
+		reset_fd(fd_red);
+		exit(1);
+	}
 	if (fd_red->out_new != -1)
 		stdout_redirected = 1;
-	// Důležité: fd_red se zde NEUVOLŇUJE, protože file descriptory musí zůstat otevřené
-	// pro execve. Systém je zavře po skončení procesu.
+	if (fd_red->temp)
+	{
+		free(fd_red->temp);
+		fd_red->temp = NULL;
+	}
+	free(fd_red);
 	return (stdout_redirected);
 }
 
+/*
+ * Executes left child in pipe with proper redirection handling
+ * Sets up stdout redirection and connects to pipe if needed
+ */
 void	execute_left_child(int *pipe_fd, t_ast_node *left_node,
 			t_shell *shell, char **envp)
 {
 	int	stdout_redirected;
-	int exit_code;
+	int	exit_code;
 
-	// 1. Nejprve nastavíme přesměrování specifická pro tento příkaz
 	stdout_redirected = setup_child_redirections(left_node, shell);
-	
-	close(pipe_fd[0]); // Zavřeme čtecí konec roury
-	// 2. Pokud stdout NEBYL přesměrován do souboru, napojíme ho na rouru
+	close(pipe_fd[0]);
 	if (!stdout_redirected)
 		dup2(pipe_fd[1], STDOUT_FILENO);
-	close(pipe_fd[1]); // Vždy zavřeme zapisovací konec
+	close(pipe_fd[1]);
 	exit_code = execute_command(left_node, shell, envp);
+	cleanup_resources(shell, NULL, NULL);
 	exit(exit_code);
 }
 
+/*
+ * Executes right child in pipe
+ * Connects stdin to pipe and executes command
+ */
 void	execute_right_child(int *pipe_fd, t_ast_node *right_node,
 			t_shell *shell, char **envp)
 {
-	int exit_code;
+	int	exit_code;
 
-	close(pipe_fd[1]); // Zavřeme zapisovací konec roury
-	dup2(pipe_fd[0], STDIN_FILENO); // Napojíme stdin na rouru
+	close(pipe_fd[1]);
+	dup2(pipe_fd[0], STDIN_FILENO);
 	close(pipe_fd[0]);
-	
-	// Pravá strana roury může mít také svá vlastní přesměrování
 	exit_code = execute_command(right_node, shell, envp);
+	cleanup_resources(shell, NULL, NULL);
 	exit(exit_code);
 }
 
-// Funkce handle_parent_process zůstává stejná, jak jsme ji opravili minule.
+/*
+ * Handles parent process after forking pipe children
+ * Waits for both children and sets shell exit code based on right child
+ */
 void	handle_parent_process(int *pipe_fd, pid_t left_pid,
 			pid_t right_pid, t_shell *shell)
 {

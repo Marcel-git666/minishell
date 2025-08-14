@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:59:08 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/13 22:48:21 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 12:16:05 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	signal_handler_heredoc(int signum)
 	{
 		g_signal_received = signum;
 		write(STDOUT_FILENO, "\n", 1);
-		close(STDIN_FILENO);
-		rl_on_new_line();
+		rl_done = 1;
+		exit(130);
 	}
 }

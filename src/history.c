@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   history.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 19:41:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/13 23:14:57 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/14 12:34:52 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ static char	*get_history_path(void)
 		return (ft_strdup(HISTORY_FILE));
 	full_path = ft_strjoin(path_with_slash, HISTORY_FILE);
 	free(path_with_slash);
+	if (!full_path)
+		return (ft_strdup(HISTORY_FILE));
 	return (full_path);
 }
 
@@ -47,9 +49,13 @@ void	load_history(void)
 
 	history = NULL;
 	history_path = get_history_path();
+	if (!history_path)
+		return ;
 	if (open_file(history_path, &history, O_RDONLY) == -1)
 	{
 		free(history_path);
+		if (history)
+			free(history);
 		return ;
 	}
 	if (history)
@@ -83,6 +89,8 @@ void	save_history(void)
 	if (!h_array)
 		return ;
 	history_path = get_history_path();
+	if (!history_path)
+		return ;
 	fd = open_file(history_path, NULL, O_WRONLY | O_CREAT | O_TRUNC);
 	free(history_path);
 	if (fd == -1)
@@ -127,15 +135,22 @@ static int	should_add_to_history(char *input, char *last_executed)
  */
 void	handle_input(char *input, t_shell *shell)
 {
-	if (*input)
+	char	*input_copy;
+	
+	if (!input || !shell || !*input)
+		return ;
+	input_copy = ft_strdup(input);
+	if (!input_copy)
+		return ;
+	if (should_add_to_history(input_copy, shell->last_executed))
 	{
-		if (should_add_to_history(input, shell->last_executed))
-		{
-			add_history(input);
-			save_history();
-		}
-		if (shell->last_executed)
-			free(shell->last_executed);
-		shell->last_executed = ft_strdup(input);
+		add_history(input_copy);
+		save_history();
 	}
+	if (shell->last_executed)
+	{
+		free(shell->last_executed);
+		shell->last_executed = NULL;
+	}
+	shell->last_executed = input_copy;
 }

@@ -57,12 +57,15 @@ static void	handle_assignment(t_ast_node *ast_node, t_shell *shell)
 	shell->last_exit_code = 0;
 }
 
+/*
+ * Executes the actual command after expansion and validation
+ * Handles both builtin commands and external programs
+ */
 static void	execute_actual_command(t_ast_node *ast_node, t_shell *shell,
 	char **envp, t_fds *fd_red)
 {
 	char	*expanded_cmd;
 
-	// Pokud uzel neobsahuje příkaz (např. jen přesměrování `> file`), nic neděláme
 	if (!ast_node->u_content.cmd.cmd)
 	{
 		shell->last_exit_code = 0;
@@ -88,6 +91,10 @@ static void	execute_actual_command(t_ast_node *ast_node, t_shell *shell,
 	}
 }
 
+/*
+ * Processes heredoc redirections for given command node
+ * Returns 0 on success, -1 on error or interruption
+ */
 int	process_heredocs(t_ast_node *node, t_shell *shell, t_fds *fds)
 {
 	t_redirection	*redir;
@@ -100,9 +107,7 @@ int	process_heredocs(t_ast_node *node, t_shell *shell, t_fds *fds)
 		if (redir->type == REDIR_HEREDOC)
 		{
 			if (heredoc(shell, redir, fds) == -1)
-			{
-				return (-1); // Chyba nebo přerušení (Ctrl+C)
-			}
+				return (-1);
 		}
 		redir = redir->next;
 	}
@@ -114,12 +119,14 @@ int	process_heredocs(t_ast_node *node, t_shell *shell, t_fds *fds)
  * Handles redirections, pipes, assignments and commands
  * Sets up file descriptors and manages execution flow
  */
+// In execution.c
 int	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
 	t_fds	*fd_red;
+	int		result;
 
-	if (!ast_node)
-		return (0);
+	if (!ast_node || !shell)
+		return (1);
 	fd_red = set_fd();
 	if (!fd_red)
 	{
@@ -128,22 +135,29 @@ int	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 	}
 	fd_red->in_old = dup(STDIN_FILENO);
 	fd_red->out_old = dup(STDOUT_FILENO);
+	if (fd_red->in_old == -1 || fd_red->out_old == -1)
+	{
+		reset_fd(fd_red);
+		shell->last_exit_code = 1;
+		return (1);
+	}
+	
 	if (ast_node->type == NODE_PIPE)
 		execute_pipe(ast_node, shell, envp);
 	else if (ast_node->type == NODE_ASSIGNMENT)
 		handle_assignment(ast_node, shell);
 	else if (ast_node->type == NODE_COMMAND)
 	{
-		// 1. Zpracujeme heredocs
 		if (process_heredocs(ast_node, shell, fd_red) == 0)
 		{
-			// 2. Zpracujeme ostatní přesměrování
 			if (handle_redirections(ast_node, fd_red, shell) == 0)
 				execute_actual_command(ast_node, shell, envp, fd_red);
 			else
 				shell->last_exit_code = 1;
 		}
 	}
+	
+	result = shell->last_exit_code;
 	reset_fd(fd_red);
-	return (shell->last_exit_code);
+	return (result);
 }

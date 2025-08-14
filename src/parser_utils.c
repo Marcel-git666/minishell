@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 09:45:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/14 09:47:15 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 11:42:29 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,12 @@ t_token	*get_next_token(t_parser *parser)
  */
 static void	free_command_node(t_ast_node *node)
 {
-	int	i;
+	int				i;
 	t_redirection	*redir;
 	t_redirection	*next_redir;
 
+	if (!node)
+		return ;
 	if (node->u_content.cmd.cmd)
 		free(node->u_content.cmd.cmd);
 	if (node->u_content.cmd.args)
@@ -44,7 +46,7 @@ static void	free_command_node(t_ast_node *node)
 		while (i < node->u_content.cmd.arg_count)
 		{
 			if (node->u_content.cmd.args[i])
-                free(node->u_content.cmd.args[i]);
+				free(node->u_content.cmd.args[i]);
 			i++;
 		}
 		free(node->u_content.cmd.args);
@@ -67,9 +69,12 @@ static void	free_command_node(t_ast_node *node)
  */
 static void	free_redirection_node(t_ast_node *node)
 {
+	if (!node)
+		return ;
 	if (node->u_content.s_redir.redir)
 	{
-		free(node->u_content.s_redir.redir->file_or_delimiter);
+		if (node->u_content.s_redir.redir->file_or_delimiter)
+			free(node->u_content.s_redir.redir->file_or_delimiter);
 		free(node->u_content.s_redir.redir);
 	}
 	if (node->u_content.s_redir.child)
@@ -81,6 +86,8 @@ static void	free_redirection_node(t_ast_node *node)
  */
 static void	free_pipe_node(t_ast_node *node)
 {
+	if (!node)
+		return ;
 	if (node->u_content.s_pipe.left)
 		free_ast(node->u_content.s_pipe.left);
 	if (node->u_content.s_pipe.right)
@@ -107,6 +114,11 @@ void	free_ast(t_ast_node *node)
 	}
 	free(node);
 }
+
+/*
+ * Adds argument to command node with proper memory management
+ * Returns 0 on success, -1 on failure
+ */
 int	add_argument_to_command(t_ast_node *cmd_node, t_token *arg_token)
 {
 	t_command	*cmd;
@@ -114,6 +126,8 @@ int	add_argument_to_command(t_ast_node *cmd_node, t_token *arg_token)
 	int			*new_types;
 	int			i;
 
+	if (!cmd_node || !arg_token || !arg_token->value)
+		return (-1);
 	cmd = &cmd_node->u_content.cmd;
 	new_args = malloc(sizeof(char *) * (cmd->arg_count + 1));
 	new_types = malloc(sizeof(int) * (cmd->arg_count + 1));
@@ -122,19 +136,18 @@ int	add_argument_to_command(t_ast_node *cmd_node, t_token *arg_token)
 	i = 0;
 	while (i < cmd->arg_count)
 	{
-		new_args[i] = cmd->args[i]; // Zkopírujeme ukazatele
+		new_args[i] = cmd->args[i];
 		new_types[i] = cmd->arg_token_types[i];
 		i++;
 	}
-	new_args[i] = ft_strdup(arg_token->value); // Přidáme nový argument
-	new_types[i] = arg_token->type;
+	new_args[i] = ft_strdup(arg_token->value);
 	if (!new_args[i])
 		return (free(new_args), free(new_types), -1);
-	free(cmd->args); // Uvolníme stará pole
+	new_types[i] = arg_token->type;
+	free(cmd->args);
 	free(cmd->arg_token_types);
 	cmd->args = new_args;
 	cmd->arg_token_types = new_types;
 	cmd->arg_count++;
 	return (0);
 }
-

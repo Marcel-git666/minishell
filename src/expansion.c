@@ -6,13 +6,14 @@
 /*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:46:01 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 13:45:35 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 12:32:42 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "expansion.h"
 #include "env.h"
+#include <stdint.h> 
 
 /*
  * Handles variable expansion from $VAR syntax
@@ -27,19 +28,26 @@ static void	handle_variable_expansion(t_expansion_state *state)
 
 	state->i++;
 	var_len = parse_var_name(&state->input[state->i], &var_name);
-	if (var_len > 0)
+	if (var_len > 0 && var_name)
 	{
 		var_value = get_variable_value(var_name, state->env,
 				state->exit_status);
-		ft_strlcpy(&state->result[state->j], var_value,
-			ft_strlen(var_value) + 1);
-		state->j += ft_strlen(var_value);
+		if (var_value)
+		{
+			ft_strlcpy(&state->result[state->j], var_value,
+				ft_strlen(var_value) + 1);
+			state->j += ft_strlen(var_value);
+			free(var_value);
+		}
 		state->i += var_len;
 		free(var_name);
-		free(var_value);
 	}
 	else
+	{
+		if (var_name)
+			free(var_name);
 		state->result[state->j++] = '$';
+	}
 }
 
 /*
@@ -50,8 +58,19 @@ static void	handle_variable_expansion(t_expansion_state *state)
 static int	init_expansion_state(t_expansion_state *state, char *input,
 		t_env *env, int exit_status)
 {
+	size_t	input_len;
+	size_t	buffer_size;
+
+	if (!state || !input)
+		return (-1);
 	state->input = input;
-	state->result = ft_calloc(ft_strlen(input) * 2 + 1, sizeof(char));
+	input_len = ft_strlen(input);
+	if (input_len > SIZE_MAX / 4)
+		return (-1);
+	buffer_size = calculate_expansion_size(input, env, exit_status);
+	if (buffer_size > SIZE_MAX)
+		return (-1);
+	state->result = ft_calloc(buffer_size + 1, sizeof(char));
 	if (!state->result)
 		return (-1);
 	state->i = 0;
@@ -73,11 +92,17 @@ char	*expand_variables(char *input, t_env *env, int exit_status,
 {
 	t_expansion_state	state;
 	char				c;
+	size_t				max_size;
 
+	if (!input)
+		return (ft_strdup(""));
 	if (is_env_var)
 		return (get_variable_value(input, env, exit_status));
-	if (!input || init_expansion_state(&state, input, env, exit_status) == -1)
+	if (init_expansion_state(&state, input, env, exit_status) == -1)
 		return (NULL);
+		
+	max_size = ft_strlen(input) * 4;
+	
 	while (state.input[state.i])
 	{
 		c = state.input[state.i];
@@ -92,7 +117,13 @@ char	*expand_variables(char *input, t_env *env, int exit_status,
 			state.result[state.j++] = c;
 			state.i++;
 		}
+		if ((size_t)state.j >= max_size)
+		{
+			free(state.result);
+			return (NULL);
+		}
 	}
-	state.result[state.j] = '\0';
+	if (state.result)
+		state.result[state.j] = '\0';
 	return (state.result);
 }

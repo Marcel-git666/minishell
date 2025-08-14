@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 19:45:48 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/14 08:44:20 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 11:34:00 by mmravec          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,20 @@ static void	free_env_list(t_shell *shell)
 	t_env	*current;
 	t_env	*next;
 
+	if (!shell || !shell->env)
+		return ;
 	current = shell->env;
-	if (shell->env)
+	while (current)
 	{
-		while (current)
-		{
-			next = current->next;
+		next = current->next;
+		if (current->key)
 			free(current->key);
+		if (current->value)
 			free(current->value);
-			free(current);
-			current = next;
-		}
-		shell->env = NULL;
+		free(current);
+		current = next;
 	}
+	shell->env = NULL;
 }
 
 /*
@@ -76,20 +77,31 @@ void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
 	if (fd)
 	{
 		if (fd->temp)
-			free(fd->temp);
+		{
+			unlink(fd->temp);
+			free(fd->temp);	
+		}
 		free(fd);
 	}
 	if (shell)
 	{
+		if (shell->ast)
+		{
+			free_ast(shell->ast);
+			shell->ast = NULL;
+		}
 		if (shell->env)
 		{
 			free_env_list(shell);
-			shell->env = NULL;
 		}
 		if (shell->last_executed)
+		{
 			free(shell->last_executed);
+			shell->last_executed = NULL;
+		}
 		free(shell);
 	}
+	rl_clear_history();
 }
 
 /*
@@ -98,6 +110,8 @@ void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast)
  */
 static int	get_exit_code(t_ast_node *ast, t_shell *shell)
 {
+	if (!ast || !shell)
+		return (1);
 	if (ast->u_content.cmd.arg_count > 1)
 	{
 		error_message("exit: too many arguments");
@@ -106,12 +120,17 @@ static int	get_exit_code(t_ast_node *ast, t_shell *shell)
 	}
 	if (ast->u_content.cmd.arg_count == 1)
 	{
+		if (!ast->u_content.cmd.args[0])
+		{
+			error_message("exit: numeric argument required");
+			return (2);
+		}
 		if (!is_valid_number(ast->u_content.cmd.args[0]))
 		{
 			error_message("exit: numeric argument required");
 			return (2);
 		}
-		return (ft_atoi(ast->u_content.cmd.args[0]));
+		return (ft_atoi(ast->u_content.cmd.args[0]) & 0xFF);
 	}
 	return (shell->last_exit_code);
 }
@@ -124,6 +143,11 @@ void	builtin_exit(t_shell *shell, t_fds *fd, t_ast_node *ast)
 {
 	int	exit_code;
 
+	if (!shell)
+	{
+		cleanup_resources(NULL, fd, ast);
+		exit(1);
+	}
 	exit_code = get_exit_code(ast, shell);
 	if (exit_code == -1)
 		return ;

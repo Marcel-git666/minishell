@@ -33,7 +33,7 @@ void	read_loop(char *delimiter, int temp_fd)
 				free(line);
 			break ;
 		}
-		if (!line) // Reakce na Ctrl+D (EOF)
+		if (!line)
 			break ;
 		if (ft_strcmp(line, delimiter) == 0)
 		{
@@ -96,12 +96,18 @@ int	heredoc(t_shell *shell, t_redirection *redir, t_fds *fds)
 	if (pid == -1)
 		return (tcsetattr(STDIN_FILENO, TCSANOW, &original_termios), -1);
 	if (pid == 0) // Dceřiný proces
-	{
-		signal(SIGINT, signal_handler_heredoc);
-		read_loop(redir->file_or_delimiter, temp_fd);
-		close(temp_fd);
-		exit(g_signal_received ? 1 : 0);
-	}
+    {
+        signal(SIGINT, signal_handler_heredoc);
+        read_loop(redir->file_or_delimiter, temp_fd);
+        close(temp_fd);
+        free_ast(shell->ast);
+        env_free(shell->env);
+        free(shell->last_executed);
+        free(shell);
+        free(fds->temp);
+        free(fds);
+        exit(g_signal_received ? 130 : 0);
+    }
 
 	// Rodičovský proces
 	close(temp_fd);
