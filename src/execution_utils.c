@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:33:05 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/14 08:44:59 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 09:04:03 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,10 @@ void	free_args(char **args)
  * Připraví pole argumentů pro execve, přičemž filtruje prázdné argumenty,
  * které mohly vzniknout po expanzi proměnných.
  */
+/*
+ * Připraví pole argumentů pro execve, přičemž filtruje prázdné argumenty,
+ * které mohly vzniknout po expanzi proměnných.
+ */
 char	**prepare_args(char *cmd, t_ast_node *ast)
 {
 	char	**args;
@@ -103,7 +107,11 @@ char	**prepare_args(char *cmd, t_ast_node *ast)
 	if (!args)
 		return (NULL);
 	args[0] = ft_strdup(cmd);
-
+	if (!args[0])
+	{
+		free(args);
+		return (NULL);
+	}
 	// 3. Zkopírujeme jen neprázdné argumenty
 	i = 0;
 	j = 1;

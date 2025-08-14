@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/14 08:40:50 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 08:56:53 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ static t_ast_node	*parse_simple_command(t_parser *parser)
 	// Změna zde: Již nekontrolujeme is_command_set, protože příkaz bez příkazu je platný
 	return (cmd_node);
 }
-
 
 /*
  * Parses tokens into expression nodes (commands, redirections, assignments)
