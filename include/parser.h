@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:18:15 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/13 17:56:30 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 08:21:12 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,6 @@ typedef struct s_parser
 }	t_parser;
 
 void			init_parser(t_token *tokens, t_parser *parser);
-t_ast_node		*parse_tokens(t_token *tokens);
 t_ast_node		*parse_expression(t_parser *parser);
 t_ast_node		*parse_command(t_parser *parser);
 t_ast_node		*parse_assignment(t_parser *parser);

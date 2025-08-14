@@ -42,7 +42,6 @@ int		only_cd(t_ast_node *root, t_shell *shell, char *cwd);
 
 // export
 void	builtin_export(t_ast_node *root, t_shell *shell);
-int		check_parts(char **parts, int *i);
 
 // unset
 void	builtin_unset(t_ast_node *root, t_shell *shell);

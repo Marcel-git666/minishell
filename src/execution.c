@@ -20,7 +20,7 @@
  * Sets up file descriptors and processes redirection nodes
  * Updates shell exit code and traverses redirection chain
  */
-static int	handle_redirections(t_ast_node *node, t_fds *fd_red,
+int	handle_redirections(t_ast_node *node, t_fds *fd_red,
 	t_shell *shell)
 {
 	t_redirection	*current_redir;
@@ -88,7 +88,7 @@ static void	execute_actual_command(t_ast_node *ast_node, t_shell *shell,
 	}
 }
 
-static int	process_heredocs(t_ast_node *node, t_shell *shell, t_fds *fds)
+int	process_heredocs(t_ast_node *node, t_shell *shell, t_fds *fds)
 {
 	t_redirection	*redir;
 
@@ -114,17 +114,17 @@ static int	process_heredocs(t_ast_node *node, t_shell *shell, t_fds *fds)
  * Handles redirections, pipes, assignments and commands
  * Sets up file descriptors and manages execution flow
  */
-void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
+int	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
 	t_fds	*fd_red;
 
 	if (!ast_node)
-		return ;
+		return (0);
 	fd_red = set_fd();
 	if (!fd_red)
 	{
 		shell->last_exit_code = 1;
-		return ;
+		return (1);
 	}
 	fd_red->in_old = dup(STDIN_FILENO);
 	fd_red->out_old = dup(STDOUT_FILENO);
@@ -143,10 +143,7 @@ void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 			else
 				shell->last_exit_code = 1;
 		}
-		else
-		{
-			shell->last_exit_code = 130; // Přerušeno signálem (Ctrl+C)
-		}
 	}
 	reset_fd(fd_red);
+	return (shell->last_exit_code);
 }

@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 23:42:32 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/13 17:56:07 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 08:11:17 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,11 @@ t_ast_node	*create_pipe_node(t_ast_node *left_node, t_ast_node *right_node)
 	{
 		free_ast(left_node);
 		free_ast(right_node);
+		return (NULL);
+	}
+	if (!right_node)
+	{
+		free_ast(left_node);
 		return (NULL);
 	}
 	pipe_node = malloc(sizeof(t_ast_node));

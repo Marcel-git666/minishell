@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:42:33 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/13 23:06:38 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 08:06:36 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,71 +14,62 @@
 #include "pipes.h"
 
 /*
- * Checks if AST node contains heredoc redirection
- * Recursively traverses redirection nodes to find REDIR_HEREDOC type
- * Returns 1 if heredoc found, 0 otherwise
+ * Zpracuje přesměrování pro daný uzel. Vrací 1, pokud byl stdout přesměrován, jinak 0.
+ * Tato funkce je klíčová pro správné chování rour.
  */
-static int	contains_heredoc(t_ast_node *node)
+static int	setup_child_redirections(t_ast_node *node, t_shell *shell)
 {
-	if (!node)
-		return (0);
-	if (node->type == NODE_REDIR)
-	{
-		if (node->u_content.s_redir.redir->type == REDIR_HEREDOC)
-			return (1);
-		return (contains_heredoc(node->u_content.s_redir.child));
-	}
-	else if (node->type == NODE_PIPE)
-	{
-		return (contains_heredoc(node->u_content.s_pipe.left)
-			|| contains_heredoc(node->u_content.s_pipe.right));
-	}
-	return (0);
+	t_fds	*fd_red;
+	int		stdout_redirected;
+
+	fd_red = set_fd();
+	if (!fd_red)
+		exit(1); // Nemůžeme pokračovat bez fds
+	stdout_redirected = 0;
+	if (process_heredocs(node, shell, fd_red) == -1)
+		exit(130); // Heredoc přerušen
+	if (handle_redirections(node, fd_red, shell) == -1)
+		exit(1); // Chyba přesměrování
+	if (fd_red->out_new != -1)
+		stdout_redirected = 1;
+	// Důležité: fd_red se zde NEUVOLŇUJE, protože file descriptory musí zůstat otevřené
+	// pro execve. Systém je zavře po skončení procesu.
+	return (stdout_redirected);
 }
 
-/*
- * Executes left side of pipe (writes to pipe output)
- * Redirects stdout to pipe write end and executes command
- */
 void	execute_left_child(int *pipe_fd, t_ast_node *left_node,
 			t_shell *shell, char **envp)
 {
-	if (contains_heredoc(left_node))
-	{
-		write(2, "minishell: heredoc not supported in pipe context\n", 49);
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		exit(2);
-	}
-	close(pipe_fd[0]);
-	dup2(pipe_fd[1], STDOUT_FILENO);
-	close(pipe_fd[1]);
-	execute_command(left_node, shell, envp);
-	exit(shell->last_exit_code);
+	int	stdout_redirected;
+	int exit_code;
+
+	// 1. Nejprve nastavíme přesměrování specifická pro tento příkaz
+	stdout_redirected = setup_child_redirections(left_node, shell);
+	
+	close(pipe_fd[0]); // Zavřeme čtecí konec roury
+	// 2. Pokud stdout NEBYL přesměrován do souboru, napojíme ho na rouru
+	if (!stdout_redirected)
+		dup2(pipe_fd[1], STDOUT_FILENO);
+	close(pipe_fd[1]); // Vždy zavřeme zapisovací konec
+	exit_code = execute_command(left_node, shell, envp);
+	exit(exit_code);
 }
 
-/*
- * Executes right side of pipe (reads from pipe input)
- * Redirects stdin to pipe read end and executes command
- */
 void	execute_right_child(int *pipe_fd, t_ast_node *right_node,
 			t_shell *shell, char **envp)
 {
-	close(pipe_fd[1]);
-	dup2(pipe_fd[0], STDIN_FILENO);
+	int exit_code;
+
+	close(pipe_fd[1]); // Zavřeme zapisovací konec roury
+	dup2(pipe_fd[0], STDIN_FILENO); // Napojíme stdin na rouru
 	close(pipe_fd[0]);
-	execute_command(right_node, shell, envp);
-	exit(shell->last_exit_code);
+	
+	// Pravá strana roury může mít také svá vlastní přesměrování
+	exit_code = execute_command(right_node, shell, envp);
+	exit(exit_code);
 }
 
-/*
- * Handles parent process cleanup and wait for children
- * Sets shell exit code based on right side command result
- */
-/*
- * Handles parent process cleanup and wait for children
- * Sets shell exit code based on right side command result
- */
+// Funkce handle_parent_process zůstává stejná, jak jsme ji opravili minule.
 void	handle_parent_process(int *pipe_fd, pid_t left_pid,
 			pid_t right_pid, t_shell *shell)
 {
@@ -89,12 +80,10 @@ void	handle_parent_process(int *pipe_fd, pid_t left_pid,
 	close(pipe_fd[1]);
 	waitpid(left_pid, &left_status, 0);
 	waitpid(right_pid, &right_status, 0);
-
-	// Klíčová změna: nastavujeme exit kód POUZE podle posledního příkazu
 	if (WIFEXITED(right_status))
 		shell->last_exit_code = WEXITSTATUS(right_status);
-	else if (WIFSIGNALED(right_status)) // Ošetření, pokud byl proces zabit signálem
+	else if (WIFSIGNALED(right_status))
 		shell->last_exit_code = 128 + WTERMSIG(right_status);
 	else
-		shell->last_exit_code = 1; // Obecná chyba
+		shell->last_exit_code = 1;
 }

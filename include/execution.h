@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 18:50:12 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/08 13:07:21 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/14 07:56:59 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,10 @@ typedef struct s_shell		t_shell;
 typedef struct s_fds		t_fds;
 
 // execution.c
-void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp);
+int	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp);
 void	save_old(t_fds *fd);
+int		process_heredocs(t_ast_node *node, t_shell *shell, t_fds *fds);
+int		handle_redirections(t_ast_node *node, t_fds *fd_red, t_shell *shell);
 
 // execution_command.c
 void	handle_command(t_ast_node *ast_node, t_shell *shell,
