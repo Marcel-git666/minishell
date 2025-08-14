@@ -6,32 +6,11 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 23:26:09 by lformank          #+#    #+#             */
-/*   Updated: 2025/08/13 23:08:43 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 07:21:46 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/*
- * Validates split assignment parts and handles cleanup on error
- * Checks for proper VAR=value format with both name and value present
- * Returns 0 on success, -1 on invalid format with cleanup
- */
-int	check_parts(char **parts, int *i)
-{
-	if (!parts || !parts[0] || !parts[1])
-	{
-		if (parts)
-		{
-			(*i) = -1;
-			while (parts[++(*i)])
-				free(parts[*i]);
-			free(parts);
-		}
-		return (-1);
-	}
-	return (0);
-}
 
 /*
  * Processes export assignment (VAR=value) and adds to environment
@@ -59,14 +38,6 @@ static void	handle_export_assignment(char *assignment, t_shell *shell)
 	env_set(&shell->env, key, value);
 	free(key);
 	free(value);
-}
-
-int	valid_name(char *arg)
-{
-	if (arg[0] == '_' || (arg[0] >= 'A' && arg[0] <= 'Z') || (arg[0] >= 'a' && arg[0] <= 'z'))
-		return (1);
-	else
-		return (0);
 }
 
 /*

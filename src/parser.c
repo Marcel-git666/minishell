@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/13 23:05:50 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 08:20:53 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,15 +46,19 @@ static void	add_redir_to_list(t_redirection **list, t_redirection *new_redir)
 static t_ast_node	*parse_simple_command(t_parser *parser)
 {
 	t_ast_node	*cmd_node;
-	int			is_command_set; // Flag, který si pamatuje, zda už máme příkaz
+	int			is_command_set;
 
 	cmd_node = NULL;
 	is_command_set = 0;
+	// Pokud na začátku není nic nebo je tam hned roura, je to chyba,
+	// kterou ošetří volající funkce. Zde jen vrátíme NULL.
+	if (!parser->current_token || parser->current_token->type == TOKEN_PIPE)
+		return (NULL);
 	while (parser->current_token && parser->current_token->type != TOKEN_PIPE)
 	{
 		if (is_redirection_token(parser->current_token->type))
 		{
-			if (!cmd_node) // Pokud je přesměrování první, vytvoříme "prázdný" uzel
+			if (!cmd_node)
 			{
 				cmd_node = ft_calloc(1, sizeof(t_ast_node));
 				if (!cmd_node)
@@ -66,26 +70,32 @@ static t_ast_node	*parse_simple_command(t_parser *parser)
 		}
 		else // Je to příkaz nebo argument
 		{
-			if (!is_command_set) // Pokud jsme ještě nenašli příkaz
+			if (!is_command_set)
 			{
-				if (cmd_node) // A už existuje uzel (kvůli přesměrování)
+				if (cmd_node)
 				{
-					// Jen do něj doplníme název příkazu
 					cmd_node->u_content.cmd.cmd = ft_strdup(parser->current_token->value);
 					cmd_node->u_content.cmd.cmd_token_type = parser->current_token->type;
 				}
-				else // Příkaz je první, vytvoříme pro něj uzel
+				else
 					cmd_node = parse_command(parser);
 				is_command_set = 1;
 			}
-			else // Příkaz už máme, toto je další argument
+			else
 				add_argument_to_command(cmd_node, parser->current_token);
 			get_next_token(parser);
 		}
 	}
+	// FINÁLNÍ KONTROLA: Pokud jsme vytvořili uzel, ale nenašli v něm žádný příkaz...
+	if (cmd_node && !is_command_set)
+	{
+		// ...znamená to, že jsme našli jen přesměrování, což je chyba.
+		set_parser_error(parser, "syntax error: missing command");
+		free_ast(cmd_node);
+		return (NULL);
+	}
 	return (cmd_node);
 }
-
 
 /*
  * Parses tokens into expression nodes (commands, redirections, assignments)
@@ -113,28 +123,8 @@ t_ast_node	*parse_expression(t_parser *parser)
 			return (free_ast(node), NULL);
 		}
 		right_node = parse_expression(parser);
-		if (!right_node)
-			return (free_ast(node), NULL);
 		node = create_pipe_node(node, right_node);
 	}
 	return (node);
-}
-
-t_ast_node	*parse_tokens(t_token *tokens)
-{
-	t_ast_node	*ast_node;
-	t_parser	parser;
-
-	if (!tokens)
-		return (NULL);
-	init_parser(tokens, &parser);
-	ast_node = parse_expression(&parser);
-	if (parser.error)
-	{
-		if (ast_node)
-			free_ast(ast_node);
-		return (NULL);
-	}
-	return (ast_node);
 }
 
