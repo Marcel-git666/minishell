@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_fork.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/01 13:20:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/13 23:14:59 by lformank         ###   ########.fr       */
+/*   Updated: 2025/08/14 08:46:01 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,6 @@ static int	wait_for_child(int pid)
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
 	return (-1);
-}
-
-static void	cleanup_child_process(char **args)
-{
-	if (args)
-		free_args(args);
 }
 
 int	fork_it(char *path, char **args, char **envp)

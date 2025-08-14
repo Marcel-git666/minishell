@@ -3,16 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/08 20:45:37 by marcel            #+#    #+#             */
-/*   Updated: 2025/08/01 16:32:28 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/14 08:48:37 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef EXPANSION_H
 # define EXPANSION_H
 # include "env.h"
+
+typedef struct s_size_calc
+{
+	char	*input;
+	t_env	*env;
+	int		exit_status;
+	size_t	i;
+	int		in_single_quotes;
+	size_t	total_size;
+}	t_size_calc;
+
 
 /*
  * Structure for maintaining state during expansion

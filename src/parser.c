@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 21:37:49 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/14 08:20:53 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 08:40:50 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,11 @@ static t_ast_node	*parse_simple_command(t_parser *parser)
 
 	cmd_node = NULL;
 	is_command_set = 0;
-	// Pokud na začátku není nic nebo je tam hned roura, je to chyba,
-	// kterou ošetří volající funkce. Zde jen vrátíme NULL.
 	if (!parser->current_token || parser->current_token->type == TOKEN_PIPE)
+	{
+		// Pokud je na začátku roura, je to chyba, kterou ošetří parse_expression
 		return (NULL);
+	}
 	while (parser->current_token && parser->current_token->type != TOKEN_PIPE)
 	{
 		if (is_redirection_token(parser->current_token->type))
@@ -86,16 +87,10 @@ static t_ast_node	*parse_simple_command(t_parser *parser)
 			get_next_token(parser);
 		}
 	}
-	// FINÁLNÍ KONTROLA: Pokud jsme vytvořili uzel, ale nenašli v něm žádný příkaz...
-	if (cmd_node && !is_command_set)
-	{
-		// ...znamená to, že jsme našli jen přesměrování, což je chyba.
-		set_parser_error(parser, "syntax error: missing command");
-		free_ast(cmd_node);
-		return (NULL);
-	}
+	// Změna zde: Již nekontrolujeme is_command_set, protože příkaz bez příkazu je platný
 	return (cmd_node);
 }
+
 
 /*
  * Parses tokens into expression nodes (commands, redirections, assignments)
