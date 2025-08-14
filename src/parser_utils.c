@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/06 09:45:21 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/13 17:47:04 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 09:47:15 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ t_token	*get_next_token(t_parser *parser)
 static void	free_command_node(t_ast_node *node)
 {
 	int	i;
+	t_redirection	*redir;
+	t_redirection	*next_redir;
 
 	if (node->u_content.cmd.cmd)
 		free(node->u_content.cmd.cmd);
@@ -49,6 +51,15 @@ static void	free_command_node(t_ast_node *node)
 	}
 	if (node->u_content.cmd.arg_token_types)
 		free(node->u_content.cmd.arg_token_types);
+	redir = node->u_content.cmd.redirections;
+	while (redir)
+	{
+		next_redir = redir->next;
+		if (redir->file_or_delimiter)
+			free(redir->file_or_delimiter);
+		free(redir);
+		redir = next_redir;
+	}
 }
 
 /*
