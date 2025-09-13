@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmravec <mmravec@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 13:52:11 by mmravec           #+#    #+#             */
-/*   Updated: 2025/07/29 22:07:03 by mmravec          ###   ########.fr       */
+/*   Updated: 2025/08/13 22:23:57 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,10 @@
 // Shell state structure
 typedef struct s_shell
 {
-	t_env	*env;
-	int		last_exit_code;
+	t_env		*env;
+	int			last_exit_code;
+	char		*last_executed;
+	t_ast_node	*ast;
 }	t_shell;
 
 // global variable

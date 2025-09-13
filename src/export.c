@@ -6,61 +6,38 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 23:26:09 by lformank          #+#    #+#             */
-/*   Updated: 2025/07/20 11:35:19 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 07:21:46 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /*
- * Validates split assignment parts and handles cleanup on error
- * Checks for proper VAR=value format with both name and value present
- * Returns 0 on success, -1 on invalid format with cleanup
- */
-int	check_parts(char **parts, int *i)
-{
-	if (!parts || !parts[0] || !parts[1])
-	{
-		if (parts)
-		{
-			(*i) = -1;
-			while (parts[++(*i)])
-				free(parts[*i]);
-			free(parts);
-		}
-		return (-1);
-	}
-	return (0);
-}
-
-/*
  * Processes export assignment (VAR=value) and adds to environment
  * Handles quoted values by removing surrounding quotes
  * Splits assignment string and sets environment variable
  */
-static void	handle_export_assignment(char *assignment, t_env **env)
+static void	handle_export_assignment(char *assignment, t_shell *shell)
 {
-	char	**parts;
-	int		i;
-	char	*clean_value;
-	char	*temp;
+	char	*equals_pos;
+	char	*key;
+	char	*value;
 
-	parts = ft_split(assignment, '=');
-	if (check_parts(parts, &i) == -1)
+	equals_pos = ft_strchr(assignment, '=');
+	if (!equals_pos) // Případ `export VAR` bez hodnoty - nic se neděje
 		return ;
-	clean_value = parts[1];
-	if (clean_value[0] == '"' && clean_value[ft_strlen(clean_value) - 1] == '"')
+	key = ft_strndup(assignment, equals_pos - assignment);
+	if (!key)
+		return ;
+	value = ft_strdup(equals_pos + 1);
+	if (!value)
 	{
-		temp = ft_substr(clean_value, 1, ft_strlen(clean_value) - 2);
-		env_set(env, parts[0], temp);
-		free(temp);
+		free(key);
+		return ;
 	}
-	else
-		env_set(env, parts[0], clean_value);
-	i = -1;
-	while (parts[++i])
-		free(parts[i]);
-	free(parts);
+	env_set(&shell->env, key, value);
+	free(key);
+	free(value);
 }
 
 /*
@@ -70,25 +47,31 @@ static void	handle_export_assignment(char *assignment, t_env **env)
  */
 void	builtin_export(t_ast_node *root, t_shell *shell)
 {
-	if (root->u_content.cmd.arg_count == 1
-		&& ft_strchr(root->u_content.cmd.args[0], '='))
-	{
-		handle_export_assignment(root->u_content.cmd.args[0], &shell->env);
-		shell->last_exit_code = 0;
-		return ;
-	}
-	if (root->u_content.cmd.arg_count > 1 || (root->u_content.cmd.arg_count == 1
-			&& ft_strncmp(root->u_content.cmd.args[0], "-p", 2) != 0))
-	{
-		error_message("error: export: -l: invalid option\n"
-			"export: usage: export or export -p");
-		shell->last_exit_code = 1;
-		return ;
-	}
+	int		i;
+	char	*arg;
+	char	*equals_pos;
+	int		name_len;
+
 	if (root->u_content.cmd.arg_count == 0)
 	{
-		env_print_sorted(shell);
+		env_print_sorted(shell); // `export` bez argumentů vypíše seřazené proměnné
 		return ;
 	}
-	shell->last_exit_code = 0;
+	i = -1;
+	shell->last_exit_code = 0; // Výchozí stav je úspěch
+	while (++i < root->u_content.cmd.arg_count)
+	{
+		arg = root->u_content.cmd.args[i];
+		equals_pos = ft_strchr(arg, '=');
+		name_len = (equals_pos) ? (equals_pos - arg) : ft_strlen(arg);
+		if (!is_valid_var_name(arg, name_len))
+		{
+			error_message("export: not a valid identifier");
+			shell->last_exit_code = 1; // Nastavíme chybu
+			continue ; // A pokračujeme na další argument
+		}
+		if (equals_pos)
+			handle_export_assignment(arg, shell);
+	}
 }
+

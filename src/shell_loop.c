@@ -22,6 +22,8 @@ t_shell	*initialize_shell(char **envp)
 	t_shell	*shell;
 
 	shell = malloc(sizeof(t_shell));
+	shell->last_executed = NULL;
+	shell->ast = NULL;
 	if (!shell)
 	{
 		error_message("Failed to allocate shell state");
@@ -48,19 +50,35 @@ static void	process_tokens_and_execute(t_token *tokens, t_shell *shell,
 				char **envp)
 {
 	t_ast_node	*ast;
+	t_parser	parser;
 
 	if (!tokens)
 	{
-		shell->last_exit_code = 1;
+		shell->last_exit_code = 2;
 		return ;
 	}
-	ast = parse_tokens(tokens);
+	init_parser(tokens, &parser);
+	ast = parse_expression(&parser);
+	if (parser.error || !ast)
+	{
+		if (parser.error) // Vypíšeme chybu, jen pokud byla nějaká nastavena
+		{
+			error_message(parser.error_msg);
+			free(parser.error_msg);
+		}
+		shell->last_exit_code = 2;
+		free_tokens(tokens);
+		if (ast) // Uklidíme AST, pokud náhodou vznikl i přes chybu
+			free_ast(ast);
+		return ;
+	}
+	shell->ast = ast;
+	free_tokens(tokens);
 	if (ast)
 	{
 		execute_command(ast, shell, envp);
 		free_ast(ast);
 	}
-	free_tokens(tokens);
 }
 
 /*
@@ -73,7 +91,7 @@ static void	process_input_line(char *input, t_shell *shell, char **envp)
 
 	if (!*input)
 		return ;
-	handle_input(input);
+	handle_input(input, shell);
 	tokens = lexer(input);
 	process_tokens_and_execute(tokens, shell, envp);
 }

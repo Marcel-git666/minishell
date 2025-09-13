@@ -13,144 +13,109 @@
 #include "minishell.h"
 #include "redirection.h"
 #include <errno.h>
-
-/*
- * Finds and returns the last heredoc delimiter in AST chain
- * Traverses redirection nodes to find REDIR_HEREDOC type
- * Returns duplicated delimiter string or NULL if none found
- */
-char	*find_heredocs(t_ast_node *ast)
-{
-	char		*delim;
-
-	delim = NULL;
-	while (ast && ast->type == NODE_REDIR)
-	{
-		if (ast->u_content.s_redir.redir->type == REDIR_HEREDOC)
-		{
-			if (delim != NULL)
-				free(delim);
-			delim = ft_strdup(ast->u_content.s_redir.redir->file_or_delimiter);
-		}
-		ast = ast->u_content.s_redir.child;
-	}
-	return (delim);
-}
-
-/*
- * Handles parent process after heredoc child completes
- * Waits for child, converts heredoc to input redirection on success
- * Returns 0 on success, -1 on failure
- */
-int	parent(t_ast_node *ast, char *delimiter, int pid, t_fds *fd)
-{
-	int		status;
-
-	signal(SIGINT, SIG_IGN);
-	waitpid(pid, &status, 0);
-	free(delimiter);
-	if (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS)
-	{
-		ast->u_content.s_redir.redir->type = REDIR_IN;
-		free(ast->u_content.s_redir.redir->file_or_delimiter);
-		ast->u_content.s_redir.redir->file_or_delimiter = ft_strdup(fd->temp);
-		return (0);
-	}
-	else
-	{
-		unlink(fd->temp);
-		return (-1);
-	}
-}
+#include <termios.h>
 
 /*
  * Reads heredoc input from user until delimiter is encountered
  * Creates temporary file and writes input lines to it
  * Handles EOF and delimiter matching for termination
  */
-void	read_loop(char *delimiter, t_fds *fd)
+void	read_loop(char *delimiter, int temp_fd)
 {
-	char	*newline;
+	char	*line;
 
-	fd->here_new = open(fd->temp, O_CREAT | O_RDWR | O_TRUNC, 0666);
-	if (fd->here_new == -1)
-	{
-		perror("minishell: heredoc");
-		free(delimiter);
-		exit(1);
-	}
 	while (1)
 	{
-		newline = readline("> ");
-		if (!newline || ft_strcmp(newline, delimiter) == 0)
+		line = readline("> ");
+		if (g_signal_received)
 		{
-			if (newline)
-				free(newline);
-			else
-				write(fd->here_new, "bash: warning: here-document at line 1\
-delimited by end-of-file (wanted `EOF')\n", 79);
+			if (line)
+				free(line);
 			break ;
 		}
-		write(fd->here_new, newline, ft_strlen(newline));
-		write(fd->here_new, "\n", 1);
-		free(newline);
+		if (!line) // Reakce na Ctrl+D (EOF)
+			break ;
+		if (ft_strcmp(line, delimiter) == 0)
+		{
+			free(line);
+			break ;
+		}
+		ft_putendl_fd(line, temp_fd);
+		free(line);
 	}
 }
 
 /*
- * Implements heredoc functionality (<<) by forking child process
- * Child process reads input, parent waits and processes result
- * Returns 0 on success, -1 on failure
+ * Logika rodičovského procesu po forku pro heredoc.
+ * Čeká na child a zkontroluje jeho exit status.
  */
-int	heredoc(t_ast_node *ast_node, t_fds *fd)
+static int	heredoc_parent(pid_t pid, t_shell *shell)
 {
-	char	*delimiter;
-	int		pid;
+	int	status;
 
-	delimiter = find_heredocs(ast_node);
-	fd->temp = ft_strdup("temp.txt");
-	if (delimiter)
-		pid = fork();
-	else
-		return (0);
+	signal(SIGINT, SIG_IGN); // Ignorujeme signál, zatímco čekáme
+	waitpid(pid, &status, 0);
+	setup_signals(); // Obnovíme původní signál handlery
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
+	{
+		shell->last_exit_code = 130;
+		g_signal_received = SIGINT;
+		return (-1); // Přerušeno signálem
+	}
+	return (0); // Vše v pořádku
+}
+
+/*
+ * Hlavní funkce pro heredoc. Vytvoří dočasný soubor a forkuje proces pro čtení vstupu.
+ * Upraví uzel přesměrování tak, aby ukazoval na dočasný soubor.
+ */
+int	heredoc(t_shell *shell, t_redirection *redir, t_fds *fds)
+{
+	int				temp_fd;
+	pid_t			pid;
+	struct termios	original_termios;
+
+	// 1. Uložíme si původní nastavení terminálu.
+	tcgetattr(STDIN_FILENO, &original_termios);
+
+	// 2. Nahradíme mkstemp vlastní logikou.
+	fds->temp = new_tempfile(); // Použijeme vaši funkci pro generování názvu.
+	if (!fds->temp)
+		return (-1);
+	temp_fd = open(fds->temp, O_CREAT | O_RDWR | O_TRUNC, 0600);
+	if (temp_fd == -1)
+	{
+		perror("minishell");
+		free(fds->temp);
+		fds->temp = NULL;
+		return (-1);
+	}
+	
+	g_signal_received = 0;
+	pid = fork();
 	if (pid == -1)
-		return (-1);
-	else if (pid > 0)
+		return (tcsetattr(STDIN_FILENO, TCSANOW, &original_termios), -1);
+	if (pid == 0) // Dceřiný proces
 	{
-		if (parent(ast_node, delimiter, pid, fd) == 0)
-			return (0);
-		else
-			return (-1);
+		signal(SIGINT, signal_handler_heredoc);
+		read_loop(redir->file_or_delimiter, temp_fd);
+		close(temp_fd);
+		exit(g_signal_received ? 1 : 0);
 	}
-	signal(SIGINT, signal_handler_heredoc);
-	signal(SIGQUIT, SIG_IGN);
-	read_loop(delimiter, fd);
-	close(fd->here_new);
-	free(delimiter);
-	exit(EXIT_SUCCESS);
-}
 
-/*
- * Main redirection handler - processes all redirection types
- * Saves original stdin/stdout, handles heredocs, applies redirections
- * Returns 0 on success, -1 on failure
- */
-int	redirection(t_ast_node *ast_node, t_fds *fd_, t_shell *shell)
-{
-	fd_->out_old = dup(STDOUT_FILENO);
-	fd_->in_old = dup(STDIN_FILENO);
-	if (heredoc(ast_node, fd_) == -1)
-		return (-1);
-	while (ast_node && ast_node->type == NODE_REDIR)
+	// Rodičovský proces
+	close(temp_fd);
+	if (heredoc_parent(pid, shell) == -1)
 	{
-		if (fd(ast_node, fd_, ast_node->u_content.s_redir.redir->type,
-				shell) == -1)
-			return (-1);
-		ast_node = ast_node->u_content.s_redir.child;
+		tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
+		return (-1);
 	}
-	if (fd_->out_new != -1)
-		dup2(fd_->out_new, 1);
-	if (fd_->in_new != -1)
-		dup2(fd_->in_new, 0);
+	
+	tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
+	free(redir->file_or_delimiter);
+	redir->file_or_delimiter = ft_strdup(fds->temp);
+	if (!redir->file_or_delimiter)
+		return (-1);
+	redir->type = REDIR_IN;
 	return (0);
 }

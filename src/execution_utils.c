@@ -6,7 +6,7 @@
 /*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 23:33:05 by marcel            #+#    #+#             */
-/*   Updated: 2025/07/20 11:52:12 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/14 09:04:03 by marcel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,48 +76,51 @@ void	free_args(char **args)
 	free(args);
 }
 
+
 /*
- * Allocates memory for argument array with specified size
- * Uses ft_calloc to ensure all pointers are initialized to NULL
- * Returns allocated array or NULL on allocation failure
+ * Připraví pole argumentů pro execve, přičemž filtruje prázdné argumenty,
+ * které mohly vzniknout po expanzi proměnných.
  */
-static char	**allocate_args_array(int size)
-{
-	char	**args;
-
-	args = ft_calloc(size, sizeof(char *));
-	if (!args)
-		return (NULL);
-	return (args);
-}
-
 /*
- * Prepares argument array for command execution
- * Creates array with command name as first argument, followed by AST arguments
- * Returns NULL-terminated array suitable for execve or NULL on failure
+ * Připraví pole argumentů pro execve, přičemž filtruje prázdné argumenty,
+ * které mohly vzniknout po expanzi proměnných.
  */
 char	**prepare_args(char *cmd, t_ast_node *ast)
 {
 	char	**args;
 	int		i;
+	int		j;
+	int		final_arg_count;
 
-	args = allocate_args_array(ast->u_content.cmd.arg_count + 2);
+	// 1. Spočítáme, kolik argumentů není prázdných
+	final_arg_count = 0;
+	i = 0;
+	while (i < ast->u_content.cmd.arg_count)
+	{
+		if (ast->u_content.cmd.args[i] && ast->u_content.cmd.args[i][0] != '\0')
+			final_arg_count++;
+		i++;
+	}
+
+	// 2. Alokujeme paměť jen pro platné argumenty (+ cmd + NULL)
+	args = ft_calloc(final_arg_count + 2, sizeof(char *));
 	if (!args)
 		return (NULL);
 	args[0] = ft_strdup(cmd);
 	if (!args[0])
 	{
-		free_args(args);
+		free(args);
 		return (NULL);
 	}
+	// 3. Zkopírujeme jen neprázdné argumenty
 	i = 0;
+	j = 1;
 	while (i < ast->u_content.cmd.arg_count)
 	{
-		args[i + 1] = ft_strdup(ast->u_content.cmd.args[i]);
-		if (!args[i + 1])
+		if (ast->u_content.cmd.args[i] && ast->u_content.cmd.args[i][0] != '\0')
 		{
-			free_args(args);
-			return (NULL);
+			args[j] = ft_strdup(ast->u_content.cmd.args[i]);
+			j++;
 		}
 		i++;
 	}

@@ -20,19 +20,29 @@
  * Sets up file descriptors and processes redirection nodes
  * Updates shell exit code and traverses redirection chain
  */
-static void	handle_redirection(t_ast_node **ast_node, t_fds *fd_red,
+int	handle_redirections(t_ast_node *node, t_fds *fd_red,
 	t_shell *shell)
 {
-	if (redirection(*ast_node, fd_red, shell) == -1)
+	t_redirection	*current_redir;
+
+	current_redir = node->u_content.cmd.redirections;
+	while (current_redir)
 	{
-		shell->last_exit_code = 1;
-		return ;
+		if (fd(node, fd_red, current_redir, shell) == -1)
+			return (-1);
+		current_redir = current_redir->next;
 	}
-	while ((*ast_node)->type == NODE_REDIR && *ast_node)
+	if (fd_red->out_new != -1)
 	{
-		*ast_node = (*ast_node)->u_content.s_redir.child;
-		shell->last_exit_code = 0;
+		dup2(fd_red->out_new, STDOUT_FILENO);
+		close(fd_red->out_new);
 	}
+	if (fd_red->in_new != -1)
+	{
+		dup2(fd_red->in_new, STDIN_FILENO);
+		close(fd_red->in_new);
+	}
+	return (0);
 }
 
 /*
@@ -47,58 +57,56 @@ static void	handle_assignment(t_ast_node *ast_node, t_shell *shell)
 	shell->last_exit_code = 0;
 }
 
-/*
- * Expands environment variables in command strings
- * Handles both regular commands and environment variable references
- * Returns expanded command string or NULL on failure/empty result
- */
-static char	*expand_command(t_ast_node *ast_node, t_shell *shell)
+static void	execute_actual_command(t_ast_node *ast_node, t_shell *shell,
+	char **envp, t_fds *fd_red)
 {
-	int		cmd_is_env_var;
 	char	*expanded_cmd;
 
-	if (ft_strcmp(ast_node->u_content.cmd.cmd, "$") == 0)
+	// Pokud uzel neobsahuje příkaz (např. jen přesměrování `> file`), nic neděláme
+	if (!ast_node->u_content.cmd.cmd)
 	{
-		printf("minishell: $: command not found\n");
-		return (shell->last_exit_code = 127, NULL);
+		shell->last_exit_code = 0;
+		return ;
 	}
-	cmd_is_env_var = (ast_node->u_content.cmd.cmd_token_type == TOKEN_ENV_VAR
-			|| ast_node->u_content.cmd.cmd_token_type == TOKEN_EXIT_CODE);
 	expanded_cmd = expand_variables(ast_node->u_content.cmd.cmd,
-			shell->env, shell->last_exit_code, cmd_is_env_var);
+			shell->env, shell->last_exit_code,
+			ast_node->u_content.cmd.cmd_token_type == TOKEN_ENV_VAR);
 	if (!expanded_cmd)
 	{
 		shell->last_exit_code = 1;
-		return (NULL);
+		return ;
 	}
-	if (ft_strlen(expanded_cmd) == 0)
+	if (ft_strcmp(expanded_cmd, "exit") == 0)
 	{
-		printf("minishell: : command not found\n");
-		shell->last_exit_code = 127;
 		free(expanded_cmd);
-		return (NULL);
+		builtin_exit(shell, fd_red, ast_node);
 	}
-	return (expanded_cmd);
+	else
+	{
+		handle_command(ast_node, shell, envp, expanded_cmd);
+		free(expanded_cmd);
+	}
 }
 
-/*
- * Handles command execution with special case for exit builtin
- * Expands command, handles exit specially due to shell termination
- * Delegates to handle_command for other commands
- */
-static void	handle_command_execution(t_ast_node *ast_node, t_shell *shell,
-		char **envp, t_fds *fd_red)
+int	process_heredocs(t_ast_node *node, t_shell *shell, t_fds *fds)
 {
-	char	*expanded_cmd;
+	t_redirection	*redir;
 
-	expanded_cmd = expand_command(ast_node, shell);
-	if (!expanded_cmd)
-		return ;
-	if (ft_strcmp(expanded_cmd, "exit") == 0)
-		builtin_exit(shell, fd_red, ast_node);
-	else
-		handle_command(ast_node, shell, envp, expanded_cmd);
-	free(expanded_cmd);
+	if (!node || node->type != NODE_COMMAND)
+		return (0);
+	redir = node->u_content.cmd.redirections;
+	while (redir)
+	{
+		if (redir->type == REDIR_HEREDOC)
+		{
+			if (heredoc(shell, redir, fds) == -1)
+			{
+				return (-1); // Chyba nebo přerušení (Ctrl+C)
+			}
+		}
+		redir = redir->next;
+	}
+	return (0);
 }
 
 /*
@@ -106,27 +114,36 @@ static void	handle_command_execution(t_ast_node *ast_node, t_shell *shell,
  * Handles redirections, pipes, assignments and commands
  * Sets up file descriptors and manages execution flow
  */
-void	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
+int	execute_command(t_ast_node *ast_node, t_shell *shell, char **envp)
 {
 	t_fds	*fd_red;
 
-	fd_red = set_fd();
 	if (!ast_node)
+		return (0);
+	fd_red = set_fd();
+	if (!fd_red)
 	{
-		reset_fd(fd_red);
-		return ;
+		shell->last_exit_code = 1;
+		return (1);
 	}
-	if (ast_node->type == NODE_REDIR)
-		handle_redirection(&ast_node, fd_red, shell);
-	if (ast_node && ast_node->type == NODE_PIPE)
-	{
-		reset_fd(fd_red);
+	fd_red->in_old = dup(STDIN_FILENO);
+	fd_red->out_old = dup(STDOUT_FILENO);
+	if (ast_node->type == NODE_PIPE)
 		execute_pipe(ast_node, shell, envp);
-		return ;
-	}
-	if (ast_node->type == NODE_ASSIGNMENT)
+	else if (ast_node->type == NODE_ASSIGNMENT)
 		handle_assignment(ast_node, shell);
 	else if (ast_node->type == NODE_COMMAND)
-		handle_command_execution(ast_node, shell, envp, fd_red);
+	{
+		// 1. Zpracujeme heredocs
+		if (process_heredocs(ast_node, shell, fd_red) == 0)
+		{
+			// 2. Zpracujeme ostatní přesměrování
+			if (handle_redirections(ast_node, fd_red, shell) == 0)
+				execute_actual_command(ast_node, shell, envp, fd_red);
+			else
+				shell->last_exit_code = 1;
+		}
+	}
 	reset_fd(fd_red);
+	return (shell->last_exit_code);
 }

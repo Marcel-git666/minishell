@@ -27,6 +27,7 @@ typedef struct s_fds		t_fds;
 
 //	exit
 void	builtin_exit(t_shell *shell, t_fds *fd_red, t_ast_node *ast);
+void	cleanup_resources(t_shell *shell, t_fds *fd, t_ast_node *ast);
 
 // pwd
 void	builtin_pwd(t_shell *shell);
@@ -35,13 +36,12 @@ void	builtin_pwd(t_shell *shell);
 void	builtin_cd(t_ast_node *root, t_shell *shell);
 char	*get_pwd(void);
 void	previous_rep(t_shell *shell, char *cwd);
-int	path(t_ast_node *root, char *cwd, t_shell *shell);
+int		path(t_ast_node *root, char *cwd, t_shell *shell);
 int		absolute_path(t_ast_node *root, int i, t_shell *shell);
 int		only_cd(t_ast_node *root, t_shell *shell, char *cwd);
 
 // export
 void	builtin_export(t_ast_node *root, t_shell *shell);
-int		check_parts(char **parts, int *i);
 
 // unset
 void	builtin_unset(t_ast_node *root, t_shell *shell);

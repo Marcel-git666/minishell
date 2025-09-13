@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   history.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcel <marcel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lformank <lformank@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 19:41:39 by mmravec           #+#    #+#             */
-/*   Updated: 2025/08/01 14:01:55 by marcel           ###   ########.fr       */
+/*   Updated: 2025/08/13 23:14:57 by lformank         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,18 +125,17 @@ static int	should_add_to_history(char *input, char *last_executed)
  * Adds non-duplicate commands to history and saves to file
  * Maintains static reference to last executed command
  */
-void	handle_input(char *input)
+void	handle_input(char *input, t_shell *shell)
 {
-	static char	*last_executed = NULL;
-
 	if (*input)
 	{
-		if (should_add_to_history(input, last_executed))
+		if (should_add_to_history(input, shell->last_executed))
 		{
 			add_history(input);
 			save_history();
 		}
-		free(last_executed);
-		last_executed = ft_strdup(input);
+		if (shell->last_executed)
+			free(shell->last_executed);
+		shell->last_executed = ft_strdup(input);
 	}
 }
